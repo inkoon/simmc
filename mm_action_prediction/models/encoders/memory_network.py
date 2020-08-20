@@ -86,6 +86,8 @@ class MemoryNetworkEncoder(nn.Module):
         Args:
           batch: Dict of hist, hist_len, hidden_state
         """
+        # kwon : fact = prevuiys utterance + response concatenated as one
+        # For example, 'What is the color of the couch? A : Red.'
         batch_size, num_rounds, enc_time_steps = batch["fact"].shape
         all_ones = np.full((num_rounds, num_rounds), 1)
         fact_mask = np.triu(all_ones, 1)
