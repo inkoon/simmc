@@ -623,6 +623,9 @@ def main():
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
+    parser.add_argument(
+        "--gpu_id", type=int, default=-1, help="GPU id to use, -1 for CPU"
+    )
     args = parser.parse_args()
 
     if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
@@ -663,6 +666,16 @@ def main():
         print("Waiting for debugger attach")
         ptvsd.enable_attach(address=(args.server_ip, args.server_port), redirect_output=True)
         ptvsd.wait_for_attach()
+
+    # Setup GPU
+    gpu_id = args.gpu_id
+    if gpu_id < 0:
+        print("Running on CPU...")
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""
+    else:
+        print("Running on GPU {0}...".format(gpu_id))
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
 
     # Setup CUDA, GPU & distributed training
     if args.local_rank == -1 or args.no_cuda:

@@ -6,6 +6,8 @@ else
     PATH_DIR=$(realpath "$1")
 fi
 
+GPU_ID=1
+
 # Train (furniture, text-only)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/furniture_to \
@@ -20,7 +22,8 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --num_train_epochs=1 \
     --overwrite_output_dir \
     --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4
+    --per_gpu_eval_batch_size=4 \
+    --gpu_id=$GPU_ID
 
 # Train (furniture, multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
@@ -36,7 +39,8 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --num_train_epochs=1 \
     --overwrite_output_dir \
     --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4
+    --per_gpu_eval_batch_size=4 \
+    --gpu_id=$GPU_ID
 
 # Train (Fashion, text-only)
 python -m gpt2_dst.scripts.run_language_modeling \
@@ -52,7 +56,8 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --num_train_epochs=1 \
     --overwrite_output_dir \
     --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4
+    --per_gpu_eval_batch_size=4 \
+    --gpu_id=$GPU_ID
 
 # Train (Fashion, multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
@@ -68,4 +73,5 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --num_train_epochs=1 \
     --overwrite_output_dir \
     --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4
+    --per_gpu_eval_batch_size=4 \
+    --gpu_id=$GPU_ID
