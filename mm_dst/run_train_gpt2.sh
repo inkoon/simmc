@@ -20,6 +20,7 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture_to/furniture_dev_dials_target.txt \
     --num_train_epochs=1 \
+    --save_steps=7303 \
     --overwrite_output_dir \
     --per_gpu_train_batch_size=4 \
     --per_gpu_eval_batch_size=4 \
@@ -37,6 +38,7 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_dev_dials_target.txt \
     --num_train_epochs=1 \
+    --save_steps=7303 \
     --overwrite_output_dir \
     --per_gpu_train_batch_size=4 \
     --per_gpu_eval_batch_size=4 \
@@ -54,6 +56,7 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/fashion_to/fashion_dev_dials_target.txt \
     --num_train_epochs=1 \
+    --save_steps=7303 \
     --overwrite_output_dir \
     --per_gpu_train_batch_size=4 \
     --per_gpu_eval_batch_size=4 \
@@ -71,6 +74,7 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_dev_dials_target.txt \
     --num_train_epochs=1 \
+    --save_steps=7303 \
     --overwrite_output_dir \
     --per_gpu_train_batch_size=4 \
     --per_gpu_eval_batch_size=4 \
