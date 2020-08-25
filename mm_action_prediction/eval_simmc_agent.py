@@ -69,7 +69,6 @@ def evaluate_agent(wizard, val_loader, args):
             else:
                 mode = None
             batch_outputs = wizard(batch, mode)
-            import ipdb; ipdb.set_trace(context=10)
             # Stringify model responses.
             if args["bleu_evaluation"]:
                 batch_outputs["model_response"] = (
@@ -80,6 +79,10 @@ def evaluate_agent(wizard, val_loader, args):
                 # Remove beam output to avoid memory issues.
                 del batch_outputs["beam_output"]
             matches.append(batch_outputs)
+
+            # Toy
+            # print("###############TOY TESTING!!###############")
+            # break
     wizard.train()
 
     # Compute perplexity.

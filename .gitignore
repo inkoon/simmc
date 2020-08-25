@@ -129,4 +129,5 @@ dmypy.json
 .pyre/
 
 # Checkpoint file
-mm_dst/gpt2_dst/save/
+mm_action_prediction/checkpoints
+mm_dst/gpt2_dst/save
