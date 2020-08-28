@@ -229,8 +229,8 @@ class GenerativeDecoder(nn.Module):
 
         # Encoder states conditioned on action outputs, if need be.
         if self.params["use_action_output"]:
-            action_out = encoder_output["action_output_all"].unsqueeze(1)
-            time_steps = encoder_output["hidden_states_all"].shape[1]
+            action_out = encoder_output["action_output_all"].unsqueeze(1) # [B * R, 1 , D]
+            time_steps = encoder_output["hidden_states_all"].shape[1] # int : time_steps
             fusion_out = torch.cat(
                 [
                     encoder_output["hidden_states_all"],
@@ -251,12 +251,12 @@ class GenerativeDecoder(nn.Module):
                 if DIALOG_CONTEXT in encoder_output:
                     dialog_context = encoder_output[DIALOG_CONTEXT][inst_id][round_id]
                     new_output[DIALOG_CONTEXT] = dialog_context.view(1, 1, -1)
-                # Hidden States all.
+                # Hidden States all. # RNN : rnn_outputs # TF : TRY DEBUG
                 index = num_rounds * inst_id + round_id
                 if "hidden_states_all" in encoder_output:
                     hidden_state = encoder_output["hidden_states_all"][index]
                     new_output["hidden_states_all"] = hidden_state.unsqueeze(0)
-                # Hidden state.
+                # Hidden state. # RNN : rnn's (h_n, c_n) # TF : X
                 if "hidden_state" in encoder_output:
                     hidden_state = encoder_output["hidden_state"]
                     if self.params["encoder"] == "tf_idf":

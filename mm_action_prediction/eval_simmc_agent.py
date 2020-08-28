@@ -70,6 +70,7 @@ def evaluate_agent(wizard, val_loader, args):
                 mode = None
             batch_outputs = wizard(batch, mode)
             # Stringify model responses.
+            # batch_outputs["beam_output"] = idx of str
             if args["bleu_evaluation"]:
                 batch_outputs["model_response"] = (
                     val_loader.stringify_beam_outputs(

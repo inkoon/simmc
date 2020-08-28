@@ -43,6 +43,7 @@ def evaluate_response_generation(gt_responses, model_responses):
             gt_response = gt_datum["system_transcript"]
 
             bleu_score = nltk.translate.bleu_score.sentence_bleu(
+                # [gt_response], response, smoothing_function=chencherry.method1
                 [normalize_sentence(gt_response)],
                 normalize_sentence(response),
                 smoothing_function=chencherry.method1
