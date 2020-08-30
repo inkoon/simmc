@@ -220,6 +220,9 @@ def read_command_line():
     parser.add_argument(
         "--gpu_id", type=int, default=-1, help="GPU id to use, -1 for CPU"
     )
+    parser.add_argument(
+        "--tensorboard_path", default=None, help="Path to generate tensorboard log"
+    )
     try:
         parsed_args = vars(parser.parse_args())
     except (IOError) as msg:

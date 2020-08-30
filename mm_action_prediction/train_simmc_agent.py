@@ -17,6 +17,7 @@ import options
 import eval_simmc_agent as evaluation
 from tools import support
 
+from tensorboardX import SummaryWriter
 
 # Arguments.
 args = options.read_command_line()
@@ -52,6 +53,10 @@ if args["encoder"] == "tf_idf":
 
 # Optimizer.
 optimizer = torch.optim.Adam(wizard.parameters(), args["learning_rate"])
+
+# Tensorboard.
+if args["tensorboard_path"] is not None:
+    tensorboard_writer = SummaryWriter(logdir=args["tensorboard_path"])
 
 # Training iterations.
 smoother = support.ExponentialSmoothing()
@@ -89,6 +94,14 @@ for iter_ind, batch in enumerate(train_loader.get_batch()):
         )
         print(print_str.format(*print_args))
 
+        # plot losses to tensorboard
+        if args["tensorboard_path"] is not None:
+            tensorboard_writer.add_scalar('loss/action', losses["action"], iter_ind)
+            tensorboard_writer.add_scalar('loss/action_arrt', losses["action_attr"], iter_ind)
+            tensorboard_writer.add_scalar('loss/token', losses["token"], iter_ind)
+            tensorboard_writer.add_scalar('loss/total', losses["total"], iter_ind)
+
+
     # Perform evaluation, every X number of epochs.
     if (
         val_loader
@@ -101,8 +114,13 @@ for iter_ind, batch in enumerate(train_loader.get_batch()):
         # Print the best epoch so far.
         best_epoch, best_epoch_dict = support.sort_eval_metrics(eval_dict)[0]
         print("\nBest Val Performance: Ep {}".format(best_epoch))
+        # items : loss, perplexity, bleu, action_accuracy, acction_perplexity, action_attribute, r1, r5, r10, mean, mrr
         for item in best_epoch_dict.items():
             print("\t{}: {:.2f}".format(*item))
+
+            # plot eval performances to tensorboard
+            if args["tensorboard_path"] is not None:
+                tensorboard_writer.add_scalar(f'eval/{item[0]}', item[1], iter_ind)
 
     # Save the model every epoch.
     if (

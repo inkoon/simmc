@@ -12,7 +12,7 @@ DEVTEST_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials.json"
 
 
 # Evaluate a trained model checkpoint.
-CHECKPOINT_PATH="checkpoints/epoch_70.tar"
+CHECKPOINT_PATH="checkpoints/baselines/hae/epoch_30.tar"
 python -u eval_simmc_agent.py \
     --eval_data_path=${DEV_JSON_FILE/.json/_mm_inputs.npy} \
     --checkpoint="$CHECKPOINT_PATH" \
