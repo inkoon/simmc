@@ -223,6 +223,9 @@ def read_command_line():
     parser.add_argument(
         "--tensorboard_path", default=None, help="Path to generate tensorboard log"
     )
+    parser.add_argument(
+        "--seed", type=int, default=2020, help="Seed number for initialization"
+    )
     try:
         parsed_args = vars(parser.parse_args())
     except (IOError) as msg:

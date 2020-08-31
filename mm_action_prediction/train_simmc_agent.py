@@ -10,6 +10,8 @@ import math
 import time
 import os
 import torch
+import random
+import numpy as np
 
 import loaders
 import models
@@ -21,6 +23,15 @@ from tensorboardX import SummaryWriter
 
 # Arguments.
 args = options.read_command_line()
+
+# Set seed.
+seed = args["seed"]
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(seed)
+print(f'Set Seed: {seed}')
 
 # Dataloader.
 dataloader_args = {
@@ -116,7 +127,7 @@ for iter_ind, batch in enumerate(train_loader.get_batch()):
         print("\nBest Val Performance: Ep {}".format(best_epoch))
         # items : loss, perplexity, bleu, action_accuracy, acction_perplexity, action_attribute, r1, r5, r10, mean, mrr
         for item in best_epoch_dict.items():
-            print("\t{}: {:.2f}".format(*item))
+            print("\t{}: {:.3f}".format(*item))
 
             # plot eval performances to tensorboard
             if args["tensorboard_path"] is not None:

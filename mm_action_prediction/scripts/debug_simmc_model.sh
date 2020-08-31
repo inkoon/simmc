@@ -1,16 +1,15 @@
 #!/bin/bash
 
 # Check the parameters
-if [ $# -lt 2 ];then
-    echo "There's no parameters -> ./run.sh [model descriptions] [gpu no]"
+if [ $# -lt 1 ];then
+    echo "There's no parameters -> ./debug.sh [gpu no]"
     exit 1
 fi
 
 DOMAIN="furniture"
 # DOMAIN="fashion"
 ROOT="../data/simmc_${DOMAIN}/"
-DETAILS=$1
-GPU_ID=$2
+GPU_ID=$1
 
 
 # Input files.
@@ -32,12 +31,6 @@ VOCAB_FILE="${ROOT}${DOMAIN}_vocabulary.json"
 METADATA_EMBEDS="${ROOT}${DOMAIN}_asset_embeds.npy"
 ATTR_VOCAB_FILE="${ROOT}${DOMAIN}_attribute_vocabulary.json"
 MODEL_METAINFO="models/${DOMAIN}_model_metainfo.json"
-
-# Train all models on a domain Save checkpoints and logs with unique label.
-# CUR_TIME=$(date +"_%m%d_%H:%M")
-# UNIQ_LABEL="${DETAILS}${CUR_TIME}"
-# CHECKPOINT_PATH="outputs/${UNIQ_LABEL}/checkpoints"
-# LOG_PATH="outputs/${UNIQ_LABEL}/logs"
 
 
 COMMON_FLAGS="
