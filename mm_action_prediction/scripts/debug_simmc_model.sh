@@ -49,10 +49,16 @@ COMMON_FLAGS="
 
 # Train history-agnostic model.
 # For other models, please look at scripts/train_all_simmc_models.sh
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="history_agnostic" \
+#     --text_encoder="lstm" \
+
+# Transformer model.
 python -u train_simmc_agent.py $COMMON_FLAGS \
     --encoder="history_agnostic" \
-    --text_encoder="lstm" \
-
+    --text_encoder="transformer" \
+    --num_heads_transformer=4 --num_layers_transformer=4 \
+    --hidden_size_transformer=2048 --hidden_size=256\
 
 # Evaluate a trained model checkpoint.
 # CHECKPOINT_PATH="checkpoints/hae/epoch_20.tar"
