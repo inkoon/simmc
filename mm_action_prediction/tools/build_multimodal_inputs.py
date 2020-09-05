@@ -209,7 +209,7 @@ def build_multimodal_inputs(input_json_file):
             vocabulary = json.load(file_id)
         mm_inputs["vocabulary"] = vocabulary
         word2ind = {word: index for index, word in enumerate(vocabulary["word"])}
-
+        ind2word = {index: word for index, word in enumerate(vocabulary["word"])} # pretrained embedding에 필요
         mm_inputs["user_sent"], mm_inputs["user_sent_len"] = convert_pool_matrices(
             utterance_list["user"], word2ind
         )
@@ -272,6 +272,7 @@ def build_multimodal_inputs(input_json_file):
         "retrieval": FLAGS.retrieval_candidate_file,
         "vocabulary": FLAGS.vocab_file
     }
+    mm_inputs["ind2word"] = ind2word
     return mm_inputs
 
 
