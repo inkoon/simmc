@@ -9,7 +9,9 @@ import argparse
 import ast
 
 import numpy as np
-from tools import data_support
+import sys
+sys.path.append('/home/yeonseok/simmc/mm_action_prediction') 
+import data_support
 import spacy
 
 
