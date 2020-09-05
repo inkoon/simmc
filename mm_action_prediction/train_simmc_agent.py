@@ -127,7 +127,7 @@ for iter_ind, batch in enumerate(train_loader.get_batch()):
         print("\nBest Val Performance: Ep {}".format(best_epoch))
         # items : loss, perplexity, bleu, action_accuracy, acction_perplexity, action_attribute, r1, r5, r10, mean, mrr
         for item in best_epoch_dict.items():
-            print("\t{}: {:.3f}".format(*item))
+            print("\t{}: {:.4f}".format(*item))
 
             # plot eval performances to tensorboard
             if args["tensorboard_path"] is not None:
