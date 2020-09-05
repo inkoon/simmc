@@ -229,7 +229,7 @@ def read_command_line():
     parser.add_argument(
         "--embedding_type",
         dest="embedding_type",
-        choices=["random", "glove", "word2vec", "fasttext"]
+        choices=["random", "glove", "word2vec", "fasttext"],
         type=str,
         default="random",
         help="choose embedding"
