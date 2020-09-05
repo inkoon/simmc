@@ -226,6 +226,14 @@ def read_command_line():
     parser.add_argument(
         "--seed", type=int, default=2020, help="Seed number for initialization"
     )
+    parser.add_argument(
+        "--embedding_type",
+        dest="embedding_type",
+        choices=["random", "glove", "word2vec", "fasttext"]
+        type=str,
+        default="random",
+        help="choose embedding"
+    )
     try:
         parsed_args = vars(parser.parse_args())
     except (IOError) as msg:

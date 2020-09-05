@@ -23,7 +23,12 @@ class HierarchicalRecurrentEncoder(nn.Module):
         self.word_embed_net = nn.Embedding(
             params["vocab_size"], params["word_embed_size"]
         )
-        encoder_input_size = params["word_embed_size"]
+        if self.params["embedding_type"]=="glove":
+            self.nlp = spacy.load("en_vectors_web_lg")
+        elif self.params["embedding_type"]=="word2vec":
+            self.w2v_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/GoogleNews-vectors-negative300.bin', binary=True)
+        elif self.params["embedding_type"]=="fasttext":
+            self.fasttext_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/wiki.en.vec', binary=True)
         self.encoder_unit = nn.LSTM(
             encoder_input_size,
             params["hidden_size"],
@@ -51,8 +56,20 @@ class HierarchicalRecurrentEncoder(nn.Module):
         batch_size, num_rounds, _ = batch["user_utt"].shape
         encoder_in = support.flatten(batch["user_utt"], batch_size, num_rounds)
         encoder_len = batch["user_utt_len"].reshape(-1)
-        word_embeds_enc = self.word_embed_net(encoder_in)
-
+        if self.params["embedding_type"]=="random":
+            word_embeds_enc = self.word_embed_net(encoder_in)
+        elif self.params["embedding_type"]=="glove":
+            word_embeds_enc = torch.Tensor([[self.nlp(batch["ind2word"][int(encoder_in[row][col])]).vector for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]).to(torch.device("cuda:0"))
+        elif self.params["embedding_type"]=="word2vec":
+            try:
+                word_embeds_enc = torch.Tensor([[self.w2v_model[batch["ind2word"][int(encoder_in[row][col])]] for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]).to(torch.device("cuda:0"))
+            except KeyError as k:
+                word_embeds_enc = torch.zeros(encoder_in.shape[0],  encoder_in.shape[1], encoder_input_size).to(torch.device("cuda:0"))
+        elif self.params["embedding_type"]=="fasttext":
+            try:
+                word_embeds_enc = torch.Tensor([[self.fasttext_model[batch["ind2word"][int(encoder_in[row][col])]] for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]).to(torch.device("cuda:0"))
+            except KeyError as k:
+                word_embeds_enc = torch.zeros(encoder_in.shape[0],  encoder_in.shape[1], encoder_input_size).to(torch.device("cuda:0"))
         # Fake encoder_len to be non-zero even for utterances out of dialog.
         fake_encoder_len = encoder_len.eq(0).long() + encoder_len
         all_enc_states, enc_states = rnn.dynamic_rnn(
