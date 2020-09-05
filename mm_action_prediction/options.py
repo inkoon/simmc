@@ -268,5 +268,6 @@ def read_command_line():
     # (otherwise results in weird race conditions in PyTorch 1.4).
     if parsed_args["use_gpu"]:
         _ = torch.Tensor([1.0]).cuda()
+    parsed_args["bleu_evaluation"]=True
     support.pretty_print_dict(parsed_args)
     return parsed_args
