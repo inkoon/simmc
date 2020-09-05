@@ -111,7 +111,7 @@ def evaluate_action_prediction(gt_actions, model_actions):
         "action_accuracy": np.mean(matches["action"]),
         "action_perplexity": np.exp(-1 * np.mean(matches["perplexity"])),
         "attribute_accuracy": np.mean(matches["attributes"]),
-        "confusion_matrix": matrix
+        "confusion_matrix": matrix.astype(int)
     }
 
 
