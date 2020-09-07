@@ -7,14 +7,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import torch
 import torch.nn as nn
-
+import torchtext
 from tools import rnn_support as rnn
 from tools import torch_support as support
 import models
 # import models.encoders as encoders
 from models import encoders
-
-
+import gensim
+import spacy
 @encoders.register_encoder("history_agnostic")
 class HistoryAgnosticEncoder(nn.Module):
     def __init__(self, params):
@@ -25,12 +25,13 @@ class HistoryAgnosticEncoder(nn.Module):
             params["vocab_size"], params["word_embed_size"]
         )
         encoder_input_size = params["word_embed_size"]
+        self.encoder_input_size = encoder_input_size
         if self.params["embedding_type"]=="glove":
             self.nlp = spacy.load("en_vectors_web_lg")
         elif self.params["embedding_type"]=="word2vec":
             self.w2v_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/GoogleNews-vectors-negative300.bin', binary=True)
         elif self.params["embedding_type"]=="fasttext":
-            self.fasttext_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/wiki.en.vec', binary=True)
+            self.fasttext_model = torchtext.vocab.FastText('en')
         if params["text_encoder"] == "transformer":
             layer = nn.TransformerEncoderLayer(
                 params["word_embed_size"],
@@ -61,6 +62,7 @@ class HistoryAgnosticEncoder(nn.Module):
             encoder_outputs: Dict of outputs from the forward pass.
         """
         encoder_out = {}
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         # Flatten for history_agnostic encoder.
         batch_size, num_rounds, max_length = batch["user_utt"].shape
         encoder_in = support.flatten(batch["user_utt"], batch_size, num_rounds)
@@ -68,17 +70,20 @@ class HistoryAgnosticEncoder(nn.Module):
         if self.params["embedding_type"]=="random":
             word_embeds_enc = self.word_embed_net(encoder_in)
         elif self.params["embedding_type"]=="glove":
-            word_embeds_enc = torch.Tensor([[self.nlp(batch["ind2word"][int(encoder_in[row][col])]).vector for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]).to(torch.device("cuda:0"))
+            word_embeds_enc = torch.tensor([[self.nlp(batch["ind2word"][int(encoder_in[row][col])]).vector for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])], requires_grad=True).to(device)
         elif self.params["embedding_type"]=="word2vec":
-            try:
-                word_embeds_enc = torch.Tensor([[self.w2v_model[batch["ind2word"][int(encoder_in[row][col])]] for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]).to(torch.device("cuda:0"))
-            except KeyError as k:
-                word_embeds_enc = torch.zeros(encoder_in.shape[0],  encoder_in.shape[1], encoder_input_size).to(torch.device("cuda:0"))
+            word_embeds_enc = torch.zeros(encoder_in.shape[0], encoder_in.shape[1], self.encoder_input_size, requires_grad=True).to(device)
+            for row in range(encoder_in.shape[0]):
+                for col in range(encoder_in.shape[1]):
+                    try:
+                        word_embeds_enc[row][col] = torch.from_numpy(self.w2v_model[batch["ind2word"][int(encoder_in[row][col])]]).requires_grad_(requires_grad=True).to(device)
+                    except KeyError as k:
+                        word_embeds_enc[row][col] = torch.zeros(300, requires_grad=True).to(device)
+            word_embeds_enc.requires_grad_(requires_grad=True)
         elif self.params["embedding_type"]=="fasttext":
-            try:
-                word_embeds_enc = torch.Tensor([[self.fasttext_model[batch["ind2word"][int(encoder_in[row][col])]] for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]).to(torch.device("cuda:0"))
-            except KeyError as k:
-                word_embeds_enc = torch.zeros(encoder_in.shape[0],  encoder_in.shape[1], encoder_input_size).to(torch.device("cuda:0"))
+            word_list = [[batch["ind2word"][int(encoder_in[row][col])] for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]
+            word_embeds_enc = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
+            word_embeds_enc.requires_grad=True
         # Text encoder: LSTM or Transformer.
         if self.params["text_encoder"] == "lstm":
             all_enc_states, enc_states = rnn.dynamic_rnn(
