@@ -34,7 +34,8 @@ class Assistant(nn.Module):
         self.criterion = nn.CrossEntropyLoss(reduction="none")
 
         # Initialize weights.
-        weight_init.weight_init(self)
+        if not self.params["gpt2"]:
+            weight_init.weight_init(self)
         if params["use_gpu"]:
             self = self.cuda()
         # Sharing word embeddings across encoder and decoder.

@@ -226,6 +226,9 @@ def read_command_line():
     parser.add_argument(
         "--seed", type=int, default=2020, help="Seed number for initialization"
     )
+    parser.add_argument(
+        "--gpt2", action="store_true", default=False, help="Whether we decode using gpt2"
+    )
     try:
         parsed_args = vars(parser.parse_args())
     except (IOError) as msg:

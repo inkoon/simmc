@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import json
 import numpy as np
 from nltk.tokenize import word_tokenize
+from transformers import BertTokenizer, GPT2Tokenizer
 
 import loaders
 from tools import support, torch_support
@@ -28,7 +29,15 @@ class DataloaderSIMMC(loaders.LoaderParent):
         # Load the dataset.
         raw_data = np.load(params["data_read_path"], allow_pickle=True)
         self.raw_data = raw_data[()]
-        if self.params["encoder"] != "pretrained_transformer":
+        import ipdb; ipdb.set_trace(context=10)
+        if self.params['gpt2']:
+            self.words = GPT2Tokenizer.from_pretrained('gpt2')
+            # self.words = GPT2Tokenizer.from_pretrained(self.raw_data["Vocabulary"])
+            self.start_token = self.words.bos_token
+            self.end_token = self.words.eos_token
+            self.words.add_special_tokens({'pad_token':'<|pad|>'})
+            self.pad_token = self.words.pad_token
+        elif self.params["encoder"] != "pretrained_transformer":
             self.words = loaders.Vocabulary()
             self.words.set_vocabulary_state(self.raw_data["vocabulary"]["word"])
             # Aliases.
@@ -37,7 +46,6 @@ class DataloaderSIMMC(loaders.LoaderParent):
             self.pad_token = self.words.index("<pad>")
             self.unk_token = self.words.index("<unk>")
         else:
-            from transformers import BertTokenizer
             self.words = BertTokenizer.from_pretrained(self.raw_data["vocabulary"])
             # Aliases.
             self.start_token = self.words.added_tokens_encoder["[start]"]
