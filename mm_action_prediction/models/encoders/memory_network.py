@@ -72,14 +72,15 @@ class MemoryNetworkEncoder(nn.Module):
         elif self.params["embedding_type"]=="glove":
             word_embeds_enc = torch.tensor([[self.nlp(batch["ind2word"][int(encoder_in[row][col])]).vector for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])], requires_grad=True).to(torch.device("cuda:0"))
         elif self.params["embedding_type"]=="word2vec":
-            word_embeds_enc = torch.zeros(encoder_in.shape[0], encoder_in.shape[1], self.encoder_input_size, requires_grad=True).to(device)
-            for row in range(encoder_in.shape[0]):
-                for col in range(encoder_in.shape[1]):
-                    try:
-                        word_embeds_enc[row][col] = torch.from_numpy(self.w2v_model[batch["ind2word"][int(encoder_in[row][col])]]).requires_grad_(requires_grad=True).to(device)
-                    except KeyError as k:
-                        word_embeds_enc[row][col] = torch.zeros(300, requires_grad=True).to(device)
-            word_embeds_enc.requires_grad_(requires_grad=True)
+            #word_embeds_enc = torch.zeros(encoder_in.shape[0], encoder_in.shape[1], self.encoder_input_size, requires_grad=True).to(device)
+            #for row in range(encoder_in.shape[0]):
+                #for col in range(encoder_in.shape[1]):
+                    #try:
+                        #word_embeds_enc[row][col] = torch.from_numpy(self.w2v_model[batch["ind2word"][int(encoder_in[row][col])]]).requires_grad_(requires_grad=True).to(device)
+                    #except KeyError as k:
+                        #word_embeds_enc[row][col] = torch.zeros(300, requires_grad=True).to(device)
+            word_embeds_enc = torch.stack([torch.stack([self.word_to_vec(encoder_in, row, col, batch["ind2word"]) for col in range(encoder_in.shape[1])]) for row in range(encoder_in.shape[0])])
+            word_embeds_enc.requires_grad_(requires_grad=True)            
         elif self.params["embedding_type"]=="fasttext":
             word_list = [[batch["ind2word"][int(encoder_in[row][col])] for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]
             word_embeds_enc = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
@@ -98,6 +99,13 @@ class MemoryNetworkEncoder(nn.Module):
         )
         encoder_out["dialog_context"] = self._memory_net_forward(batch)
         return encoder_out
+
+    def word_to_vec(self, encoder_in, row, col, ind2word):
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        try:
+            return torch.from_numpy(self.w2v_model[ind2word[int(encoder_in[row][col])]]).requires_grad_(requires_grad=True).to(device)
+        except KeyError as k:
+            return torch.zeros(300, requires_grad=True).to(device)
 
     def _memory_net_forward(self, batch):
         """Forward pass for memory network to look up fact.
