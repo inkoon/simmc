@@ -14,11 +14,11 @@ CONTEXT=3
 GPU_ID='0'
 RESPONCE=1
 STATE=1
-BEAMS=1
+BEAMS=2
 
 
 echo "Running on GPU $GPU_ID with keyword $KEY_WORD"
-
+"
 # furniture
 # Multimodal Data
 # Train split
@@ -73,14 +73,14 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --warmup_steps=1000 \
     --save_steps=1000 \
     --gpu_id=$GPU_ID 
-
+"
 # Generate sentences (furniture, multi-modal)
 python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
-    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/furniture$KEY_WORD/ \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/furniture \
     --num_return_sequences=1 \
     --length=100 \
-    --stop_token='<EOB>' \
+    --stop_token='<EOS>' \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/furniture/furniture_devtest_dials_predicted$KEY_WORD.txt \
     --num_beams=$BEAMS \
