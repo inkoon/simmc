@@ -82,8 +82,8 @@ def evaluate_agent(wizard, val_loader, args):
             matches.append(batch_outputs)
 
             # Toy
-            # print("###############TOY TESTING!!###############")
-            # break
+            print("###############TOY TESTING!!###############")
+            break
     wizard.train()
 
     # Compute perplexity.

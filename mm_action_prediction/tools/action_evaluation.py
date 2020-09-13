@@ -106,6 +106,7 @@ def evaluate_action_prediction(gt_actions, model_actions):
         labels, counts = np.unique(confusion_dict[action], return_counts=True)
         for label, count in zip(labels, counts):
             matrix[all_actions.index(label), index] += count
+    import ipdb; ipdb.set_trace(context=10)
 
     return {
         "action_accuracy": np.mean(matches["action"]),
