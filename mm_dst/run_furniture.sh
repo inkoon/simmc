@@ -11,11 +11,11 @@ PATH_DATA_DIR=$(realpath ../data)
 
 # PARAMETERS
 CONTEXT=3
-GPU_ID='0'
+GPU_ID='2'
 RESPONCE=1
 STATE=1
-BEAMS=1
-
+BEAMS=2
+NUM_SEQUENCES=5
 
 echo "Running on GPU $GPU_ID with keyword $KEY_WORD"
 
@@ -66,13 +66,12 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --train_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_train_dials_target$KEY_WORD.txt \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_dev_dials_target$KEY_WORD.txt \
-    --num_train_epochs=8 \
+    --num_train_epochs=1 \
     --overwrite_output_dir \
-    --per_gpu_train_batch_size=8 \
-    --per_gpu_eval_batch_size=8 \
-    --warmup_steps=1000 \
-    --save_steps=1000 \
+    --per_gpu_train_batch_size=4 \
+    --per_gpu_eval_batch_size=4 \
     --gpu_id=$GPU_ID 
+    --num_return_sequences=$NUM_SEQUENCES \ 
 
 # Generate sentences (furniture, multi-modal)
 python -m gpt2_dst.scripts.run_generation \

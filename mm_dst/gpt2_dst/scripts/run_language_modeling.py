@@ -286,8 +286,8 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
 
     # multi-gpu training (should be after apex fp16 initialization)
     # B : multi gpu off
-    if args.n_gpu > 1:
-        model = torch.nn.DataParallel(model)
+    #if args.n_gpu > 1:
+     #   model = torch.nn.DataParallel(model)
 
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu_id

@@ -17,7 +17,7 @@
 """ Conditional text generation with the auto-regressive models of the library (GPT/GPT-2/CTRL/Transformer-XL/XLNet)
 
 Adapted from
-https://github.com/huggingface/transformers/blob/master/examples/text-generation/run_generation.py
+https://github.com/huingface/transformers/blob/master/examples/text-generation/run_generation.py
 """
 
 import argparse
@@ -197,7 +197,7 @@ command line"""
     parser.add_argument("--no_cuda", action="store_true", help="Avoid using CUDA when available")
     parser.add_argument("--num_return_sequences", type=int, default=1, help="The number of samples to generate.")
     parser.add_argument("--path_output", type=str, default=None, help="Path to output predictions in a line separated text file.")
-
+    parser.add_argument("--num_return_sequences", type=int, default=1, help="number of output sequences");
     # B : usera added argumetns
     parser.add_argument("--num_beams", type=int, default=1)
     parser.add_argument("--gpu_id", type=str, default="0")
@@ -272,7 +272,7 @@ command line"""
                     return_tensors="pt"
                 )
             encoded_prompt = encoded_prompt.to(args.device)
-
+            import ipdb; ipdb.set_trace()
             output_sequences = model.generate(
                 input_ids=encoded_prompt,
                 max_length=args.length + len(encoded_prompt[0]),
@@ -292,6 +292,8 @@ command line"""
             generated_sequences = []
 
             for generated_sequence_idx, generated_sequence in enumerate(output_sequences):
+                if not generated_sequence.startsWith("DA:"):
+                    continue 
                 print(
                     "=== GENERATED SEQUENCE {sequence_idx}, {promt_idx}/{n_prompts} ===".format(
                         sequence_idx=generated_sequence_idx + 1,
@@ -311,7 +313,7 @@ command line"""
                 text = text[: text.find(args.stop_token) if args.stop_token else None]
 
                 # Add the prompt at the beginning of the sequence. Remove the
-                # excess text that was used for pre-processing
+                # excess text that was used for preprocessing
                 total_sequence = (
                     prompt_text + text[
                         len(tokenizer.decode(
