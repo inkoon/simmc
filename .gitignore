@@ -7,7 +7,6 @@ checkpoints/
 *.tar
 save/
 mm_dst/gpt2_dst/save/
-mm_dst/gpt2_dst/data/
 
 
 
