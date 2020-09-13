@@ -11,7 +11,7 @@ PATH_DATA_DIR=$(realpath ../data)
 
 # PARAMETERS
 CONTEXT=2
-GPU_ID='1'
+GPU_ID='0'
 RESPONCE=1
 STATE=1
 BEAMS=3
@@ -86,7 +86,6 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --warmup_steps=1000 \
     --save_steps=1000 \
     --gpu_id=$GPU_ID 
-'
 
 # Generate sentences (furniture, multi-modal)
 python -m gpt2_dst.scripts.run_generation \
@@ -101,7 +100,7 @@ python -m gpt2_dst.scripts.run_generation \
     --no_repeat_ngram_size=$NGRAM \
     --repetition_penalty=$REP \
     --gpu_id=$GPU_ID
-'
+
 python gpt2_dst/results/toy_furniture/add_eob.py \
 	--path "gpt2_dst/results/toy_furniture/furniture_devtest_dials_predicted$KEY_WORD.txt"
 

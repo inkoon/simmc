@@ -201,6 +201,7 @@ command line"""
     # B : usera added argumetns
     parser.add_argument("--num_beams", type=int, default=1)
     parser.add_argument("--gpu_id", type=str, default="0")
+    parser.add_argument("--no_repeat_ngram_size", type=int, default=0)
     args = parser.parse_args()
 
     args.device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
@@ -282,9 +283,9 @@ command line"""
                 repetition_penalty=args.repetition_penalty,
                 do_sample=True,
                 num_return_sequences=args.num_return_sequences,
-                num_beams=args.num_beams
+                num_beams=args.num_beams,
+                no_repeat_ngram_size=args.no_repeat_ngram_size
             )
-
             # Remove the batch dimension when returning multiple sequences
             if len(output_sequences.shape) > 2:
                 output_sequences.squeeze_()
