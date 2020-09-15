@@ -67,13 +67,13 @@ class UserMemoryEmbedder(nn.Module):
         query = encoder_state.unsqueeze(0)
 
         #MAG
-        #multimodal_encode = torch.cat([self.MAG(query, multimodal_memory).squeeze(0), encoder_state], dim=-1)
+        multimodal_encode = torch.cat([self.MAG(query, multimodal_memory).squeeze(0), encoder_state], dim=-1)
 
 
         attended_query, attented_wts = self.multimodal_attend(
             query, multimodal_memory, multimodal_memory
         )
-        multimodal_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
+        #multimodal_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
 
 
         return multimodal_encode
