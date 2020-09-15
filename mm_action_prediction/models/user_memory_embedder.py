@@ -35,6 +35,8 @@ class UserMemoryEmbedder(nn.Module):
         self.multimodal_embed_net = nn.Linear(input_size, output_size)
         self.multimodal_attend = nn.MultiheadAttention(output_size, 1)
 
+        self.MAG = Multimodal_Adaptation_Gate(params)
+
     def forward(self, multimodal_state, encoder_state, encoder_size):
         """Multimodal Embedding.
 
@@ -63,13 +65,22 @@ class UserMemoryEmbedder(nn.Module):
         # Key (L, N, E), value (L, N, E), query (S, N, E)
         multimodal_memory = multimodal_memory.transpose(0, 1)
         query = encoder_state.unsqueeze(0)
+
+        #MAG
+        #multimodal_encode = torch.cat([self.MAG(query, multimodal_memory).squeeze(0), encoder_state], dim=-1)
+
+
         attended_query, attented_wts = self.multimodal_attend(
             query, multimodal_memory, multimodal_memory
         )
-        multimodal_encode = torch.cat(
-            [attended_query.squeeze(0), encoder_state], dim=-1
-        )
+        multimodal_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
+
+
         return multimodal_encode
+
+
+    
+
 
     def _setup_category_states(self):
         """Setup category states (focus + memory images).
@@ -84,3 +95,35 @@ class UserMemoryEmbedder(nn.Module):
             ],
             dim=0,
         ).unsqueeze(0)
+
+
+class Multimodal_Adaptation_Gate(nn.Module):
+    def __init__(self, params):
+        super(Multimodal_Adaptation_Gate, self).__init__()
+        if params["text_encoder"] == "lstm":
+            output_size = params["hidden_size"]
+        else:
+            output_size = params["word_embed_size"]
+        self.gating_linear = nn.Linear(output_size*2, output_size)
+        self.dropout = nn.Dropout(0.5)
+        self.linear = nn.Linear(output_size, output_size)
+        self.layer_norm = nn.LayerNorm(output_size)
+        self.ones = torch.ones(1)
+        self.ones = self.ones.cuda()
+
+    def forward(self, query, metadata_states):
+        query_m = query
+        metadata_states_m = metadata_states.mean(dim=0)
+        metadata_states_m = metadata_states_m.unsqueeze(0)
+        g_v = self.gating_linear(torch.cat([query_m, metadata_states_m], dim=2))
+        g_v = torch.tanh(g_v)
+        H = self.linear(metadata_states_m)
+        H = g_v.mul(H)
+        beta = 0.75
+        norms = torch.norm(query)/torch.norm(H)*beta
+        alpha = torch.min(norms, self.ones)
+        H = alpha*H
+        Z = query.add(H)
+        Z = self.layer_norm(Z)
+        Z = self.dropout(Z)
+        return Z

@@ -15,6 +15,8 @@ import numpy as np
 from nltk.tokenize import word_tokenize
 from tqdm import tqdm as progressbar
 
+import sys
+sys.path.append('/home/nlp908/data/kbj/gitwork/simmc/mm_action_prediction')
 from tools import support
 
 

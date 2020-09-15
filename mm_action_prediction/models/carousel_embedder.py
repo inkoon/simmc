@@ -35,6 +35,11 @@ class CarouselEmbedder(nn.Module):
         self.carousel_embed_net = nn.Linear(input_size, output_size)
         self.carousel_attend = nn.MultiheadAttention(output_size, 1)
         self.carousel_mask = self._generate_carousel_mask(3)
+        #query mask add
+        self.query_mask = self._generate_carousel_mask(1)
+
+        self.MAG = Multimodal_Adaptation_Gate(params)
+        self.MAG_only = Multimodal_Adaptation_Gate_only(params)
 
     def forward(self, carousel_state, encoder_state, encoder_size):
         """Carousel Embedding.
@@ -88,14 +93,27 @@ class CarouselEmbedder(nn.Module):
         carousel_states = torch.stack(carousel_states, dim=1)
         # Mask: (N,S)
         carousel_len = self.host.LongTensor(carousel_sizes)
+        query_len = torch.ones(len(carousel_sizes), dtype=torch.long)
+        query_len = query_len.cuda()
         query = encoder_state.unsqueeze(0)
+
+        ###using gate for carousel, query
+        #MAG+encoder_state
+        carousel_encode = torch.cat([self.MAG(query, carousel_states).squeeze(0), encoder_state], dim=-1)
+        
+        #MAG_only
+        #carousel_encode = self.MAG_only(query, carousel_states).squeeze(0)        
+        ###
+        tv_input = torch.cat([query, carousel_states], dim =0)
+        tv_input = tv_input.mean(dim=0)
+        tv_input = tv_input.unsqueeze(0)
         attended_query, attented_wts = self.carousel_attend(
-            query,
-            carousel_states,
-            carousel_states,
-            key_padding_mask=self.carousel_mask[carousel_len - 1],
+            tv_input,          #query
+            query,             #carousel_states
+            query,             #carousel_states
+            key_padding_mask=self.query_mask[query_len - 1],  #self.carousel_mask[carousel_len-1]
         )
-        carousel_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
+        #carousel_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
         return carousel_encode
 
     def empty_carousel(self, carousel_state):
@@ -137,3 +155,69 @@ class CarouselEmbedder(nn.Module):
             [self.zero_tensor, self.carousel_pos["empty"]], dim=-1
         ).unsqueeze(0)
         self.none_features = self.empty_feature.expand(3, -1)
+
+
+class Multimodal_Adaptation_Gate(nn.Module):
+    def __init__(self, params):
+        super(Multimodal_Adaptation_Gate, self).__init__()
+        if params["text_encoder"] == "lstm":
+            output_size = params["hidden_size"]
+        else:
+            output_size = params["word_embed_size"]
+        self.gating_linear = nn.Linear(output_size*2, output_size)
+        self.dropout = nn.Dropout(0.5)
+        self.linear = nn.Linear(output_size, output_size)
+        self.layer_norm = nn.LayerNorm(output_size)
+        self.ones = torch.ones(1)
+        self.ones = self.ones.cuda()
+
+    def forward(self, query, metadata_states):
+        query_m = query    #(1,200,512)
+        metadata_states_m = metadata_states.mean(dim=0)  #(200, 512)
+        metadata_states_m = metadata_states_m.unsqueeze(0)  #(1, 200, 512)
+        g_v = self.gating_linear(torch.cat([query_m, metadata_states_m], dim=2)) #(1, 200, 1024)->(1, 200, 512)
+        g_v = torch.tanh(g_v)   #(1, 200, 512)
+        H = self.linear(metadata_states_m) #(1, 1, 512)
+        H = g_v.mul(H)    #(1, 200, 512)
+        beta = 0.75
+        norms = torch.norm(query)/torch.norm(H)*beta
+        alpha = torch.min(norms, self.ones)
+        H = alpha*H
+        Z = query.add(H) #(1, 200, 512)
+        Z = self.layer_norm(Z)
+        Z = self.dropout(Z)  #(1, 200, 512)
+        
+        return Z
+
+class Multimodal_Adaptation_Gate_only(nn.Module):
+    def __init__(self, params):
+        super(Multimodal_Adaptation_Gate_only, self).__init__()
+        if params["text_encoder"] == "lstm":
+            output_size = params["hidden_size"]
+        else:
+            output_size = params["word_embed_size"]
+        self.gating_linear = nn.Linear(output_size*2, output_size*2)
+        self.dropout = nn.Dropout(0.2)
+        self.linear = nn.Linear(output_size, output_size*2)
+        self.linear_q = nn.Linear(output_size, output_size*2)
+        self.layer_norm = nn.LayerNorm(output_size*2)
+        self.ones = torch.ones(1)
+        self.ones = self.ones.cuda()
+
+    def forward(self, query, metadata_states):
+        query_m = query
+        metadata_states_m = metadata_states.mean(dim=0)
+        metadata_states_m = metadata_states_m.unsqueeze(0)
+        g_v = self.gating_linear(torch.cat([query_m, metadata_states_m], dim=2))
+        g_v = torch.tanh(g_v)
+        H = self.linear(metadata_states_m)
+        H = g_v.mul(H)
+        beta = 0.5
+        query_l = self.linear_q(query)
+        norms = torch.norm(query_l)/torch.norm(H)*beta
+        alpha = torch.min(norms, self.ones)
+        H = alpha*H
+        Z = query_l.add(H)
+        Z = self.layer_norm(Z)
+        Z = self.dropout(Z)
+        return Z

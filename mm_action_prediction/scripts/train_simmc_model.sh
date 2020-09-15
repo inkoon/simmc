@@ -7,7 +7,7 @@ if [ $# -lt 2 ];then
 fi
 
 DOMAIN="furniture"
-# DOMAIN="fashion"
+#DOMAIN="fashion"
 ROOT="../data/simmc_${DOMAIN}/"
 DETAILS=$1
 GPU_ID=$2
@@ -62,18 +62,18 @@ COMMON_FLAGS="
 
 # Train history-agnostic model.
 # For other models, please look at scripts/train_all_simmc_models.sh
-# python -u train_simmc_agent.py $COMMON_FLAGS \
-#     --encoder="history_agnostic" \
-#     --text_encoder="lstm" \
-#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/output.log" &
+python -u train_simmc_agent.py $COMMON_FLAGS \
+     --encoder="history_agnostic" \
+     --text_encoder="lstm" \
+     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/output.log" &
 
 # Transformer model.
-python -u train_simmc_agent.py $COMMON_FLAGS \
-    --encoder="history_agnostic" \
-    --text_encoder="transformer" \
-    --num_heads_transformer=4 --num_layers_transformer=4 \
-    --hidden_size_transformer=2048 --hidden_size=256\
-    --snapshot_path="${CHECKPOINT_PATH}/transf/" &> "${LOG_PATH}/transf.log" &
+#python -u train_simmc_agent.py $COMMON_FLAGS \
+#    --encoder="history_agnostic" \
+#    --text_encoder="transformer" \
+#    --num_heads_transformer=4 --num_layers_transformer=4 \
+#    --hidden_size_transformer=2048 --hidden_size=256\
+#    --snapshot_path="${CHECKPOINT_PATH}/transf/" &> "${LOG_PATH}/transf.log" &
 
 # Evaluate a trained model checkpoint.
 # CHECKPOINT_PATH="checkpoints/hae/epoch_20.tar"
