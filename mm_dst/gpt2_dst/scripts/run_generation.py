@@ -197,6 +197,13 @@ command line"""
     parser.add_argument("--no_cuda", action="store_true", help="Avoid using CUDA when available")
     parser.add_argument("--num_return_sequences", type=int, default=1, help="The number of samples to generate.")
     parser.add_argument("--path_output", type=str, default=None, help="Path to output predictions in a line separated text file.")
+
+    # B : User added arguments
+    parser.add_argument("--num_beams", type=int, default=1, help="Number of beams when decoding")
+    parser.add_argument("--no_repeat_ngram_size", type=int, default=0, help="N-gram not to repeat")
+    parser.add_argument("--num_gen", type=int, default=100000, help="Number of sentences to generate")
+    parser.add_argument("--token", type=int, default=0, help="Whether to start first token with special token only")
+    parser.add_argument("--gpu_id", type=str, default='0')
     args = parser.parse_args()
 
     args.device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
@@ -266,6 +273,14 @@ command line"""
                 )
             encoded_prompt = encoded_prompt.to(args.device)
 
+            # B : special token only for first token
+            if args.token==1:
+                bad_words_ids = [[el] for el in np.arange(0, 50261)]
+            else:
+                bad_words_ids = None
+
+            #TODO: get transformer model locally and set first token manually
+
             output_sequences = model.generate(
                 input_ids=encoded_prompt,
                 max_length=args.length + len(encoded_prompt[0]),
@@ -275,6 +290,9 @@ command line"""
                 repetition_penalty=args.repetition_penalty,
                 do_sample=True,
                 num_return_sequences=args.num_return_sequences,
+                num_beams=args.num_beams,
+                no_repeat_ngram_size=args.no_repeat_ngram_size,
+                bad_words_ids=bad_words_ids
             )
 
             # Remove the batch dimension when returning multiple sequences
@@ -318,6 +336,8 @@ command line"""
                 print(total_sequence)
 
             results.append(generated_sequences)
+            if i == args.num_gen-1:
+                break
 
         prompts = []
         if args.prompt or args.prompts_from_file:
