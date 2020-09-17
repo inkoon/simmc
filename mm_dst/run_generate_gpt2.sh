@@ -2,7 +2,7 @@
 
 # parameters	defaut value
 NUM_GEN=500	# 100000
-NUM_BEAMS=4	# 1
+NUM_BEAMS=2	# 1
 LENGTH=100	# 100
 NGRAM=0		# 0
 TOKEN=0		# 0
@@ -20,6 +20,8 @@ then
 	exit 1
 fi
 
+MODEL=""
+
 if [[ $# -eq 1 ]]
 then
 	DOMAIN="all"
@@ -32,6 +34,13 @@ then
 	KEYWORD=$2
 fi
 
+if [[ $# -eq 3 ]]
+then
+	DOMAIN=$1
+	KEYWORD=$2
+	MODEL=$3
+fi
+
 PATH_DIR=$(realpath .)
 PATH_DATA_DIR=$(realpath ../data)
 
@@ -40,7 +49,7 @@ then
 # Generate sentences (Furniture, text-only)
 python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
-    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/furniture_to/ \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/furniture_to/"${MODEL}" \
     --num_return_sequences=1 \
     --length=$LENGTH \
     --stop_token='<EOS>' \
@@ -60,7 +69,7 @@ then
 # Generate sentences (Furniture, multi-modal)
 python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
-    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/furniture/ \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/furniture/"${MODEL}" \
     --num_return_sequences=1 \
     --length=$LENGTH \
     --stop_token='<EOS>' \
@@ -79,7 +88,7 @@ then
 # Generate sentences (Fashion, text-only)
 python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
-    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fashion_to/ \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fashion_to/"${MODEL}" \
     --num_return_sequences=1 \
     --length=$LENGTH \
     --stop_token='<EOS>' \
@@ -98,7 +107,7 @@ then
 # Generate sentences (Fashion, multi-modal)
 python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
-    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fashion/ \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fashion/"${MODEL}"  \
     --num_return_sequences=1 \
     --length=$LENGTH \
     --stop_token='<EOS>' \
