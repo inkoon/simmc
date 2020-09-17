@@ -79,6 +79,7 @@ class HierarchicalRecurrentEncoder(nn.Module):
             word_embeds_enc = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
             word_embeds_enc.requires_grad=True
         # Fake encoder_len to be non-zero even for utterances out of dialog.
+        #import pdb;pdb.set_trace()
         fake_encoder_len = encoder_len.eq(0).long() + encoder_len
         all_enc_states, enc_states = rnn.dynamic_rnn(
             self.encoder_unit, word_embeds_enc, fake_encoder_len, return_states=True

@@ -38,7 +38,7 @@ def main(args):
             clean_asset[key] = val if isinstance(val, list) else [val]
         clean_asset["id"] = int(asset["obj"].split("/")[-1].strip(".zip"))
         cleaned_assets.append(clean_asset)
-
+    import pdb;pdb.set_trace()
     # Vocabulary for each field.
     vocabulary = {key: {} for key in EMBED_ATTRIBUTES}
     for asset in cleaned_assets:

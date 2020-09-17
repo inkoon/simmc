@@ -119,6 +119,7 @@ class MemoryNetworkEncoder(nn.Module):
         """
         # kwon : fact = prevuiys utterance + response concatenated as one
         # For example, 'What is the color of the couch? A : Red.'
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         batch_size, num_rounds, enc_time_steps = batch["fact"].shape
         all_ones = np.full((num_rounds, num_rounds), 1)
         fact_mask = np.triu(all_ones, 1)
@@ -130,7 +131,17 @@ class MemoryNetworkEncoder(nn.Module):
 
         fact_in = support.flatten(batch["fact"], batch_size, num_rounds)
         fact_len = support.flatten(batch["fact_len"], batch_size, num_rounds)
-        fact_embeds = self.word_embed_net(fact_in)
+        if self.params["embedding_type"]=="random":
+            fact_embeds  = self.word_embed_net(fact_in)
+        elif self.params["embedding_type"]=="glove":
+            fact_embeds  = torch.tensor([[self.nlp(batch["ind2word"][int(fact_in[row][col])]).vector for col in range(fact_in.shape[1])] for row in range(fact_in.shape[0])], requires_grad=True).to(device)
+        elif self.params["embedding_type"]=="word2vec":
+            fact_embeds  = torch.stack([torch.stack([self.word_to_vec(fact_in, row, col, batch["ind2word"]) for col in range(fact_in.shape[1])]) for row in range(fact_in.shape[0])])
+            fact_embeds .requires_grad_(requires_grad=True)
+        elif self.params["embedding_type"]=="fasttext":
+            word_list = [[batch["ind2word"][int(fact_in[row][col])] for col in range(fact_in.shape[1])] for row in range(fact_in.shape[0])]
+            fact_embeds  = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
+            fact_embeds.requires_grad=True
         # Encoder fact and unflatten the last hidden state.
         _, (hidden_state, _) = rnn.dynamic_rnn(
             self.fact_unit, fact_embeds, fact_len, return_states=True

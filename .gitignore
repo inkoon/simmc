@@ -132,3 +132,6 @@ dmypy.json
 mm_action_prediction/checkpoints
 mm_dst/gpt2_dst/save
 outputs/
+mm_action_prediction/.vector_cache
+mm_action_prediction/scripts/yeonseok_simmc_all_model.sh
+mm_action_prediction/scripts/yeonseok_simmc_model.sh
