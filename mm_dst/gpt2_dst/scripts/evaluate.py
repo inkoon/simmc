@@ -34,6 +34,9 @@ if __name__ == '__main__':
 
     # Evaluate
     report = evaluate_from_flat_list(list_target, list_predicted)
+    
+    # B : print results rightaway
+    print(f"Joint acc : {report['joint_accuracy']:.3f}, Act f1 : {report['act_f1']:.3f}, Slot f1 : {report['slot_f1']:.3f}")
 
     # Save report
     with open(output_path_report, 'w') as f_out:

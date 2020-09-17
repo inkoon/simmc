@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# PARAMETERS	DEFAUT VALUE
-NUM_GEN=100000	# 100000
-NUM_BEAMS=2	# 1
+# parameters	defaut value
+NUM_GEN=500	# 100000
+NUM_BEAMS=1	# 1
 LENGTH=100	# 100
-NGRAM=1		# 0
-TOKEN=0		# 'none' ['first']
+NGRAM=0		# 0
+TOKEN=0		# 0
 GPU_ID='0'	# '0'
 
 PARAMETERS="NUM_GEN		$NUM_GEN
@@ -16,7 +16,7 @@ TOKEN 		$TOKEN"
 
 if [[ $# -eq 0 ]]
 then
-	echo "ERROR : run format > [*.sh] (DOMAIN) KEYWORD"
+	echo "error : run format > ./*.sh (domain) keyword"
 	exit 1
 fi
 
@@ -35,7 +35,7 @@ fi
 PATH_DIR=$(realpath .)
 PATH_DATA_DIR=$(realpath ../data)
 
-if [ $DOMAIN == "funiture_to" ] || [ $DOMAIN == "all" ]
+if [ $DOMAIN == "furniture_to" ] || [ $DOMAIN == "all" ]
 then
 # Generate sentences (Furniture, text-only)
 python -m gpt2_dst.scripts.run_generation \
@@ -55,7 +55,7 @@ python -m gpt2_dst.scripts.run_generation \
 echo "$PARAMETERS" > "${PATH_DIR}"/gpt2_dst/results/furniture_to/"${KEYWORD}"/parameters.txt
 fi
 
-if [ $DOMAIN == "funiture" ] || [ $DOMAIN == "all" ]
+if [ $DOMAIN == "furniture" ] || [ $DOMAIN == "all" ]
 then
 # Generate sentences (Furniture, multi-modal)
 python -m gpt2_dst.scripts.run_generation \
