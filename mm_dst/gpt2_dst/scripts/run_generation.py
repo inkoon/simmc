@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#nullsr/bin/env python3
 # coding=utf-8
 # Copyright 2018 Google AI, Google Brain and Carnegie Mellon University Authors and the HuggingFace Inc. team.
 # Copyright (c) 2018, NVIDIA CORPORATION.  All rights reserved.
@@ -25,7 +25,8 @@ import logging
 import os
 import numpy as np
 import torch
-
+import json
+import itertools
 from transformers import (
     CTRLLMHeadModel,
     CTRLTokenizer,
@@ -138,7 +139,14 @@ PREPROCESSING_FUNCTIONS = {
     "transfo-xl": prepare_transfoxl_input,
 }
 
-
+def allow_good_words(tokenizer,bad_words_ids, input_path_json):
+    with open(input_path_json, 'r') as f_in:
+        data = json.load(f_in)["word"]
+    good_words_ids = [tokenizer.encode(good_word) for good_word in data ]
+    good_words_ids=set(itertools.chain(*good_words_ids))
+    good_words_ids=[[i] for i in good_words_ids]
+    bad_words_ids=[word for word in bad_words_ids if word not in good_words_ids]
+    
 def adjust_length_to_model(length, max_sequence_length):
     if length < 0 and max_sequence_length > 0:
         length = max_sequence_length
@@ -197,10 +205,12 @@ command line"""
     parser.add_argument("--no_cuda", action="store_true", help="Avoid using CUDA when available")
     parser.add_argument("--num_return_sequences", type=int, default=1, help="The number of samples to generate.")
     parser.add_argument("--path_output", type=str, default=None, help="Path to output predictions in a line separated text file.")
-    parser.add_argument("--num_return_sequences", type=int, default=1, help="number of output sequences");
     # B : usera added argumetns
     parser.add_argument("--num_beams", type=int, default=1)
     parser.add_argument("--gpu_id", type=str, default="0")
+    parser.add_argument("--no_repeat_ngram_size", type=int, default=0)
+    parser.add_argument("--good_words", type=str, default=None)
+    
     args = parser.parse_args()
 
     args.device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
@@ -233,7 +243,9 @@ command line"""
     if args.prompts_from_file:
         with open(args.prompts_from_file) as handle:
             prompts = handle.readlines()
-
+    bad_words_ids= [[el] for el in np.arange(0, 50257)] # pretrained tokens (-> data)
+    end_of_ids = [[el] for el in np.arange(50258, 50261)] # special tokens (-> 66.99) 
+    bad_words_ids.extend(end_of_ids)
     while True:
         if not prompts:
             prompts = [args.prompt if args.prompt else input("Model prompt >>> ")]
@@ -245,10 +257,12 @@ command line"""
                 break  # break while True loop
 
         n_prompts = len(prompts)
+        #if args.good_words is not None :
+         #   allow_good_words(tokenizer,bad_words_ids,args.good_words)
+    
         for i, prompt_text in enumerate(prompts):
             # Strip any trailing \n if provided
             prompt_text = prompt_text.strip('\n')
-
             # Different models need different input formatting and/or extra arguments
             requires_preprocessing = args.model_type in PREPROCESSING_FUNCTIONS.keys()
             if requires_preprocessing:
@@ -272,7 +286,7 @@ command line"""
                     return_tensors="pt"
                 )
             encoded_prompt = encoded_prompt.to(args.device)
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             output_sequences = model.generate(
                 input_ids=encoded_prompt,
                 max_length=args.length + len(encoded_prompt[0]),
@@ -282,7 +296,9 @@ command line"""
                 repetition_penalty=args.repetition_penalty,
                 do_sample=True,
                 num_return_sequences=args.num_return_sequences,
-                num_beams=args.num_beams
+                num_beams=args.num_beams,
+                bad_words_ids=bad_words_ids,
+                no_repeat_ngram_size=args.no_repeat_ngram_size
             )
 
             # Remove the batch dimension when returning multiple sequences
@@ -292,8 +308,7 @@ command line"""
             generated_sequences = []
 
             for generated_sequence_idx, generated_sequence in enumerate(output_sequences):
-                if not generated_sequence.startsWith("DA:"):
-                    continue 
+                #import ipdb; ipdb.set_trace()
                 print(
                     "=== GENERATED SEQUENCE {sequence_idx}, {promt_idx}/{n_prompts} ===".format(
                         sequence_idx=generated_sequence_idx + 1,
@@ -302,16 +317,18 @@ command line"""
                     )
                 )
                 generated_sequence = generated_sequence.tolist()
-
+                #import ipdb; ipdb.set_trace()
                 # Decode text
+
                 text = tokenizer.decode(
                     generated_sequence,
                     clean_up_tokenization_spaces=True
                 )
-
+                #if not text[len(prompt_text):].startswith('DA:') and not text[len(prompt_text):].startswith('ERR:') :
+                 #   continue 
                 # Remove all text after the stop token
                 text = text[: text.find(args.stop_token) if args.stop_token else None]
-
+            
                 # Add the prompt at the beginning of the sequence. Remove the
                 # excess text that was used for preprocessing
                 total_sequence = (
@@ -323,10 +340,8 @@ command line"""
                         :
                     ]
                 )
-
                 generated_sequences.append(total_sequence)
                 print(total_sequence)
-
             results.append(generated_sequences)
 
         prompts = []
