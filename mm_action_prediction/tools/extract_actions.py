@@ -676,7 +676,6 @@ def extract_actions(input_json_file, save_root, furniture_db, subtask):
         last_search_args = {}
 
         for round_datum in dialog_datum:
-            import pdb;pdb.set_trace()
             insert_item = {"turn_idx": round_datum["turn_idx"]}
             raw_keystroke_list = round_datum["raw_assistant_keystrokes"]
             keystrokes_with_args = get_keystrokes_with_args(
@@ -867,7 +866,6 @@ def gen_getinfo_from_annotation(round_datum, reversed_dialog_coref_map):
         round_datum['system_turn_label'],
         reversed_dialog_coref_map
     )
-    #import pdb;pdb.set_trace()
     # For GetInfo, look for DA:ASK:GET intent with attributes and extract
     # the attributes, and check system responded
     get_info_attributes = []
@@ -1197,7 +1195,6 @@ def get_carousel_state(state=None, action_args=None):
 
 
 def main(_):
-    #import pdb;pdb.set_trace()
     furniture_db = data_support.FurnitureDatabase(FLAGS.metadata_path)
     for input_json_file in FLAGS.json_path:
         extract_actions(
@@ -1206,7 +1203,6 @@ def main(_):
             furniture_db,
             FLAGS.subtask
         )
-    #import pdb;pdb.set_trace()
     furniture_db.shutdown()
 
 
