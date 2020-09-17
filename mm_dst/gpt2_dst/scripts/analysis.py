@@ -31,13 +31,15 @@ def analyze_turn(turn_idx,true_turn, pred_turn):
     for frame_idx in range(len(true_turn)):
         # For each frame
         true_frame = true_turn[frame_idx]
-        if frame_idx >= len(pred_turn):
+        if frame_idx >= len(pred_turn): ## less prediction made 
             pred_frame = {}
-            wrong_index.add(turn_idx)
+            wrong_index.add(turn_idx) ## wrong overall
         else:
             pred_frame = pred_turn[frame_idx]
             if analyze_frame(turn_idx,true_frame,pred_frame, strict=False) == 0 :
                 wrong_index.add(turn_idx)
+                if turn_idx in perfect :
+                    perfect.remove(turn_idx)
 
 
                
@@ -148,15 +150,16 @@ def analyze_frame(idx,true_frame, pred_frame, strict=True):
     # Compare Slots
     true_frame_slot_values = {f'{k}={v}' for k, v in true_frame.get('slots', [])}
     pred_frame_slot_values = {f'{k}={v}' for k, v in pred_frame.get('slots', [])}
-    if len(true_frame_slot_values.intersection(pred_frame_slot_values)) > 0 :
-        slot_part_right.add(idx)   ## partially right 
-
-    if flag == 1 :
-        if true_frame_slot_values == pred_frame_slot_values :
+   
+    if flag == 1 : ## if right DA, check slots 
+        if true_frame_slot_values == pred_frame_slot_values : ## perfect prediction made 
             perfect.add(idx)
+            slot_part_right.add(idx) 
+        if len(true_frame_slot_values.intersection(pred_frame_slot_values)) > 0 :
+            slot_part_right.add(idx)   ## partially right 
         else :
             flag = 0 ## correct act but wrong slot values 
-    
+
     return flag 
 
 
@@ -198,28 +201,25 @@ if __name__ == '__main__':
     wrong_index = set()
     slot_part_right = set()
     perfect = set() 
-
-    analyze_from_flat_list(list_target, list_predicted)
     
+    analyze_from_flat_list(list_target, list_predicted)
+    slot_part_right = slot_part_right - slot_part_right.intersection(wrong_index) - slot_part_right.intersection(perfect)
+    perfect = perfect - perfect.intersection(wrong_index)
     # Save report
 
     results = []
     idx = -1
-    with open(os.path.join(output_dir, "comparison.txt"),'w') as out:
-        out.write('')
-    with open(input_path_target) as targetfile, open(input_path_predicted) as predictedfile, open(os.path.join(output_dir, "comparison.txt"),"a+") as out: 
-        for x, y in zip(targetfile, predictedfile):
-            x = x.strip()
-            y = y.strip()
-            target = x.split(START_BELIEF_STATE)
-            predicted = y.split(START_BELIEF_STATE)
-            idx+=1
-            if idx in wrong_index : 
-                out.write("=============================DIALOGUE #{}====================\n".format(idx))
-                out.write("{0}\n".format(target[0]))
-                out.write("------------------------------------------------------------\n")
-                out.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
-
+    
+    comparison = open(os.path.join(output_dir, "wrong.txt"),'w') ## Wrong DA or slot
+    comparison.write('')
+    comparison = open(os.path.join(output_dir, "wrong.txt"),'a') 
+    slot_comparison = open(os.path.join(output_dir, "partially_right.txt"),'w')  ## Right DA but wrong slot 
+    slot_comparison.write('')
+    slot_comparison = open(os.path.join(output_dir, "partially_right.txt"),'a+') 
+    all_correct = open(os.path.join(output_dir, "perfect.txt"),'w') 
+    all_correct.write('')
+    all_correct = open(os.path.join(output_dir, "perfect.txt"),'a+') 
+    
 
     with open(os.path.join(output_dir, "analysis.json"), 'w') as f_out:
         json.dump(acts, f_out)
@@ -247,4 +247,36 @@ if __name__ == '__main__':
                 f_out.write("--------------------------------------------------------------------------------------\n")
             f_out.write("\n\n\n")
 
+    turn = 0
+    with open(input_path_target) as targetfile, open(input_path_predicted) as predictedfile : 
+        for x, y in zip(targetfile, predictedfile):
+            x = x.strip()
+            y = y.strip()
+            turn += 1
+            target = x.split(START_BELIEF_STATE)
+            predicted = y.split(START_BELIEF_STATE)
+            idx+=1
+            if idx in wrong_index : 
+                comparison.write("=============================DIALOGUE #{}====================\n".format(idx))
+                comparison.write("{0}\n".format(target[0]))
+                comparison.write("------------------------------------------------------------\n")
+                comparison.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
+            if idx in slot_part_right : 
+                slot_comparison.write("=============================DIALOGUE #{}====================\n".format(idx))
+                slot_comparison.write("{0}\n".format(target[0]))
+                slot_comparison.write("------------------------------------------------------------\n")
+                slot_comparison.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
+            if idx in perfect : 
+                all_correct.write("=============================DIALOGUE #{}====================\n".format(idx))
+                all_correct.write("{0}\n".format(target[0]))
+                all_correct.write("------------------------------------------------------------\n")
+                all_correct.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
+
+
+    print("Quick summary") 
+    print("Out of {} total turns..".format(turn))
+    print("{} right DA and slot predictions made... {:.2f}%".format(len(perfect), 100*len(perfect)/turn))
+    print("{} right DA but wrong slot predictions....{:.2f}%".format(len(slot_part_right), 100*len(slot_part_right)/turn))
+    print("{} wrong DA and wrong slot predictions....{:.2f}%\n".format(len(wrong_index), 100*len(wrong_index)/turn))
+    print("Analysis completed..!\nDetailed analysis saved in {}".format(output_dir))
 
