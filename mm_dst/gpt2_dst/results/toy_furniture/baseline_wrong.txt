@@ -1,0 +1,213 @@
+2
+pred : DA:INFORM:PREFER:FURNITURE.dimensions [ furniture-O = OBJECT_0 ] DA:INFORM:REFINE:FURNITURE.price [ furniture-O = OBJECT_0, furniture-attentionOn = $100 ] 
+target :DA:INFORM:REFINE:FURNITURE.price [ furniture-price = $100 ] 
+3
+pred : Brown
+target :DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0, furniture-displaySecond = middle ] DA:INFORM:REFINE:FURNITURE.color [ furniture-decorStyle = similar, furniture-color = brown ] 
+4
+pred : $206.99
+target :DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_1, furniture-attentionOn = Those ] DA:ASK:GET:FURNITURE.price [ furniture-O = OBJECT_1 ] 
+5
+pred : DA:ASK:GET:FURNITURE.info [ furniture-O = OBJECT_1, furniture-attentionOn = these ] 
+target :DA:INFORM:PREFER:FURNITURE.price [ furniture-O = OBJECT_1 ] DA:ASK:GET:FURNITURE.info [ furniture-O = OBJECT_1, furniture-attentionOn = these ] 
+6
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_0, furniture-attentionOn = This ] 
+target :ERR:CHITCHAT [  ] 
+8
+pred : Black, Brown, or Green
+target :DA:INFORM:REFINE:FURNITURE.info [ furniture-decorStyle = Any, furniture-color = black, furniture-color = brown ] 
+9
+pred : DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0, furniture-displaySecond = second ] 
+target :DA:REQUEST:GET:FURNITURE [ furniture-displaySecond = second ] 
+10
+pred : DA:ASK:GET:FURNITURE.info [ furniture-O = OBJECT_0, furniture-attentionOn = this ] 
+target :DA:INFORM:PREFER:FURNITURE [  ] DA:ASK:GET:FURNITURE.info [ furniture-attentionOn = this ] 
+11
+pred : $265.99
+target :DA:ASK:GET:FURNITURE.price [ furniture-attentionOn = this ] 
+12
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_0, furniture-attentionOn = this ] 
+target :DA:INFORM:PREFER:FURNITURE.price [  ] DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-attentionOn = this ] 
+14
+pred : DA:REQUEST:GET:FURNITURE [ furniture-color = white ] 
+target :DA:REQUEST:GET:FURNITURE.color [ furniture-color = white ] 
+15
+pred : DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_0, furniture-displayFirst = first ] 
+target :DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0, furniture-displayFirst = first ] 
+17
+pred : W: 36, D: 32, H: 32
+target :DA:ASK:GET:FURNITURE.dimensions [ furniture-O = OBJECT_0 ] 
+18
+pred : It is $233.99
+target :DA:ASK:GET:FURNITURE.price [ furniture-O = OBJECT_0 ] 
+19
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_0, furniture-attentionOn = this ] 
+target :ERR:CHITCHAT [  ] 
+20
+pred : ERR:CHITCHAT [  ] 
+target :DA:INFORM:PREFER:FURNITURE [ furniture-attentionOn = this ] 
+21
+pred : Have a great day.
+target :ERR:CHITCHAT [  ] 
+23
+pred : DA:INFORM:REFINE:FURNITURE.decorStyle [ furniture-color = modern, furniture-color = brown ] 
+target :DA:INFORM:REFINE:FURNITURE.info [ furniture-decorStyle = modern, furniture-color = brown ] 
+24
+pred : Modern,Modern,Traditional
+target :DA:INFORM:REFINE:FURNITURE.decorStyle [ furniture-decorStyle = sophisticated ] 
+25
+pred : The one on the right is brown.
+target :DA:INFORM:REFINE:FURNITURE.color [ furniture-O = OBJECT_0, furniture-color = brown ] 
+26
+pred : It is $69.99.
+target :DA:CONFIRM:PREFER:FURNITURE [ furniture-O = OBJECT_1 ] DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_1, furniture-displayFirst = left ] DA:ASK:GET:FURNITURE.price [ furniture-O = OBJECT_1 ] 
+27
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_1, furniture-attentionOn = this ] 
+target :DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_1 ] 
+30
+pred : Dark brown or black
+target :DA:INFORM:REFINE:FURNITURE.color [ furniture-color = darker ] 
+31
+pred : DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0, furniture-displayThird = left ] 
+target :DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0, furniture-displayFirst = left ] 
+32
+pred : It's made from solid and manufactured wood.
+target :DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_1, furniture-attentionOn = That ] DA:ASK:GET:FURNITURE.material [ furniture-O = OBJECT_1, furniture-attentionOn = this ] 
+33
+pred : It costs $206.99
+target :DA:INFORM:PREFER:FURNITURE.material [ furniture-O = OBJECT_1 ] DA:ASK:GET:FURNITURE.price [ furniture-O = OBJECT_1 ] 
+34
+pred : Yes, here you go.
+target :DA:CONFIRM:ROTATE:FURNITURE [ furniture-O = OBJECT_1 ] DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_1, furniture-rotateTo = top ] 
+35
+pred : It's 55.29 inches tall.
+target :DA:INFORM:PREFER:FURNITURE.depth [ furniture-O = OBJECT_1 ] DA:ASK:GET:FURNITURE.height [ furniture-O = OBJECT_1 ] 
+36
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_1, furniture-attentionOn = this ] 
+target :DA:INFORM:PREFER:FURNITURE.dimensions [ furniture-O = OBJECT_1 ] DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_1, furniture-attentionOn = this ] 
+40
+pred : It's only one ottoman
+target :DA:REQUEST:GET:FURNITURE [  ] 
+42
+pred : DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0, furniture-attentionOn = this ] DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_0, furniture-rotateTo = angle, furniture-attentionOn = this ] 
+target :DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0, furniture-attentionOn = this, furniture-pattern = zebra ] DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_0 ] 
+43
+pred : $329.99
+target :DA:ASK:GET:FURNITURE.price [ furniture-O = OBJECT_0, furniture-attentionOn = this ] 
+44
+pred : 
+target :DA:ASK:GET:FURNITURE.info [ furniture-O = OBJECT_0, furniture-attentionOn = this ] 
+46
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_0 ] 
+target :ERR:CHITCHAT [  ] 
+49
+pred : DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_0, furniture-attentionOn = it ] 
+target :DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0 ] DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_0 ] 
+50
+pred : It does not.
+target :DA:ASK:GET:FURNITURE.finish [ furniture-O = OBJECT_0 ] 
+51
+pred : DA:CONFIRM:GET:FURNITURE [ furniture-O = OBJECT_0, furniture-attentionOn = That ] DA:INFORM:REFINE:FURNITURE.material [ furniture-O = OBJECT_0, furniture-attentionOn = this ] 
+target :DA:INFORM:PREFER:FURNITURE.finish [ furniture-O = OBJECT_0 ] DA:ASK:GET:FURNITURE.decorStyle [ furniture-O = OBJECT_0 ] 
+52
+pred : It is $759.99
+target :DA:ASK:GET:FURNITURE.price [ furniture-O = OBJECT_0 ] 
+53
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_0, furniture-attentionOn = that ] 
+target :DA:INFORM:PREFER:FURNITURE.price [ furniture-O = OBJECT_0 ] DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_0, furniture-attentionOn = this ] 
+55
+pred : DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0 ] DA:ASK:GET:FURNITURE.color [ furniture-O = OBJECT_0, furniture-attentionOn = this ] 
+target :DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0 ] DA:ASK:GET:FURNITURE.color [ furniture-O = OBJECT_0 ] 
+56
+pred : DA:ASK:GET:FURNITURE.material [ furniture-O = OBJECT_1 ] 
+target :DA:ASK:GET:FURNITURE.material [ furniture-material = wood ] 
+57
+pred : DA:ASK:GET:FURNITURE.dimensions [ furniture-O = OBJECT_1 ] 
+target :DA:INFORM:PREFER:FURNITURE.material [ furniture-O = OBJECT_1, furniture-attentionOn = That ] DA:ASK:GET:FURNITURE.dimensions [ furniture-O = OBJECT_1, furniture-intendedRoom = kitchen ] 
+58
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_2, furniture-O = OBJECT_3, furniture-O = OBJECT_4, furniture-attentionOn = That ] 
+target :DA:INFORM:PREFER:FURNITURE.dimensions [ furniture-O = OBJECT_1, furniture-attentionOn = That ] DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_1 ] DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-amount = six ] 
+59
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_3, furniture-displayFirst = first ] 
+target :DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_2, furniture-displayFirst = first ] 
+60
+pred : Great, I will add it to your cart.
+target :DA:CONFIRM:GET:FURNITURE [ furniture-O = OBJECT_2, furniture-attentionOn = that ] 
+64
+pred : DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0, furniture-displayFirst = first ] 
+target :DA:REQUEST:GET:FURNITURE [ furniture-displayFirst = first ] 
+65
+pred : DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_0, furniture-rotateTo = side ] 
+target :DA:INFORM:PREFER:FURNITURE [  ] DA:REQUEST:ROTATE:FURNITURE [ furniture-rotateTo = side ] 
+66
+pred : DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_0, furniture-rotateTo = top ] 
+target :DA:INFORM:PREFER:FURNITURE [  ] DA:REQUEST:ROTATE:FURNITURE [ furniture-rotateTo = top ] 
+69
+pred : DA:REQUEST:GET:FURNITURE [  ] 
+target :DA:REQUEST:GET:FURNITURE [ furniture-sequential = others ] 
+70
+pred : DA:REQUEST:GET:FURNITURE [  ] 
+target :DA:REQUEST:GET:FURNITURE [ furniture-sequential = others ] 
+71
+pred : Here are a few more.
+target :DA:REQUEST:GET:FURNITURE [ furniture-sequential = others ] 
+72
+pred : DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_6, furniture-displayThird = right ] 
+target :DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0, furniture-displayThird = right, furniture-ordinal = second ] 
+73
+pred : DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_1, furniture-rotateTo = top ] 
+target :DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_1, furniture-rotateTo = top ] DA:ASK:GET:FURNITURE.info [ furniture-O = OBJECT_1 ] 
+74
+pred : 
+target :DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_1, furniture-rotateTo = back ] DA:ASK:CHECK:FURNITURE.hasStorage [ furniture-O = OBJECT_1, furniture-check = drawers ] 
+75
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_1 ] 
+target :DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_1, furniture-attentionOn = That ] DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_1 ] 
+77
+pred : Rustic
+target :DA:INFORM:REFINE:FURNITURE.info [ furniture-decorStyle = rustic, furniture-color = color ] 
+78
+pred : DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0, furniture-displaySecond = end ] DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0 ] 
+target :DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0, furniture-displayThird = end ] DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0 ] 
+79
+pred : DA:ASK:GET:FURNITURE.dimensions [ furniture-O = OBJECT_0 ] 
+target :DA:INFORM:PREFER:FURNITURE [ furniture-attentionOn = this ] DA:ASK:GET:FURNITURE.dimensions [  ] 
+80
+pred : DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_0, furniture-rotateTo = side ] 
+target :DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0 ] DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_0, furniture-rotateTo = side ] 
+81
+pred : It is $171.99
+target :DA:ASK:GET:FURNITURE.price [  ] 
+82
+pred : DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_0 ] 
+target :DA:INFORM:PREFER:FURNITURE.price [  ] DA:INFORM:ADD_TO_CART:FURNITURE [  ] 
+86
+pred : DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0, furniture-displayThird = right ] DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0 ] 
+target :DA:CONFIRM:PREFER:FURNITURE [ furniture-O = OBJECT_0 ] DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0, furniture-displayThird = right ] DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0 ] 
+87
+pred : It is 35.5" W x 35.5" D x 35.5" H
+target :DA:ASK:GET:FURNITURE.info [ furniture-O = OBJECT_0, furniture-attentionOn = this, furniture-dimensions = Dimensions, furniture-price = price ] 
+88
+pred : ERR:CHITCHAT [  ] 
+target :DA:INFORM:DISPREFER:FURNITURE.price [ furniture-O = OBJECT_0 ] 
+90
+pred : DA:CONFIRM:REFINE:FURNITURE.info [ furniture-color = tall, furniture-color = brown, furniture-color = white ] 
+target :DA:INFORM:REFINE:FURNITURE.color [ furniture-color = black, furniture-color = brown, furniture-color = white ] 
+91
+pred : DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0, furniture-O = OBJECT_1, furniture-O = OBJECT_2, furniture-attentionOn = that ] DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0 ] 
+target :DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_0, furniture-attentionOn = that ] DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_0 ] 
+94
+pred : It is priced at $319.99.
+target :DA:ASK:GET:FURNITURE.price [ furniture-O = OBJECT_0 ] 
+96
+pred : DA:REQUEST:GET:FURNITURE [  ] 
+target :DA:REQUEST:GET:FURNITURE [ furniture-condition = new ] 
+98
+pred : Brown
+target :DA:INFORM:REFINE:FURNITURE.dimensions [ furniture-dimensions = smaller ] 
+99
+pred : DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_1, furniture-rotateTo = back ] 
+target :DA:REQUEST:ROTATE:FURNITURE [ furniture-O = OBJECT_0, furniture-rotateTo = back ] 
+100
+pred : W: 44.92 D: 44.33 H: 44.33
+target :DA:ASK:GET:FURNITURE.dimensions [ furniture-O = OBJECT_1 ] 

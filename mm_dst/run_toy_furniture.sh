@@ -10,18 +10,8 @@ PATH_DIR=$(realpath .)
 PATH_DATA_DIR=$(realpath ../data)
 
 # PARAMETERS
-CONTEXT=3
-GPU_ID='2'
-RESPONCE=1
-STATE=1
-BEAMS=2
-NUM_SEQUENCES=5
-
-
-echo "Running on GPU $GPU_ID with keyword $KEY_WORD"
-=======
 CONTEXT=2
-GPU_ID='1'
+GPU_ID='0'
 RESPONCE=1
 STATE=1
 BEAMS=3
@@ -40,6 +30,8 @@ LENGTH=$LENGTH
 NGRAM=$NGRAM
 REP=$REP
 "
+
+'
 # furniture
 # Multimodal Data
 # Train split
@@ -87,12 +79,13 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --train_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_train_dials_target$KEY_WORD.txt \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_dev_dials_target$KEY_WORD.txt \
-    --num_train_epochs=1 \
+    --num_train_epochs=8 \
     --overwrite_output_dir \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4 \
+    --per_gpu_train_batch_size=8 \
+    --per_gpu_eval_batch_size=8 \
+    --warmup_steps=1000 \
+    --save_steps=1000 \
     --gpu_id=$GPU_ID 
-    --num_return_sequences=$NUM_SEQUENCES \ 
 
 # Generate sentences (furniture, multi-modal)
 python -m gpt2_dst.scripts.run_generation \
@@ -112,7 +105,7 @@ python gpt2_dst/results/toy_furniture/add_eob.py \
 	--path "gpt2_dst/results/toy_furniture/furniture_devtest_dials_predicted$KEY_WORD.txt"
 
 mv "gpt2_dst/results/toy_furniture/furniture_devtest_dials_predicted$KEY_WORD.txt.eob" "gpt2_dst/results/toy_furniture/furniture_devtest_dials_predicted$KEY_WORD.txt"
-
+'
 
 # Evaluate (furniture, multi-modal)
 python -m gpt2_dst.scripts.evaluate \

@@ -210,7 +210,6 @@ command line"""
     parser.add_argument("--gpu_id", type=str, default="0")
     parser.add_argument("--no_repeat_ngram_size", type=int, default=0)
     parser.add_argument("--good_words", type=str, default=None)
-    
     args = parser.parse_args()
 
     args.device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
@@ -300,7 +299,6 @@ command line"""
                 bad_words_ids=bad_words_ids,
                 no_repeat_ngram_size=args.no_repeat_ngram_size
             )
-
             # Remove the batch dimension when returning multiple sequences
             if len(output_sequences.shape) > 2:
                 output_sequences.squeeze_()
