@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # PARAMETERS	DEFAUT VALUE
-EPOCHS=1	# 1
+EPOCHS=10	# 1
 TRAIN_BATCH=4	# 4
 VAL_BATCH=4	# 4
 MUL_GPU=1	# 1
 GPU_ID='0'	# '0'
+WARM_UP=1000	# 0
+LR=5e-5		# 5e-5
 
 PARAMETERS="EPOCHS		$EPOCHS
 TRAIN_BATCH	$TRAIN_BATCH
@@ -37,7 +39,7 @@ if [ $DOMAIN == "furniture_to" ] || [ $DOMAIN == "all" ]
 then
 # Train (furniture, text-only)
 python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/furniture_to/ \
+    --output_dir="${PATH_DIR}"/gpt2_dst/save/furniture_to/"${KEYWORD}" \
     --model_type=gpt2 \
     --model_name_or_path=gpt2 \
     --line_by_line \
@@ -46,17 +48,19 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --train_data_file="${PATH_DIR}"/gpt2_dst/data/furniture_to/furniture_train_dials_target.txt \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture_to/furniture_dev_dials_target.txt \
-    --num_train_epochs=$EPOCH \
+    --num_train_epochs=$EPOCHS \
     --overwrite_output_dir \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4
+    --learning_rate=$LR \
+    --warmup_steps=$WARM_UP \
+    --per_gpu_train_batch_size=$TRAIN_BATCH \
+    --per_gpu_eval_batch_size=$VAL_BATCH
 fi
 
 if [ $domain == "furniture" ] || [ $domain == "all" ]
 then
 # Train (furniture, multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/furniture \
+    --output_dir="${PATH_DIR}"/gpt2_dst/save/furniture/"${KEYWORD}" \
     --model_type=gpt2 \
     --model_name_or_path=gpt2 \
     --line_by_line \
@@ -65,17 +69,19 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --train_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_train_dials_target.txt \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_dev_dials_target.txt \
-    --num_train_epochs=1 \
+    --num_train_epochs=$EPOCHS \
     --overwrite_output_dir \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4
+    --learning_rate=$LR \
+    --warmup_steps=$WARM_UP \
+    --per_gpu_train_batch_size=$TRAIN_BATCH \
+    --per_gpu_eval_batch_size=$VAL_BATCH
 fi
 
 if [ $domain == "fashion_to" ] || [ $domain == "all" ]
 then
 # Train (Fashion, text-only)
 python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/fashion_to \
+    --output_dir="${PATH_DIR}"/gpt2_dst/save/fashion_to/"${KEYWORD}" \
     --model_type=gpt2 \
     --model_name_or_path=gpt2 \
     --line_by_line \
@@ -84,17 +90,19 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --train_data_file="${PATH_DIR}"/gpt2_dst/data/fashion_to/fashion_train_dials_target.txt \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/fashion_to/fashion_dev_dials_target.txt \
-    --num_train_epochs=1 \
+    --num_train_epochs=$EPOCHS \
     --overwrite_output_dir \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4
+    --learning_rate=$LR \
+    --warmup_steps=$WARM_UP \
+    --per_gpu_train_batch_size=$TRAIN_BATCH \
+    --per_gpu_eval_batch_size=$VAL_BATCH
 fi
 
 if [ $domain == "fashion" ] || [ $domain == "all" ]
 then
 # Train (Fashion, multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/fashion \
+    --output_dir="${PATH_DIR}"/gpt2_dst/save/fashion/"${KEYWORD}" \
     --model_type=gpt2 \
     --model_name_or_path=gpt2 \
     --line_by_line \
@@ -103,8 +111,10 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --train_data_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_train_dials_target.txt \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_dev_dials_target.txt \
-    --num_train_epochs=1 \
+    --num_train_epochs=$EPOCHS \
     --overwrite_output_dir \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4
+    --learning_rate=$LR \
+    --warmup_steps=$WARM_UP \
+    --per_gpu_train_batch_size=$TRAIN_BATCH \
+    --per_gpu_eval_batch_size=$VAL_BATCH
 fi
