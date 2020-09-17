@@ -22,7 +22,7 @@ def analyze_from_flat_list(d_true, d_pred):
         analyze_turn(turn_idx,true_turn, pred_turn)
     
     # Save report
-    with open(os.path.join(output_dir, "analysis.txt"), 'w') as f_out:
+    with open(os.path.join(output_dir, "analysis.json"), 'w') as f_out:
         json.dump(acts, f_out)
 
 def analyze_turn(turn_idx,true_turn, pred_turn):
@@ -159,7 +159,9 @@ def analyze_frame(idx,true_frame, pred_frame, strict=True):
             slot_part_right.add(idx)   ## partially right 
         else :
             flag = 0 ## correct act but wrong slot values 
-
+    else :
+        if true_frame_slot_values == pred_frame_slot_values : 
+            wrong_act_right_slot.add(idx)
     return flag 
 
 
@@ -188,6 +190,7 @@ if __name__ == '__main__':
 
     list_target = parse_flattened_results_from_file(input_path_target)
     list_predicted = parse_flattened_results_from_file(input_path_predicted)
+    
     total_act = 0
     total_correct = 0
     acts = {
@@ -201,25 +204,30 @@ if __name__ == '__main__':
     wrong_index = set()
     slot_part_right = set()
     perfect = set() 
-    
+    wrong_act_right_slot = set() 
+
     analyze_from_flat_list(list_target, list_predicted)
+
     slot_part_right = slot_part_right - slot_part_right.intersection(wrong_index) - slot_part_right.intersection(perfect)
     perfect = perfect - perfect.intersection(wrong_index)
+    wrong_index = wrong_index - wrong_index.intersection(perfect) - wrong_index.intersection(slot_part_right) - wrong_index.intersection(wrong_act_right_slot)
     # Save report
 
     results = []
     idx = -1
     
-    comparison = open(os.path.join(output_dir, "wrong.txt"),'w') ## Wrong DA or slot
+    comparison = open(os.path.join(output_dir, "all_wrong.txt"),'w') ## Wrong DA or slot
     comparison.write('')
-    comparison = open(os.path.join(output_dir, "wrong.txt"),'a') 
-    slot_comparison = open(os.path.join(output_dir, "partially_right.txt"),'w')  ## Right DA but wrong slot 
+    comparison = open(os.path.join(output_dir, "all_wrong.txt"),'a') 
+    slot_comparison = open(os.path.join(output_dir, "right_act_wrong_slot.txt"),'w')  ## Right DA but wrong slot 
     slot_comparison.write('')
-    slot_comparison = open(os.path.join(output_dir, "partially_right.txt"),'a+') 
+    slot_comparison = open(os.path.join(output_dir, "right_act_wrong_slot.txt"),'a+') 
     all_correct = open(os.path.join(output_dir, "perfect.txt"),'w') 
     all_correct.write('')
     all_correct = open(os.path.join(output_dir, "perfect.txt"),'a+') 
-    
+    wrong_act =  open(os.path.join(output_dir, "wrong_act_right_slot.txt"),'w')
+    wrong_act.write('') 
+    wrong_act =  open(os.path.join(output_dir, "wrong_act_right_slot.txt"),'a+') 
 
     with open(os.path.join(output_dir, "analysis.json"), 'w') as f_out:
         json.dump(acts, f_out)
@@ -271,12 +279,15 @@ if __name__ == '__main__':
                 all_correct.write("{0}\n".format(target[0]))
                 all_correct.write("------------------------------------------------------------\n")
                 all_correct.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
+            if idx in wrong_act_right_slot : 
+                wrong_act.write("=============================DIALOGUE #{}====================\n".format(idx))
+                wrong_act.write("{0}\n".format(target[0]))
+                wrong_act.write("------------------------------------------------------------\n")
+                wrong_act.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
 
-
-    print("Quick summary") 
     print("Out of {} total turns..".format(turn))
     print("{} right DA and slot predictions made... {:.2f}%".format(len(perfect), 100*len(perfect)/turn))
     print("{} right DA but wrong slot predictions....{:.2f}%".format(len(slot_part_right), 100*len(slot_part_right)/turn))
+    print("{} wrong DA and right slot predictions....{:.2f}%".format(len(wrong_act_right_slot), 100*len(wrong_act_right_slot)/turn))
     print("{} wrong DA and wrong slot predictions....{:.2f}%\n".format(len(wrong_index), 100*len(wrong_index)/turn))
     print("Analysis completed..!\nDetailed analysis saved in {}".format(output_dir))
-
