@@ -2,11 +2,11 @@
 
 # parameters	defaut value
 NUM_GEN=500	# 100000
-NUM_BEAMS=1	# 1
+NUM_BEAMS=4	# 1
 LENGTH=100	# 100
 NGRAM=0		# 0
 TOKEN=0		# 0
-GPU_ID='0'	# '0'
+GPU_ID='1'	# '0'
 
 PARAMETERS="NUM_GEN		$NUM_GEN
 NUM_BEAMS	$NUM_BEAMS

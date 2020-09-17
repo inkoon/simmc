@@ -265,7 +265,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
         model, optimizer = amp.initialize(model, optimizer, opt_level=args.fp16_opt_level)
 
     # multi-gpu training (should be after apex fp16 initialization)
-    if args.n_gpu > 1:
+    if args.n_gpu > 1 and args.mul_gpu == 1:
         model = torch.nn.DataParallel(model)
 
     # Distributed training (should be after apex fp16 initialization)
@@ -603,7 +603,16 @@ def main():
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
+
+    # B: user added args
+    parser.add_argument("--gpu_id", type=str, default='0')
+    parser.add_argument("--mul_gpu", type=int, default=0)
     args = parser.parse_args()
+
+    
+    # B : gpu setting
+    os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu_id
 
     if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
         raise ValueError(

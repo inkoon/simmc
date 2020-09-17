@@ -206,6 +206,9 @@ command line"""
     parser.add_argument("--gpu_id", type=str, default='0')
     args = parser.parse_args()
 
+    os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu_id
+
     args.device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
     args.n_gpu = 0 if args.no_cuda else torch.cuda.device_count()
 
@@ -214,6 +217,7 @@ command line"""
     if args.prompts_from_file and not os.path.exists(args.prompts_from_file):
         raise Exception(f"prompt file '{args.prompts_from_file}' not found")
 
+    
     # Initialize the model and tokenizer
     try:
         args.model_type = args.model_type.lower()
