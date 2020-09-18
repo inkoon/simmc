@@ -8,12 +8,13 @@ else
 	KEYWORD=$2
 fi
 
-GPU_ID='1'
+GPU_ID='0'
+NUM_GEN=500
 
 PATH_DIR=$(realpath .)
 PATH_DATA_DIR=$(realpath ../data)
 
-
+'
 # "${DOMAIN}"
 # Multimodal Data
 # Train split
@@ -44,7 +45,6 @@ python -m gpt2_dst.scripts.preprocess_input \
     --use_multimodal_contexts=1 \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
 
-'
 # Train ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}" \
@@ -63,7 +63,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
     --per_gpu_eval_batch_size=32 \
     --warmup_steps=2000 \
     --save_steps=1000
-
+'
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
@@ -73,6 +73,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --gpu_id=$GPU_ID \
     --stop_token="<EOS>" \
     --num_beams=2 \
+    --num_gen=$NUM_GEN \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predicted.txt
 
@@ -81,4 +82,3 @@ python -m gpt2_dst.scripts.evaluate \
     --input_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_target.txt \
     --input_path_predicted="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predicted.txt \
     --output_path_report="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}"/"${DOMAIN}"_devtest_dials_report.json
-'
