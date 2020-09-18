@@ -8,7 +8,7 @@ fi
 
 DOMAIN="furniture"
 # DOMAIN="fashion"
-ROOT="../data/simmc_${DOMAIN}/"
+ROOT="../data/gpt2_simmc_${DOMAIN}/"
 GPU_ID=$1
 
 

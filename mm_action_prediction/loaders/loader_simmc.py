@@ -30,15 +30,16 @@ class DataloaderSIMMC(loaders.LoaderParent):
         raw_data = np.load(params["data_read_path"], allow_pickle=True)
         self.raw_data = raw_data[()]
         if self.params['gpt2']:
-            # TODO
-            # self.words should initialize with vocab not tokenizer
-
-            self.words = GPT2Tokenizer.from_pretrained('gpt2')
-            # self.words = GPT2Tokenizer.from_pretrained(self.raw_data["Vocabulary"])
-            self.start_token = self.words.bos_token
-            self.end_token = self.words.eos_token
-            # self.words.add_special_tokens({'pad_token':'<|pad|>'})
-            # self.pad_token = self.words.pad_token
+            self.raw_data["vocabulary"]["word"] = list(self.raw_data["vocabulary"]["word"].keys())
+            self.words = loaders.Vocabulary()
+            self.words.set_vocabulary_state(self.raw_data["vocabulary"]["word"])
+            # self.words = GPT2Tokenizer.from_pretrained('gpt2')
+            self.start_token = 50256
+            self.end_token = 50256
+            self.pad_token = 50256
+            self.unk_token = 50256
+            # self.words.word = self.words.convert_ids_to_tokens
+            # self.words.index = self.words.convert_tokens_to_ids
         elif self.params["encoder"] != "pretrained_transformer":
             self.words = loaders.Vocabulary()
             self.words.set_vocabulary_state(self.raw_data["vocabulary"]["word"])

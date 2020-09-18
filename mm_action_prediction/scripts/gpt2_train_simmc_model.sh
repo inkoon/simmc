@@ -8,7 +8,7 @@ fi
 
 DOMAIN="furniture"
 # DOMAIN="fashion"
-ROOT="../data/simmc_${DOMAIN}/"
+ROOT="../data/gpt2_simmc_${DOMAIN}/"
 DETAILS=$1
 GPU_ID=$2
 
@@ -53,7 +53,7 @@ COMMON_FLAGS="
     --metainfo_path=${MODEL_METAINFO} \
     --attr_vocab_path=${ATTR_VOCAB_FILE} \
     --learning_rate=0.0001 --gpu_id=$GPU_ID --use_action_attention \
-    --num_epochs=100 --eval_every_epoch=1 --batch_size=20 \
+    --num_epochs=10 --eval_every_epoch=1 --batch_size=20 \
     --save_every_epoch=1 --word_embed_size=256 --num_layers=2 \
     --hidden_size=512 \
     --use_multimodal_state --use_action_output --use_bahdanau_attention \

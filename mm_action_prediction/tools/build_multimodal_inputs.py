@@ -15,6 +15,9 @@ import numpy as np
 from nltk.tokenize import word_tokenize
 from tqdm import tqdm as progressbar
 
+import sys
+sys.path.append('/home/kwon/simmc/mm_action_prediction')
+
 from tools import support
 
 
@@ -39,6 +42,9 @@ flags.DEFINE_enum(
 )
 flags.DEFINE_boolean(
     "pretrained_tokenizer", False, "Use pretrained tokenizer instead of nltk"
+)
+flags.DEFINE_boolean(
+    "gpt2", False, "Use gpt2"
 )
 
 
@@ -203,7 +209,32 @@ def build_multimodal_inputs(input_json_file):
 
     # If token-wise encoding is to be used.
     print("Vocabulary: {}".format(FLAGS.vocab_file))
-    if not FLAGS.pretrained_tokenizer:
+    if FLAGS.gpt2:
+        # use pretrained GPT2 tokenizer.
+        from transformers import GPT2Tokenizer
+        tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+        with open(FLAGS.vocab_file, "r") as file_id:
+            vocabulary = json.load(file_id)
+        mm_inputs["vocabulary"] = dict()
+        mm_inputs["vocabulary"]["word"] = vocabulary
+        word2ind = {word: index for index, word in enumerate(vocabulary)}
+
+        mm_inputs["user_sent"], mm_inputs["user_sent_len"] = (
+            convert_pool_matrices_pretrained_tokenizer(
+                utterance_list["user"], tokenizer
+            )
+        )
+        mm_inputs["assist_sent"], mm_inputs["assist_sent_len"] = (
+            convert_pool_matrices_pretrained_tokenizer(
+                utterance_list["assistant"], tokenizer
+            )
+        )
+
+        # Token aliases.
+        pad_token = tokenizer.eos_token_id # GPT2 dosen't have pad token.
+        start_token = tokenizer.bos_token_id
+        end_token = tokenizer.eos_token_id
+    elif not FLAGS.pretrained_tokenizer:
         with open(FLAGS.vocab_file, "r") as file_id:
             vocabulary = json.load(file_id)
         mm_inputs["vocabulary"] = vocabulary
@@ -328,7 +359,10 @@ def convert_pool_matrices_pretrained_tokenizer(pool_input, pretrained_tokenizer)
     tokenized_items = [tokenizer(item) for item in progressbar(pool_list)]
     max_item_len = max(len(ii) for ii in tokenized_items)
     item_tokens = np.zeros((len(tokenized_items), max_item_len)).astype("int32")
-    item_tokens.fill(pretrained_tokenizer.pad_token_id)
+    if pretrained_tokenizer.pad_token_id is not None:
+        item_tokens.fill(pretrained_tokenizer.pad_token_id)
+    else:
+        item_tokens.fill(pretrained_tokenizer.eos_token_id)
     item_lens = np.zeros(len(tokenized_items)).astype("int32")
     for item_id, tokens in progressbar(enumerate(tokenized_items)):
         item_lens[item_id] = len(tokens)

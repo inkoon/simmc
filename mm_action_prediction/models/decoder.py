@@ -289,7 +289,6 @@ class GenerativeDecoder(nn.Module):
                     d_len = self.params['max_decoder_len']
                     new_batch['user_utt'] = new_batch['user_utt'].resize_(1, e_len+1)
                     new_batch['user_utt'][0][e_len] = self.params['start_token']
-                    import ipdb; ipdb.set_trace(context=10)
                     beam_out = self.decoder_unit.generate(
                         input_ids=new_batch['user_utt'].reshape(1, -1),
                         max_length=100, # max(100, e_len + d_len + 1)

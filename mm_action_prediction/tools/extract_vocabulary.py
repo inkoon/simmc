@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import argparse
 from nltk.tokenize import word_tokenize
+from transformers import GPT2Tokenizer
 
 
 def main(args):
@@ -17,15 +18,24 @@ def main(args):
         train_data = json.load(file_id)
     dialog_data = train_data["dialogue_data"]
 
+    # Load pretrained GPT2Tokenizer
+    if args['gpt2']:
+        tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+
     counts = {}
     for datum in dialog_data:
         dialog_utterances = [
             ii[key] for ii in datum["dialogue"]
             for key in ("transcript", "system_transcript")
         ]
-        dialog_tokens = [
-            word_tokenize(ii.lower()) for ii in dialog_utterances
-        ]
+        if args['gpt2']:
+            dialog_tokens = [
+                tokenizer(ii.lower())['input_ids'] for ii in dialog_utterances
+            ]
+        else:
+            dialog_tokens = [
+                word_tokenize(ii.lower()) for ii in dialog_utterances
+            ]
         for turn in dialog_tokens:
             for word in turn:
                 counts[word] = counts.get(word, 0) + 1
@@ -42,8 +52,11 @@ def main(args):
     # Save answers and vocabularies.
     print("Identified {} words..".format(len(words)))
     print("Saving dictionary: {}".format(args["vocab_save_path"]))
-    with open(args["vocab_save_path"], "w") as file_id:
-        json.dump(vocabulary, file_id)
+    if args['gpt2']:
+        tokenizer.save_vocabulary(args["vocab_save_path"])
+    else:
+        with open(args["vocab_save_path"], "w") as file_id:
+            json.dump(vocabulary, file_id)
 
 
 if __name__ == "__main__":
@@ -64,6 +77,12 @@ if __name__ == "__main__":
         default=0,
         type=int,
         help="Words are included if beyond this threshold",
+    )
+    parser.add_argument(
+        "--gpt2",
+        action="store_true",
+        default=False,
+        help="preprocess gpt2 data"
     )
     try:
         parsed_args = vars(parser.parse_args())

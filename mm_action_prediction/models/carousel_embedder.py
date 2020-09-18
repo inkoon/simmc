@@ -40,8 +40,8 @@ class CarouselEmbedder(nn.Module):
         """Carousel Embedding.
 
         Args:
-            carousel_state: State of the carousel
-            encoder_state: State of the encoder
+            carousel_state: State of the carousel [batch_size]
+            encoder_state: State of the encoder [batch_size]
             encoder_size: (batch_size, num_rounds)
 
         Returns:

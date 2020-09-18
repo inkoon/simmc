@@ -8,10 +8,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import argparse
 import ast
 
+import sys
+sys.path.append('/home/kwon/simmc/mm_action_prediction')
+
 import numpy as np
 from tools import data_support
 import spacy
-
 
 # Attributes to encode.
 EMBED_ATTRIBUTES = [
