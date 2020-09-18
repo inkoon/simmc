@@ -31,6 +31,10 @@ if __name__ == '__main__':
                         help='determine whether to use the multimodal contexts each turn',
                         type=int, default=1)
 
+    # B : User added args
+    parser.add_argument('--noresp', action='store_true') 
+
+
     args = parser.parse_args()
     input_path_json = args.input_path_json
     output_path_predict = args.output_path_predict
@@ -48,4 +52,6 @@ if __name__ == '__main__':
         input_path_special_tokens=input_path_special_tokens,
         output_path_special_tokens=output_path_special_tokens,
         len_context=len_context,
+        noresp=args.noresp,
         use_multimodal_contexts=use_multimodal_contexts)
+

@@ -28,6 +28,7 @@ END_OF_SENTENCE = '<EOS>'
 TEMPLATE_PREDICT = '{context} {START_BELIEF_STATE} '
 TEMPLATE_TARGET = '{context} {START_BELIEF_STATE} {belief_state} ' \
     '{END_OF_BELIEF} {response} {END_OF_SENTENCE}'
+TEMPLATE_TARGET_NORESP = '{context} {START_BELIEF_STATE} {belief_state} {END_OF_SENTENCE}'
 
 
 def convert_json_to_flattened(
@@ -35,6 +36,7 @@ def convert_json_to_flattened(
         output_path_predict,
         output_path_target,
         len_context=2,
+        noresp=False,
         use_multimodal_contexts=True,
         input_path_special_tokens='',
         output_path_special_tokens=''):
@@ -129,14 +131,22 @@ def convert_json_to_flattened(
             predicts.append(predict)
 
             # Format the main output
-            target = TEMPLATE_TARGET.format(
-                context=context,
-                START_BELIEF_STATE=START_BELIEF_STATE,
-                belief_state=str_belief_state,
-                END_OF_BELIEF=END_OF_BELIEF,
-                response=asst_uttr,
-                END_OF_SENTENCE=END_OF_SENTENCE
-            )
+            if noresp : 
+                target = TEMPLATE_TARGET_NORESP.format(
+                    context=context,
+                    START_BELIEF_STATE=START_BELIEF_STATE,
+                    belief_state=str_belief_state,
+                    END_OF_SENTENCE=END_OF_SENTENCE
+                )
+            else:
+                target = TEMPLATE_TARGET.format(
+                    context=context,
+                    START_BELIEF_STATE=START_BELIEF_STATE,
+                    belief_state=str_belief_state,
+                    END_OF_BELIEF=END_OF_BELIEF,
+                    response=asst_uttr,
+                    END_OF_SENTENCE=END_OF_SENTENCE
+                )
             targets.append(target)
 
     # Create a directory if it does not exist
