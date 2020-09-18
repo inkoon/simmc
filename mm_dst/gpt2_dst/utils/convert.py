@@ -49,7 +49,6 @@ def convert_json_to_flattened(
     predicts = []
     targets = []
     if input_path_special_tokens != '':
-        with open(input_path_special_tokens, 'r') as f_in:
             special_tokens = json.load(f_in)
     else:
         special_tokens = {
