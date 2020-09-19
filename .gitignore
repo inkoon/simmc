@@ -2,6 +2,7 @@
 *.bin
 mm_dst/gpt2_dst/save/
 data/
+mm_dst/runs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

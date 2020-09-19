@@ -14,7 +14,6 @@ NUM_GEN=500
 PATH_DIR=$(realpath .)
 PATH_DATA_DIR=$(realpath ../data)
 
-'
 # "${DOMAIN}"
 # Multimodal Data
 # Train split
@@ -22,7 +21,8 @@ python -m gpt2_dst.scripts.preprocess_input \
     --input_path_json="${PATH_DATA_DIR}"/simmc_"${DOMAIN}"/"${DOMAIN}"_train_dials.json \
     --output_path_predict="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_train_dials_predict.txt \
     --output_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_train_dials_target.txt \
-    --len_context=3 \
+    --len_context=2 \
+    --noresp \
     --use_multimodal_contexts=1 \
     --output_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json
 
@@ -31,7 +31,8 @@ python -m gpt2_dst.scripts.preprocess_input \
     --input_path_json="${PATH_DATA_DIR}"/simmc_"${DOMAIN}"/"${DOMAIN}"_dev_dials.json \
     --output_path_predict="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_predict.txt \
     --output_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_target.txt \
-    --len_context=3 \
+    --len_context=2 \
+    --noresp \
     --use_multimodal_contexts=1 \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
     --output_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
@@ -41,7 +42,8 @@ python -m gpt2_dst.scripts.preprocess_input \
     --input_path_json="${PATH_DATA_DIR}"/simmc_"${DOMAIN}"/"${DOMAIN}"_devtest_dials.json \
     --output_path_predict="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predict.txt \
     --output_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_target.txt \
-    --len_context=3 \
+    --len_context=2 \
+    --noresp \
     --use_multimodal_contexts=1 \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
 
@@ -63,7 +65,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
     --per_gpu_eval_batch_size=32 \
     --warmup_steps=2000 \
     --save_steps=1000
-'
+
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
