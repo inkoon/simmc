@@ -6,12 +6,12 @@ Author(s): Satwik Kottur
 
 import torch
 import torch.nn as nn
-
+import torchtext
 from tools import weight_init, torch_support
 import models
 import models.encoders as encoders
-
-
+import spacy
+import gensim
 class Assistant(nn.Module):
     """SIMMC Assistant Agent.
     """
@@ -43,6 +43,12 @@ class Assistant(nn.Module):
                 self.decoder, "word_embed_net"
             ):
                 self.decoder.word_embed_net = self.encoder.word_embed_net
+            elif self.params["embedding_type"]=="glove":
+                self.nlp = spacy.load("en_vectors_web_lg")
+            elif self.params["embedding_type"]=="word2vec":
+                self.w2v_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/GoogleNews-vectors-negative300.bin', binary=True)
+            elif self.params["embedding_type"]=="fasttext":
+                self.fasttext_model = torchtext.vocab.FastText('en')
 
     def forward(self, batch, mode=None):
         """Forward propagation.
