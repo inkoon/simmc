@@ -151,9 +151,7 @@ class GenerativeDecoder(nn.Module):
                 # decoder_steps_in = [200, 26, h_d]
                 # decoder_in = [200, 26]
                 # decoder_out = [200, 26]
-                # 되면 위로 빼기
                 outputs = self.decoder_unit(
-                    # decoder_in,
                     inputs_embeds=decoder_steps_in,
                     labels=decoder_out,
                 )
@@ -291,7 +289,7 @@ class GenerativeDecoder(nn.Module):
                     new_batch['user_utt'][0][e_len] = self.params['start_token']
                     beam_out = self.decoder_unit.generate(
                         input_ids=new_batch['user_utt'].reshape(1, -1),
-                        max_length=100, # max(100, e_len + d_len + 1)
+                        max_length=51, # max(100, e_len + d_len + 1)
                         num_beams=5,
                         pad_token_id=self.params['pad_token'],
                         bos_token_id=self.params['start_token'],
@@ -373,7 +371,6 @@ class GenerativeDecoder(nn.Module):
                 beam_tokens_embed = self.word_embed_net(beam_tokens)
 
                 if self.params["gpt2"]:
-                    import ipdb; ipdb.set_trace(context=10)
                     outputs = self.decoder_unit(
                         inputs_embeds=beam_tokens_embed.transpose(0, 1),
                     )

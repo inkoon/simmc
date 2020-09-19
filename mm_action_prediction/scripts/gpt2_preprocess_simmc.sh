@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DOMAIN="furniture"
-# DOMAIN="fashion"
+# DOMAIN="furniture"
+DOMAIN="fashion"
 ROOT="../data/gpt2_simmc_${DOMAIN}/"
 
 # Input files.
