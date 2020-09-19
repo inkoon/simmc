@@ -455,7 +455,7 @@ class GenerativeDecoder(nn.Module):
             new_scores_flat = new_scores.view(1, -1)
             beam_scores, top_inds_flat = torch.topk(new_scores_flat, beam_size)
             beam_scores = beam_scores.t()
-            top_beam_inds = (top_inds_flat / num_candidates).squeeze(0)
+            top_beam_inds = (top_inds_flat // num_candidates).squeeze(0)   #fix by python3 version problem 
             top_tokens = top_inds_flat % num_candidates
 
             # Prepare for next step.
