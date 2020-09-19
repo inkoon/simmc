@@ -37,6 +37,7 @@ def convert_json_to_flattened(
         output_path_target,
         len_context=2,
         noresp=False,
+        attribute=False,
         use_multimodal_contexts=True,
         input_path_special_tokens='',
         output_path_special_tokens=''):
@@ -104,17 +105,37 @@ def convert_json_to_flattened(
             # Format belief state
             belief_state = []
             for bs_per_frame in user_belief:
-                str_belief_state_per_frame = "{act} [ {slot_values} ]".format(
-                    act=bs_per_frame['act'].strip(),
-                    slot_values=', '.join(
-                        [f'{kv[0].strip()} = {kv[1].strip()}'
-                            for kv in bs_per_frame['slots']])
-                )
+                if attribute:
+                    if '.' in bs_per_frame['act']:
+                        str_act = bs_per_frame['act'].split('.')
+                        str_act = str_act[0] + ' ' + str_act[1]
+                    else:
+                        str_act = bs_per_frame['act']
+                    str_belief_state_per_frame = "{act} [ {slot_values} ]".format(
+                        act=str_act,
+                        slot_values=', '.join(
+                            [f'{kv[0].strip()} = {kv[1].strip()}'
+                                for kv in bs_per_frame['slots']])
+                    ) 
+                else:
+                    str_belief_state_per_frame = "{act} [ {slot_values} ]".format(
+                        act=bs_per_frame['act'].strip(),
+                        slot_values=', '.join(
+                            [f'{kv[0].strip()} = {kv[1].strip()}'
+                                for kv in bs_per_frame['slots']])
+                    )
                 belief_state.append(str_belief_state_per_frame)
 
                 # Track OOVs
                 if output_path_special_tokens != '':
-                    oov.add(bs_per_frame['act'])
+                    if attribute:
+                        if '.' in bs_per_frame['act']:
+                            sp = bs_per_frame['act'].split('.')
+                            oov.add(sp[0])
+                            oov.add(sp[1])
+
+                    else:
+                        oov.add(bs_per_frame['act'])
                     for kv in bs_per_frame['slots']:
                         slot_name = kv[0]
                         oov.add(slot_name)
