@@ -78,6 +78,7 @@ best_epoch = -1
 
 # first_batch = None
 for iter_ind, batch in enumerate(train_loader.get_batch()):
+    #import pdb;pdb.set_trace()
     epoch = iter_ind / num_iters_per_epoch
     batch_loss = wizard(batch)
     batch_loss_items = {key: val.item() for key, val in batch_loss.items()}
@@ -88,7 +89,7 @@ for iter_ind, batch in enumerate(train_loader.get_batch()):
     batch_loss["total"].backward()
     torch.nn.utils.clip_grad_value_(wizard.parameters(), 1.0)
     optimizer.step()
-
+    #import pdb;pdb.set_trace()
     if iter_ind % 50 == 0:
         cur_time = time.strftime("%a %d%b%y %X", time.gmtime())
         print_str = (
@@ -127,7 +128,7 @@ for iter_ind, batch in enumerate(train_loader.get_batch()):
         print("\nBest Val Performance: Ep {}".format(best_epoch))
         # items : loss, perplexity, bleu, action_accuracy, acction_perplexity, action_attribute, r1, r5, r10, mean, mrr
         for item in best_epoch_dict.items():
-            print("\t{}: {:.3f}".format(*item))
+            print("\t{}: {:.4f}".format(*item))
 
             # plot eval performances to tensorboard
             if args["tensorboard_path"] is not None:

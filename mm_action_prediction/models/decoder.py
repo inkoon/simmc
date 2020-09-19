@@ -9,12 +9,12 @@ import copy
 import torch
 import torch.nn as nn
 from torch.distributions import categorical
-
+import torchtext
 import models
 from tools import rnn_support as rnn
 from tools import torch_support as support
-
-
+import gensim
+import spacy
 class GenerativeDecoder(nn.Module):
     def __init__(self, params):
         super(GenerativeDecoder, self).__init__()
@@ -23,10 +23,17 @@ class GenerativeDecoder(nn.Module):
         # Dialog context encoders.
         self.DIALOG_CONTEXT_ENCODERS = ("hierarchical_recurrent", "memory_network")
 
-        # Word embedding.
-        self.word_embed_net = nn.Embedding(
-            params["vocab_size"], params["word_embed_size"]
-        )
+        if params["embedding_type"]=="random":
+            # Word embedding.
+            self.word_embed_net = nn.Embedding(
+                params["vocab_size"], params["word_embed_size"]
+            )
+        elif self.params["embedding_type"]=="glove":
+            self.nlp = spacy.load("en_vectors_web_lg")
+        elif self.params["embedding_type"]=="word2vec":
+            self.w2v_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/GoogleNews-vectors-negative300.bin', binary=True)
+        elif self.params["embedding_type"]=="fasttext":
+            self.fasttext_model = torchtext.vocab.FastText('en')
         # Text encoder.
         if params["text_encoder"] == "transformer":
             if params["encoder"] != "pretrained_transformer":
@@ -103,12 +110,21 @@ class GenerativeDecoder(nn.Module):
             decoder_outputs: Dict of outputs from the forward pass.
         """
         # Flatten for history_agnostic encoder.
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         batch_size, num_rounds, max_length = batch["assist_in"].shape
         decoder_in = support.flatten(batch["assist_in"], batch_size, num_rounds)
         decoder_out = support.flatten(batch["assist_out"], batch_size, num_rounds)
         decoder_len = support.flatten(batch["assist_in_len"], batch_size, num_rounds)
-        word_embeds_dec = self.word_embed_net(decoder_in)
-
+        if self.params["embedding_type"]=="random":
+            word_embeds_dec = self.word_embed_net(decoder_in)
+        elif self.params["embedding_type"]=="glove":
+            word_embeds_dec = torch.tensor([[self.nlp(batch["ind2word"][int(decoder_in[row][col])]).vector for col in range(decoder_in.shape[1])] for row in range(decoder_in.shape[0])], requires_grad=True).to(device)
+        elif self.params["embedding_type"]=="word2vec":
+            word_embeds_dec = torch.stack([torch.stack([self.word_to_vec(decoder_in, row, col, batch["ind2word"]) for col in range(decoder_in.shape[1])]) for row in range(decoder_in.shape[0])])
+            word_embeds_dec.requires_grad_(requires_grad=True)
+        elif self.params["embedding_type"]=="fasttext":
+            word_list = [[batch["ind2word"][int(decoder_in[row][col])] for col in range(decoder_in.shape[1])] for row in range(decoder_in.shape[0])]
+            word_embeds_dec = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
         if self.params["encoder"] in self.DIALOG_CONTEXT_ENCODERS:
             dialog_context = support.flatten(
                 encoder_output["dialog_context"], batch_size, num_rounds
@@ -266,6 +282,7 @@ class GenerativeDecoder(nn.Module):
                             ii[:, index, :].unsqueeze(1).contiguous()
                             for ii in encoder_output["hidden_state"]
                         )
+                new_batch["ind2word"]=batch["ind2word"]
                 beamsearch_outputs = self.forward_beamsearch_single(
                     new_batch, new_output, mode_params
                 )
@@ -289,6 +306,7 @@ class GenerativeDecoder(nn.Module):
         """
         # Initializations and aliases.
         # Tensors are either on CPU or GPU.
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         LENGTH_NORM = True
         self.host = torch.cuda if self.params["use_gpu"] else torch
         end_token = self.params["end_token"]
@@ -337,7 +355,17 @@ class GenerativeDecoder(nn.Module):
             if self.params["text_encoder"] == "transformer":
                 beams, tokens_list = self._backtrack_beams(beams, reverse_inds)
                 beam_tokens = torch.cat(tokens_list, dim=0).transpose(0, 1)
-                beam_tokens_embed = self.word_embed_net(beam_tokens)
+                if self.params["embedding_type"]=="random":
+                    beam_tokens_embed = self.word_embed_net(beam_tokens)
+                elif self.params["embedding_type"]=="glove":
+                    beam_tokens_embed = torch.tensor([[self.nlp(batch["ind2word"][int(beam_tokens[row][col])]).vector for col in range(beam_tokens.shape[1])] for row in range(beam_tokens.shape[0])], requires_grad=True).to(device)
+                elif self.params["embedding_type"]=="word2vec":
+                    beam_tokens_embed = torch.stack([torch.stack([self.word_to_vec(beam_tokens, row, col, batch["ind2word"]) for col in range(beam_tokens.shape[1])]) for row in range(beam_tokens.shape[0])])
+                    beam_tokens_embed.requires_grad_(requires_grad=True)
+                elif self.params["embedding_type"]=="fasttext":
+                    word_list = [[batch["ind2word"][int(beam_tokens[row][col])] for col in range(beam_tokens.shape[1])] for row in range(beam_tokens.shape[0])]
+                    beam_tokens_embed = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
+                    beam_tokens_embed.requires_grad=True
 
                 if self.params["encoder"] != "pretrained_transformer":
                     dec_embeds = self.pos_encoder(beam_tokens_embed).transpose(0, 1)
@@ -358,7 +386,17 @@ class GenerativeDecoder(nn.Module):
 
             elif self.params["text_encoder"] == "lstm":
                 beam_tokens = beams[step - 1].t()
-                beam_tokens_embed = self.word_embed_net(beam_tokens)
+                if self.params["embedding_type"]=="random":
+                    beam_tokens_embed = self.word_embed_net(beam_tokens)
+                elif self.params["embedding_type"]=="glove":
+                    beam_tokens_embed = torch.tensor([[self.nlp(batch["ind2word"][int(beam_tokens[row][col])]).vector for col in range(beam_tokens.shape[1])] for row in range(beam_tokens.shape[0])], requires_grad=True).to(device)
+                elif self.params["embedding_type"]=="word2vec":
+                    beam_tokens_embed = torch.stack([torch.stack([self.word_to_vec(beam_tokens, row, col, batch["ind2word"]) for col in range(beam_tokens.shape[1])]) for row in range(beam_tokens.shape[0])])
+                    beam_tokens_embed.requires_grad_(requires_grad=True)
+                elif self.params["embedding_type"]=="fasttext":
+                    word_list = [[batch["ind2word"][int(beam_tokens[row][col])] for col in range(beam_tokens.shape[1])] for row in range(beam_tokens.shape[0])]
+                    beam_tokens_embed = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
+                    beam_tokens_embed.requires_grad=True
                 # Append dialog context if exists.
                 if self.params["encoder"] in self.DIALOG_CONTEXT_ENCODERS:
                     dialog_context = encoder_output["dialog_context"]
@@ -479,3 +517,10 @@ class GenerativeDecoder(nn.Module):
             ii for _, ii in sorted(backtrack_beams.items(), key=lambda x: x[0])
         ]
         return backtrack_beams, tokens_list
+
+    def word_to_vec(self, encoder_in, row, col, ind2word):
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        try:
+            return torch.from_numpy(self.w2v_model[ind2word[int(encoder_in[row][col])]]).requires_grad_(requires_grad=True).to(device)
+        except KeyError as k:
+            return torch.zeros(300, requires_grad=True).to(device)

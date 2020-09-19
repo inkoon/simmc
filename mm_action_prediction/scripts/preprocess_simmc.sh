@@ -1,7 +1,9 @@
 #!/bin/bash
 
-#DOMAIN="furniture"
-DOMAIN="fashion"
+
+DOMAIN="furniture"
+#DOMAIN="fashion"
+
 ROOT="../data/simmc_${DOMAIN}/"
 
 # Input files.
