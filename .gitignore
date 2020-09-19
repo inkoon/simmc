@@ -1,6 +1,7 @@
 # B : Usera added
 *.bin
 mm_dst/gpt2_dst/save/
+mm_dst/runs/
 data/
 mm_dst/runs/
 
