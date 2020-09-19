@@ -40,6 +40,7 @@ class CarouselEmbedder(nn.Module):
 
         self.MAG = Multimodal_Adaptation_Gate(params)
         self.MAG_only = Multimodal_Adaptation_Gate_only(params)
+        self.Visualgate = VisualGate(params)
 
     def forward(self, carousel_state, encoder_state, encoder_size):
         """Carousel Embedding.
@@ -101,6 +102,7 @@ class CarouselEmbedder(nn.Module):
         #MAG+encoder_state
         carousel_encode = torch.cat([self.MAG(query, carousel_states).squeeze(0), encoder_state], dim=-1)
         
+        """
         #MAG_only
         #carousel_encode = self.MAG_only(query, carousel_states).squeeze(0)        
         ###
@@ -114,6 +116,33 @@ class CarouselEmbedder(nn.Module):
             key_padding_mask=self.query_mask[query_len - 1],  #self.carousel_mask[carousel_len-1]
         )
         #carousel_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
+        
+        #inkoon gate
+        attended_query_q, attended_wts_q = self.carousel_attend(
+            query,
+            carousel_states,
+            carousel_states,
+            key_padding_mask=self.carousel_mask[carousel_len-1],
+        )
+        v_input = carousel_states.mean(dim=0)
+        v_input = v_input.unsqueeze(0)
+        attended_query_p, atteded_wts_p = self.carousel_attend(
+            v_input,
+            query,
+            query,
+            key_padding_mask=self.query_mask[query_len -1],
+        )
+        attended_query_a, attended_wts_a = self.carousel_attend(
+            query,
+            attended_query_p,
+            attended_query_p,
+            key_padding_mask = self.query_mask[query_len-1],
+        )
+        b = self.Visualgate(attended_query_a, attended_query_q)
+        carousel_encode = torch.cat([attended_query_a.squeeze(0), b.squeeze(0)], dim=-1)
+        ############end
+        """
+
         return carousel_encode
 
     def empty_carousel(self, carousel_state):
@@ -155,6 +184,23 @@ class CarouselEmbedder(nn.Module):
             [self.zero_tensor, self.carousel_pos["empty"]], dim=-1
         ).unsqueeze(0)
         self.none_features = self.empty_feature.expand(3, -1)
+
+
+class VisualGate(nn.Module):
+    def __init__(self, params):
+        super(VisualGate, self).__init__()
+        if params["text_encoder"] == "lstm":
+            output_size = params["hidden_size"]
+        else:
+            output_size = params["word_embed_size"]
+        self.a_linear = nn.Linear(output_size, output_size)
+        self.q_linear = nn.Linear(output_size, output_size)
+    def forward(self, a, q):
+        wa = self.a_linear(a)
+        wq = self.q_linear(q)
+        wa_wq = wa + wq
+        g = torch.sigmoid(wa_wq)
+        return g
 
 
 class Multimodal_Adaptation_Gate(nn.Module):
