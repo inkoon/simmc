@@ -94,8 +94,8 @@ class CarouselEmbedder(nn.Module):
         carousel_states = torch.stack(carousel_states, dim=1)
         # Mask: (N,S)
         carousel_len = self.host.LongTensor(carousel_sizes)
-        query_len = torch.ones(len(carousel_sizes), dtype=torch.long)
-        query_len = query_len.cuda()
+        #query_len = torch.ones(len(carousel_sizes), dtype=torch.long)
+        #query_len = query_len.cuda()
         query = encoder_state.unsqueeze(0)
 
         ###using gate for carousel, query
@@ -103,6 +103,17 @@ class CarouselEmbedder(nn.Module):
         carousel_encode = torch.cat([self.MAG(query, carousel_states).squeeze(0), encoder_state], dim=-1)
         
         """
+        ##original
+        attended_query, attended_wts = self.carousel_attend(
+            query,
+            carousel_states,
+            carousel_states,
+            key_padding_mask = self.carousel_mask[carousel_len-1]
+        )
+        carousel_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
+
+
+        
         #MAG_only
         #carousel_encode = self.MAG_only(query, carousel_states).squeeze(0)        
         ###
