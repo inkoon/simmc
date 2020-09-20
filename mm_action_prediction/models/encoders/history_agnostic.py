@@ -56,6 +56,7 @@ class HistoryAgnosticEncoder(nn.Module):
         # Flatten for history_agnostic encoder.
         batch_size, num_rounds, max_length = batch["user_utt"].shape
         encoder_in = support.flatten(batch["user_utt"], batch_size, num_rounds)
+        import ipdb; ipdb.set_trace(context=10)
         encoder_len = support.flatten(batch["user_utt_len"], batch_size, num_rounds)
         word_embeds_enc = self.word_embed_net(encoder_in)
         # Text encoder: LSTM or Transformer.
