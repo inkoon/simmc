@@ -14,7 +14,6 @@ NUM_GEN=500
 PATH_DIR=$(realpath .)
 PATH_DATA_DIR=$(realpath ../data)
 
-'
 # "${DOMAIN}"
 # Multimodal Data
 # Train split
@@ -63,7 +62,6 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
     --per_gpu_eval_batch_size=32 \
     --warmup_steps=2000 \
     --save_steps=1000
-'
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
