@@ -607,12 +607,14 @@ def main():
     # B: user added args
     parser.add_argument("--gpu_id", type=str, default='0')
     parser.add_argument("--mul_gpu", type=int, default=0)
+    parser.add_argument("--n_gpu", type=int, default=1) 
     args = parser.parse_args()
 
     
     # B : gpu setting
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu_id
+    if args.n_gpu == 1:
+        os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu_id
 
     if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
         raise ValueError(
@@ -661,7 +663,7 @@ def main():
         torch.cuda.set_device(args.local_rank)
         device = torch.device("cuda", args.local_rank)
         torch.distributed.init_process_group(backend="nccl")
-        args.n_gpu = 1
+        #args.n_gpu = 1
     args.device = device
 
     # Setup logging
