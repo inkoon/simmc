@@ -1,6 +1,6 @@
 """Implements seq2seq encoder that is history-agnostic.
 
-Author(s): Satwik Kottur
+Author(s): Boychaboy
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -12,9 +12,7 @@ from tools import torch_support as support
 import models
 import models.encoders as encoders
 
-
-@encoders.register_encoder("history_agnostic")
-class HistoryAgnosticEncoder(nn.Module):
+class BeliefStateEncoder(nn.Module):
     def __init__(self, params):
         super(HistoryAgnosticEncoder, self).__init__()
         self.params = params
@@ -56,6 +54,7 @@ class HistoryAgnosticEncoder(nn.Module):
         # Flatten for history_agnostic encoder.
         batch_size, num_rounds, max_length = batch["user_utt"].shape
         encoder_in = support.flatten(batch["user_utt"], batch_size, num_rounds)
+        import ipdb; ipdb.set_trace(context=10)
         encoder_len = support.flatten(batch["user_utt_len"], batch_size, num_rounds)
         word_embeds_enc = self.word_embed_net(encoder_in)
         # Text encoder: LSTM or Transformer.
