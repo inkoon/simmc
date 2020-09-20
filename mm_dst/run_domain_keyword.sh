@@ -3,13 +3,20 @@ if [[ $# -eq 0 ]] || [[ $# -eq 1 ]]
 then
 	echo "run format > ./run_domain_keyword.sh [domain] [keyword]"
 	exit 1
-else
+elif [[ $# -eq 2 ]]
+then
 	DOMAIN=$1
 	KEYWORD=$2
+	VERSION=""
+elif [[ $# -eq 3 ]]
+then
+	DOMAIN=$1
+	KEYWORD=$2
+	VERSION=$3
 fi
 
 GPU_ID='0'
-NUM_GEN=500
+NUM_GEN=10000
 
 PATH_DIR=$(realpath .)
 PATH_DATA_DIR=$(realpath ../data)
@@ -17,11 +24,12 @@ PATH_DATA_DIR=$(realpath ../data)
 # "${DOMAIN}"
 # Multimodal Data
 # Train split
+'
 python -m gpt2_dst.scripts.preprocess_input \
     --input_path_json="${PATH_DATA_DIR}"/simmc_"${DOMAIN}"/"${DOMAIN}"_train_dials.json \
     --output_path_predict="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_train_dials_predict.txt \
     --output_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_train_dials_target.txt \
-    --len_context=3 \
+    --len_context=2 \
     --use_multimodal_contexts=1 \
     --output_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json
 
@@ -30,7 +38,7 @@ python -m gpt2_dst.scripts.preprocess_input \
     --input_path_json="${PATH_DATA_DIR}"/simmc_"${DOMAIN}"/"${DOMAIN}"_dev_dials.json \
     --output_path_predict="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_predict.txt \
     --output_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_target.txt \
-    --len_context=3 \
+    --len_context=2 \
     --use_multimodal_contexts=1 \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
     --output_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
@@ -40,13 +48,14 @@ python -m gpt2_dst.scripts.preprocess_input \
     --input_path_json="${PATH_DATA_DIR}"/simmc_"${DOMAIN}"/"${DOMAIN}"_devtest_dials.json \
     --output_path_predict="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predict.txt \
     --output_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_target.txt \
-    --len_context=3 \
+    --len_context=2 \
     --use_multimodal_contexts=1 \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
+'
 
 # Train ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}" \
+    --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VER}" \
     --model_type=gpt2 \
     --model_name_or_path=gpt2 \
     --line_by_line \
@@ -55,12 +64,13 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
     --train_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_train_dials_target.txt \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_target.txt \
-    --num_train_epochs=5 \
+    --evaluate_during_training \
+    --num_train_epochs=10 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
     --per_gpu_train_batch_size=8 \
     --per_gpu_eval_batch_size=32 \
-    --warmup_steps=2000 \
+    --warmup_steps=4000 \
     --save_steps=1000
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
@@ -80,3 +90,4 @@ python -m gpt2_dst.scripts.evaluate \
     --input_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_target.txt \
     --input_path_predicted="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predicted.txt \
     --output_path_report="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}"/"${DOMAIN}"_devtest_dials_report.json
+'

@@ -212,6 +212,10 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
     if args.local_rank in [-1, 0]:
         tb_writer = SummaryWriter()
 
+    # B : add parameters in tensorboardX
+    tb_writer.add_hparams({'warmup_step': args.warmup_step, 'learning_rate': args.learning_rate, 'per_gpu_train_batch_size': args.per_gpu_train_batch_size, 'num_training_epochs':args.num_train_epochs, 'mul_gpu': args.mul_gpu}) 
+
+
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
 
     def collate(examples: List[torch.Tensor]):
@@ -357,7 +361,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
                     if (
                         args.local_rank == -1 and args.evaluate_during_training
                     ):  # Only evaluate when single GPU otherwise metrics may not average well
-                        results = evaluate(args, model, tokenizer)
+                        results = evaluate(args, model, tokenizer, global_step)
                         for key, value in results.items():
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
@@ -397,7 +401,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
     return global_step, tr_loss / global_step
 
 
-def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefix="") -> Dict:
+def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, global_step, prefix="") -> Dict:
     # Loop to handle MNLI double evaluation (matched, mis-matched)
     eval_output_dir = args.output_dir
 
@@ -448,11 +452,22 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefi
     result = {"perplexity": perplexity}
 
     output_eval_file = os.path.join(eval_output_dir, prefix, "eval_results.txt")
+    prev_results = []
+    if os.path.isfile(output_eval_file):
+        with open(output_eval_file, 'r') as reader:
+            for line in reader.readlines():
+                prev_results.append(line)
+
     with open(output_eval_file, "w") as writer:
         logger.info("***** Eval results {} *****".format(prefix))
-        for key in sorted(result.keys()):
-            logger.info("  %s = %s", key, str(result[key]))
-            writer.write("%s = %s\n" % (key, str(result[key])))
+        for prev_r in prev_results:
+            line = prev_r.split('\t')
+            writer.write(line[0]+'\t'+line[1])
+        # for key in sorted(result.keys()):
+            # logger.info("  %s = %s", key, str(result[key]))
+            # writer.write("%s = %s\n" % (key, str(result[key])))
+        # B : track every results
+        writer.write(str(global_step)+'\t'+str(result['perplexity'])+'\n')
 
     return result
 
@@ -550,7 +565,7 @@ def main():
         type=int,
         default=1,
         help="Number of updates steps to accumulate before performing a backward/update pass.",
-    )
+        )
     parser.add_argument("--learning_rate", default=5e-5, type=float, help="The initial learning rate for Adam.")
     parser.add_argument("--weight_decay", default=0.0, type=float, help="Weight decay if we apply some.")
     parser.add_argument("--adam_epsilon", default=1e-8, type=float, help="Epsilon for Adam optimizer.")
@@ -609,6 +624,7 @@ def main():
     parser.add_argument("--mul_gpu", type=int, default=0)
     parser.add_argument("--n_gpu", type=int, default=1) 
     args = parser.parse_args()
+    
 
     
     # B : gpu setting
@@ -803,7 +819,7 @@ def main():
 
             model = AutoModelWithLMHead.from_pretrained(checkpoint)
             model.to(args.device)
-            result = evaluate(args, model, tokenizer, prefix=prefix)
+            result = evaluate(args, model, tokenizer, global_step, prefix=prefix)
             result = {k + "_{}".format(global_step): v for k, v in result.items()}
             results.update(result)
 

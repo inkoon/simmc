@@ -33,6 +33,7 @@ if __name__ == '__main__':
 
     # B : User added args
     parser.add_argument('--noresp', action='store_true') 
+    parser.add_argument('--attribute', action='store_true')
 
 
     args = parser.parse_args()
@@ -53,5 +54,6 @@ if __name__ == '__main__':
         output_path_special_tokens=output_path_special_tokens,
         len_context=len_context,
         noresp=args.noresp,
+        attribute=args.attribute,
         use_multimodal_contexts=use_multimodal_contexts)
 
