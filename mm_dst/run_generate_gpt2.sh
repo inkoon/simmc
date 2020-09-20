@@ -7,12 +7,17 @@ LENGTH=100	# 100
 NGRAM=0		# 0
 TOKEN=0		# 0
 GPU_ID='1'	# '0'
-
+TOP_P=1
+TOP_K=1
+TEMPERATURE=1
 PARAMETERS="NUM_GEN		$NUM_GEN
 NUM_BEAMS	$NUM_BEAMS
 LENGTH		$LENGTH
 NGRAM		$NGRAM
-TOKEN 		$TOKEN"
+TOKEN 		$TOKEN
+TOP_P		$TOP_P
+TOP_K		$TOP_K
+TEMPERATURE   	$TEMPERATURE"
 
 if [[ $# -eq 0 ]]
 then
@@ -58,6 +63,9 @@ python -m gpt2_dst.scripts.run_generation \
     --num_gen=$NUM_GEN \
     --token=$TOKEN \
     --gpu_id=$GPU_ID \
+    --p=$TOP_P \
+    --k=$TOP_K \
+    --temperature=$TEMPERATURE \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/furniture_to/furniture_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/furniture_to/"${KEYWORD}"/furniture_devtest_dials_predicted.txt
 
@@ -78,6 +86,9 @@ python -m gpt2_dst.scripts.run_generation \
     --num_gen=$NUM_GEN \
     --token=$TOKEN \
     --gpu_id=$GPU_ID \
+    --p=$TOP_P \
+    --k=$TOP_K \
+    --temperature=$TEMPERATURE \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/furniture/"${KEYWORD}"/furniture_devtest_dials_predicted.txt
 echo "$PARAMETERS" > "${PATH_DIR}"/gpt2_dst/results/furniture/"${KEYWORD}"/parameters.txt
@@ -97,6 +108,9 @@ python -m gpt2_dst.scripts.run_generation \
     --num_gen=$NUM_GEN \
     --token=$TOKEN \
     --gpu_id=$GPU_ID \
+    --p=$TOP_P \
+    --k=$TOP_K \
+    --temperature=$TEMPERATURE \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/fashion_to/fashion_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/fashion_to/"${KEYWORD}"/fashion_devtest_dials_predicted.txt
 echo "$PARAMETERS" > "${PATH_DIR}"/gpt2_dst/results/fashion_to/"${KEYWORD}"/parameters.txt
@@ -116,6 +130,9 @@ python -m gpt2_dst.scripts.run_generation \
     --num_gen=$NUM_GEN \
     --token=$TOKEN \
     --gpu_id=$GPU_ID \
+    --p=$TOP_P \
+    --k=$TOP_K \
+    --temperature=$TEMPERATURE \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/fashion/"${KEYWORD}"/fashion_devtest_dials_predicted.txt
 echo "$PARAMETERS" > "${PATH_DIR}"/gpt2_dst/results/fashion/"${KEYWORD}"/parameters.txt

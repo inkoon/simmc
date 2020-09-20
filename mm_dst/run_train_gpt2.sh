@@ -2,18 +2,19 @@
 
 # PARAMETERS	DEFAUT VALUE
 EPOCHS=10	# 1
-TRAIN_BATCH=8	# 4
+TRAIN_BATCH=16	# 4
 VAL_BATCH=32	# 4
 MUL_GPU=1	# 1
 GPU_ID='1'	# '0'
 WARM_UP=2000	# 0
 LR=1e-5		# 5e-5
 LOGGING=2000	# 500
-
+N_GPU=2
 PARAMETERS="EPOCHS		$EPOCHS
 TRAIN_BATCH	$TRAIN_BATCH
 VAL_BATCH	$VAL_BATCH
 MUL_GPU		$MUL_GPU
+N_GPU 		$N_GPU
 "
 
 if [[ $# -eq 0 ]]
@@ -56,6 +57,8 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --learning_rate=$LR \
     --warmup_steps=$WARM_UP \
     --gpu_id=$GPU_ID \
+    --mul_gpu=$MUL_GPU \
+    --n_gpu=$N_GPU \
     --per_gpu_train_batch_size=$TRAIN_BATCH \
     --per_gpu_eval_batch_size=$VAL_BATCH
 fi
@@ -80,6 +83,8 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --learning_rate=$LR \
     --warmup_steps=$WARM_UP \
     --gpu_id=$GPU_ID \
+    --mul_gpu=$MUL_GPU \
+    --n_gpu=$N_GPU \
     --per_gpu_train_batch_size=$TRAIN_BATCH \
     --per_gpu_eval_batch_size=$VAL_BATCH
 fi
@@ -103,7 +108,9 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --overwrite_output_dir \
     --learning_rate=$LR \
     --warmup_steps=$WARM_UP \
+    --mul_gpu=$MUL_GPU \
     --gpu_id=$GPU_ID \
+    --n_gpu=$N_GPU \
     --per_gpu_train_batch_size=$TRAIN_BATCH \
     --per_gpu_eval_batch_size=$VAL_BATCH
 fi
@@ -127,7 +134,9 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --overwrite_output_dir \
     --learning_rate=$LR \
     --warmup_steps=$WARM_UP \
+    --mul_gpu=$MUL_GPU \
     --gpu_id=$GPU_ID \
+    --n_gpu=$N_GPU \
     --per_gpu_train_batch_size=$TRAIN_BATCH \
     --per_gpu_eval_batch_size=$VAL_BATCH
 fi
