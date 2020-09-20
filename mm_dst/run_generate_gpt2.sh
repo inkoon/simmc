@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # parameters	defaut value
-NUM_GEN=500	# 100000
+NUM_GEN=100000	# 100000
 NUM_BEAMS=2	# 1
 LENGTH=100	# 100
 NGRAM=0		# 0
