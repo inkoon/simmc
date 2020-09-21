@@ -14,9 +14,8 @@ import os
 import numpy as np
 from nltk.tokenize import word_tokenize
 from tqdm import tqdm as progressbar
-import sys
-sys.path.append('/home/yeonseok/simmc/mm_action_prediction') 
-from tools import support
+ 
+import support
 
 
 FLAGS = flags.FLAGS
@@ -82,6 +81,8 @@ def build_multimodal_inputs(input_json_file):
     ]
     action_info = {
         "action": np.full((num_dialogs, max_dialog_len), "None", dtype="object_"),
+        "belief_state_act": np.full((num_dialogs, max_dialog_len), "None", dtype="object_"),
+        "belief_state_attr": np.full((num_dialogs, max_dialog_len), "None", dtype="object_"),
         "action_supervision": copy.deepcopy(empty_action_list),
         "carousel_state": copy.deepcopy(empty_action_list),
         "action_output_state": copy.deepcopy(empty_action_list)
@@ -132,7 +133,10 @@ def build_multimodal_inputs(input_json_file):
         encoded_candidates = np.full(
             (num_dialogs, max_dialog_len, num_candidates), -1, dtype=np.int32
         )
-
+    with open(FLAGS.vocab_file, "r") as file_id:
+        vocabulary = json.load(file_id)
+    act2ind = {word: index+1 for index, word in enumerate(vocabulary["act_type"].values())}
+    attr2ind = {word: index+1 for index, word in enumerate(vocabulary["attr_type"].values())}
     for datum_id, datum in enumerate(data["dialogue_data"]):
         dialog_id = datum["dialogue_idx"]
         dialog_ids[datum_id] = dialog_id
@@ -173,12 +177,48 @@ def build_multimodal_inputs(input_json_file):
 
             action_info["action_supervision"][datum_id][round_id] = (
                 cur_action_supervision
-            )
+            );#import pdb;pdb.set_trace()
+            #action_info["belief_state"][datum_id][round_id]=round_datum["belief_state"]
+            act_list = []
+            attr_list=[]
+            for num in range(len(round_datum["belief_state"])):
+                if round_datum["belief_state"][num]["act"]==None:
+                    act = "ERR:UNSUPPORTED:OBJECT"
+                    act_list.append(act)
+                    attr_list.append('none')
+                else:
+                    if round_datum["belief_state"][num]["act"][0]=="E":
+                        act_list.append(round_datum["belief_state"][num]["act"])
+                        attr_list.append('none')
+                    elif round_datum["belief_state"][num]["act"][0]=="D":
+                        bel_list = round_datum["belief_state"][num]["act"].split('.')
+                        act_list.append(bel_list[0])
+                        if len(bel_list)==2:
+                            attr_list.append(bel_list[1])
+                        else:
+                            attr_list.append('none')
+                    else:
+                        act = "ERR:UNSUPPORTED:OBJECT"
+                        act_list.append(act)
+                        attr_list.append('none')
+            belief_state_act = []
+            belief_state_attr = []
+            for a in act_list:
+                try:
+                    belief_state_act.append(act2ind[a])
+                except KeyError:
+                    belief_state_act.append("ERR:UNSUPPORTED:OBJECT")
+            for a in attr_list:
+                try:
+                    belief_state_attr.append(attr2ind[a])
+                except KeyError:
+                    belief_state_attr.append('unk')
+            action_info["belief_state_act"][datum_id][round_id]=belief_state_act
+            action_info["belief_state_attr"][datum_id][round_id]=belief_state_attr
             for key in action_keys:
                 action_info[key][datum_id][round_id] = action_datum[key]
             action_counts[action_datum["action"]] += 1
-    support.print_distribution(action_counts, "Action distribution:")
-
+    support.print_distribution(action_counts, "Action distribution:") 
     # Record retrieval candidates, if path is provided.
     if FLAGS.retrieval_candidate_file:
         for datum_id, datum in enumerate(data["dialogue_data"]):

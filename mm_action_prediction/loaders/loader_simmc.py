@@ -27,7 +27,9 @@ class DataloaderSIMMC(loaders.LoaderParent):
         self.params = params
         # Load the dataset.
         raw_data = np.load(params["data_read_path"], allow_pickle=True)
-        self.raw_data = raw_data[()]
+        self.raw_data = raw_data[()];
+        self.belief_state_act = self.raw_data["belief_state_act"]
+        self.belief_state_attr = self.raw_data["belief_state_attr"]
         if self.params["encoder"] != "pretrained_transformer":
             self.words = loaders.Vocabulary()
             self.words.set_vocabulary_state(self.raw_data["vocabulary"]["word"])
@@ -129,11 +131,30 @@ class DataloaderSIMMC(loaders.LoaderParent):
             "pad_token": self.pad_token,
             "start_token": self.start_token,
             "sample_ids": sample_ids,
-        }
+        };
         batch["ind2word"] = self.raw_data["ind2word"]
         batch["dialog_len"] = self.raw_data["dialog_len"][sample_ids]
         batch["dialog_id"] = self.raw_data["dialog_id"][sample_ids]
         max_dialog_len = max(batch["dialog_len"])
+
+        batch["belief_state_act"] = []
+        for i in sample_ids:
+            utter_list=[]
+            for index in range(len(self.belief_state_act[i])):
+                if self.belief_state_act[i][index]=="None":
+                    utter_list.append([0])
+                else:
+                    utter_list.append(self.belief_state_act[i][index])
+            batch["belief_state_act"].append(utter_list)
+        batch["belief_state_attr"] = []#
+        for i in sample_ids:
+            utter_list=[]
+            for index in range(len(self.belief_state_attr[i])):
+                if self.belief_state_attr[i][index]=="None":
+                    utter_list.append([0])
+                else:
+                    utter_list.append(self.belief_state_attr[i][index])
+            batch["belief_state_attr"].append(utter_list)
 
         user_utt_id = self.raw_data["user_utt_id"][sample_ids]
         batch["user_utt"], batch["user_utt_len"] = self._sample_utterance_pool(

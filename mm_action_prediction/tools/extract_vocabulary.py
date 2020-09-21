@@ -18,6 +18,9 @@ def main(args):
     dialog_data = train_data["dialogue_data"]
 
     counts = {}
+    intent_list = []
+    intent_has_none = 0
+    attr_list = ['none','unk']
     for datum in dialog_data:
         dialog_utterances = [
             ii[key] for ii in datum["dialogue"]
@@ -29,7 +32,32 @@ def main(args):
         for turn in dialog_tokens:
             for word in turn:
                 counts[word] = counts.get(word, 0) + 1
+        for turn in datum["dialogue"]:
+            for num in range(len(turn["belief_state"])):
+                if turn["belief_state"][num]["act"]==None and intent_has_none==0:
+                    intent_list.append('none')
+                    intent_has_none = 1
+                else:
+                    if turn["belief_state"][num]["act"][0]=="E":
+                        if turn["belief_state"][num]["act"] not in intent_list:
+                            intent_list.append(turn["belief_state"][num]["act"] )
+                    elif turn["belief_state"][num]["act"][0]=="D":
+                        bel_list = turn["belief_state"][num]["act"].split('.')
+                        if bel_list[0] not in intent_list:
+                            intent_list.append(bel_list[0])
+                        if len(bel_list)>=2 and bel_list[1] not in attr_list:
+                            attr_list.append(bel_list[1])
+                    else:
+                        raise KeyboardInterrupt('undefined belief_state')
 
+    intent_list.sort()
+    intent_dict = {}
+    for i, intent in enumerate(intent_list):
+        intent_dict[i+1]=intent
+    attr_list.sort()
+    attr_dict={}
+    for i, attr in enumerate(attr_list):
+        attr_dict[i+1]=attr
     # Add <pad>, <unk>, <start>, <end>.
     counts["<pad>"] = args["threshold_count"] + 1
     counts["<unk>"] = args["threshold_count"] + 1
@@ -40,6 +68,7 @@ def main(args):
     words = [ii[0] for ii in word_counts if ii[1] >= args["threshold_count"]]
     vocabulary = {"word": words}
     # Save answers and vocabularies.
+    vocabulary = {"word": words,  "act_type" : intent_dict, "attr_type" : attr_dict}
     print("Identified {} words..".format(len(words)))
     print("Saving dictionary: {}".format(args["vocab_save_path"]))
     with open(args["vocab_save_path"], "w") as file_id:
