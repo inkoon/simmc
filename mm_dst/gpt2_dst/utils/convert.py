@@ -38,6 +38,7 @@ def convert_json_to_flattened(
         len_context=2,
         noresp=False,
         attribute=False,
+        slot=False,
         use_multimodal_contexts=True,
         input_path_special_tokens='',
         output_path_special_tokens=''):
@@ -108,15 +109,43 @@ def convert_json_to_flattened(
                 if attribute:
                     if '.' in bs_per_frame['act']:
                         str_act = bs_per_frame['act'].split('.')
-                        str_act = str_act[0] + ' ' + str_act[1]
+                        # B : lowercase + parse
+                        attribute = ''
+                        for c in str_act[1]:
+                            if c.isupper():
+                                attribute += ' ' + c.lower()
+                            else:
+                                attribute += c
+
+                        str_act = str_act[0] + ' ' + attribute
                     else:
                         str_act = bs_per_frame['act']
-                    str_belief_state_per_frame = "{act} [ {slot_values} ]".format(
-                        act=str_act,
-                        slot_values=', '.join(
-                            [f'{kv[0].strip()} = {kv[1].strip()}'
-                                for kv in bs_per_frame['slots']])
-                    ) 
+
+                    if slot :
+                        slot_list = list()
+                        for kv in bs_per_frame['slots']:
+                            sp = kv[0].strip().split("-")
+                            sp0 = sp[0]
+                            sp1 = ""
+                            for c in sp[1]:
+                                if c.isupper():
+                                    sp1 += ' ' + c.lower()
+                                else:
+                                    sp1 += c
+                            slot_list.append(f'{sp0} {sp1} = {kv[1].strip()}')
+
+                        str_belief_state_per_frame = "{act} [ {slot_values} ]".format(
+                            act=str_act,
+                            slot_values=', '.join(slot_list)
+                        ) 
+
+                    else : 
+                        str_belief_state_per_frame = "{act} [ {slot_values} ]".format(
+                            act=str_act,
+                            slot_values=', '.join(
+                                [f'{kv[0].strip()} = {kv[1].strip()}'
+                                    for kv in bs_per_frame['slots']])
+                        ) 
                 else:
                     str_belief_state_per_frame = "{act} [ {slot_values} ]".format(
                         act=bs_per_frame['act'].strip(),

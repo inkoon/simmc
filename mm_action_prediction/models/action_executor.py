@@ -32,6 +32,9 @@ class ActionExecutor(nn.Module):
         # If multimodal input state is to be used.
         if self.params["use_multimodal_state"]:
             input_size += self.params["hidden_size"]
+        # B : if belief state is to be used.
+        if self.params["use_belief_state"]:
+            input_size += self.params["hidden_size"]
         self.action_net = self._get_classify_network(input_size, params["num_actions"])
         # Read action metadata.
         with open(params["metainfo_path"], "r") as file_id:
@@ -84,6 +87,7 @@ class ActionExecutor(nn.Module):
             outputs: Dict of expected outputs
         """
         outputs = {}
+
         if self.params["use_action_attention"] and self.params["encoder"] != "tf_idf":
             encoder_state = prev_outputs["hidden_states_all"]
             batch_size, num_rounds, max_len = batch["user_mask"].shape
@@ -109,6 +113,10 @@ class ActionExecutor(nn.Module):
                 encoder_state = self.multimodal_embed(
                     multimodal_state, encoder_state, batch["dialog_mask"].shape[:2]
                 )
+
+        # B : belief state.
+        if self.params["use_belief_state"]:
+            encoder_state = torch.cat((encoder_state, belief_state), dim=1)
 
         # Predict and execute actions.
         action_logits = self.action_net(encoder_state)

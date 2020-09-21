@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # B : User added args
     parser.add_argument('--noresp', action='store_true') 
     parser.add_argument('--attribute', action='store_true')
-
+    parser.add_argument('--slot', action='store_true')
 
     args = parser.parse_args()
     input_path_json = args.input_path_json
@@ -55,5 +55,6 @@ if __name__ == '__main__':
         len_context=len_context,
         noresp=args.noresp,
         attribute=args.attribute,
+        slot=args.slot,
         use_multimodal_contexts=use_multimodal_contexts)
 
