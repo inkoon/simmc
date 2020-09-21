@@ -76,6 +76,10 @@ class ActionExecutor(nn.Module):
         self.criterion = nn.CrossEntropyLoss(reduction="none")
         self.criterion_multi = torch.nn.MultiLabelSoftMarginLoss()
 
+        # B : belief state embedding
+        self.action_embedding = nn.Embedding(params["action_num"], params["hidden_size"]/2)
+        self.attribute_embedding = nn.Embedding(params["attribute_num"], params["hidden_size"]/2)
+
     def forward(self, batch, prev_outputs):
         """Forward pass a given batch.
 
@@ -116,6 +120,9 @@ class ActionExecutor(nn.Module):
 
         # B : belief state.
         if self.params["use_belief_state"]:
+            action_state = self.action_embedding(batch["action"])
+            attribute_state = self.attribute_embedding(batch["attribute"])
+            belief_state = torch.cat((action_state, attribute_state), dim=1)
             encoder_state = torch.cat((encoder_state, belief_state), dim=1)
 
         # Predict and execute actions.
