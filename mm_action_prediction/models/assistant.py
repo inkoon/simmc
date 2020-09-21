@@ -53,6 +53,7 @@ class Assistant(nn.Module):
           mode: None for training or teaching forcing evaluation;
                 BEAMSEARCH / SAMPLE / MAX to generate text
         """
+        # import ipdb; ipdb.set_trace(context=10)
         outputs = self.encoder(batch)
         action_output = self.action_executor(batch, outputs)
         outputs.update(action_output)

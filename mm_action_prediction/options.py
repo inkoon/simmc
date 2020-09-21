@@ -176,9 +176,9 @@ def read_command_line():
     parser.add_argument(
         "--share_embeddings",
         dest="share_embeddings",
-        action="store_true",
+        action="store_false",
         default=True,
-        help="Encoder/decoder share emebddings",
+        help="Encoder/decoder DO NOT!!! share emebddings",
     )
 
     # Optimization hyperparameters.
@@ -227,7 +227,15 @@ def read_command_line():
         "--seed", type=int, default=2020, help="Seed number for initialization"
     )
     parser.add_argument(
-        "--gpt2", action="store_true", default=False, help="Whether we decode using gpt2"
+        "--gpt2", action="store_true", default=False, help="Using gpt2 as decoder"
+    )
+    parser.add_argument(
+        "--bert2gpt2", action="store_true", default=False, help="Using bert2gpt2 as encoder-decoder"
+    )
+    parser.add_argument(
+        "--root_path",
+        default="../data/gpt2_simmc_furniture/",
+        help="Path to ROOT (only for gpt2)",
     )
     try:
         parsed_args = vars(parser.parse_args())

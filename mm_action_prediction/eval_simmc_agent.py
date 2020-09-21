@@ -72,11 +72,18 @@ def evaluate_agent(wizard, val_loader, args):
             # Stringify model responses.
             # batch_outputs["beam_output"] = idx of str
             if args["bleu_evaluation"]:
-                batch_outputs["model_response"] = (
-                    val_loader.stringify_beam_outputs(
-                        batch_outputs["beam_output"], batch
+                if args["gpt2"]:
+                    batch_outputs["model_response"] = (
+                        val_loader.gpt2_stringify_beam_outputs(
+                            batch_outputs["beam_output"], batch
+                        )
                     )
-                )
+                else:
+                    batch_outputs["model_response"] = (
+                        val_loader.stringify_beam_outputs(
+                            batch_outputs["beam_output"], batch
+                        )
+                    )
                 # Remove beam output to avoid memory issues.
                 del batch_outputs["beam_output"]
             matches.append(batch_outputs)
@@ -98,6 +105,8 @@ def evaluate_agent(wizard, val_loader, args):
     else:
         model_responses = None
         bleu_score = -1.
+
+    print(model_response[0]['predictions'])
 
     # Evaluate retrieval score.
     if args["retrieval_evaluation"]:

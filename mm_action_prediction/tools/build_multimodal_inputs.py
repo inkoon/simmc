@@ -46,6 +46,9 @@ flags.DEFINE_boolean(
 flags.DEFINE_boolean(
     "gpt2", False, "Use gpt2"
 )
+flags.DEFINE_boolean(
+    "bert2gpt2", False, "Use bert2gpt2"
+)
 
 
 def build_multimodal_inputs(input_json_file):
@@ -213,6 +216,7 @@ def build_multimodal_inputs(input_json_file):
         # use pretrained GPT2 tokenizer.
         from transformers import GPT2Tokenizer
         tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+        tokenizer.add_special_tokens({'pad_token': '<pad>'})
         with open(FLAGS.vocab_file, "r") as file_id:
             vocabulary = json.load(file_id)
         mm_inputs["vocabulary"] = dict()
@@ -231,7 +235,7 @@ def build_multimodal_inputs(input_json_file):
         )
 
         # Token aliases.
-        pad_token = tokenizer.eos_token_id # GPT2 dosen't have pad token.
+        pad_token = tokenizer.pad_token_id # GPT2 dosen't have pad token.
         start_token = tokenizer.bos_token_id
         end_token = tokenizer.eos_token_id
     elif not FLAGS.pretrained_tokenizer:

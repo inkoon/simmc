@@ -35,6 +35,10 @@ class GenerativeDecoder(nn.Module):
         if params["text_encoder"] == "transformer":
             if params["gpt2"]:
                 self.decoder_unit = GPT2LMHeadModel.from_pretrained('gpt2')
+                # self.decoder_unit.resize_token_embeddings(params["vocab_size"])
+                self.decoder_unit.resize_token_embeddings(50258)
+                self.badword_list = params["badword_list"]
+                # self.decoder_unit.config.add_cross_attention=True
             elif params["encoder"] != "pretrained_transformer":
                 decoder_layer = nn.TransformerDecoderLayer(
                     params["word_embed_size"],
@@ -154,6 +158,8 @@ class GenerativeDecoder(nn.Module):
                 outputs = self.decoder_unit(
                     inputs_embeds=decoder_steps_in,
                     labels=decoder_out,
+                    # encoder_hidden_states=hidden_state,
+                    # encoder_attention_mask=~enc_pad_mask,
                 )
                 outputs = outputs[1]
             elif self.params["encoder"] != "pretrained_transformer":
@@ -281,7 +287,6 @@ class GenerativeDecoder(nn.Module):
                             ii[:, index, :].unsqueeze(1).contiguous()
                             for ii in encoder_output["hidden_state"]
                         )
-                # import ipdb; ipdb.set_trace(context=10)
                 if self.params['gpt2']:
                     e_len = self.params['max_encoder_len']
                     d_len = self.params['max_decoder_len']
@@ -289,11 +294,12 @@ class GenerativeDecoder(nn.Module):
                     new_batch['user_utt'][0][e_len] = self.params['start_token']
                     beam_out = self.decoder_unit.generate(
                         input_ids=new_batch['user_utt'].reshape(1, -1),
-                        max_length=51, # max(100, e_len + d_len + 1)
+                        max_length=e_len+d_len+1, # max(100, e_len + d_len + 1)
                         num_beams=5,
                         pad_token_id=self.params['pad_token'],
                         bos_token_id=self.params['start_token'],
                         eos_token_id=self.params['end_token'],
+                        bad_word_ids=self.badword_list,
                     )
                     top_beam = beam_out[0][e_len+1:e_len+d_len+1].reshape(-1, 1)
                 else:
