@@ -17,7 +17,7 @@ from tools import support, torch_support
 from tools.action_evaluation import evaluate_action_prediction
 from tools.response_evaluation import evaluate_response_generation
 from tools.retrieval_evaluation import evaluate_response_retrieval
-
+import torch
 
 class DataloaderSIMMC(loaders.LoaderParent):
     """Loads data for SIMMC datasets.
@@ -138,23 +138,27 @@ class DataloaderSIMMC(loaders.LoaderParent):
         max_dialog_len = max(batch["dialog_len"])
 
         batch["belief_state_act"] = []
-        for i in sample_ids:
+        for i in sample_ids: # 1개 dialog
             utter_list=[]
-            for index in range(len(self.belief_state_act[i])):
+            for index in range(len(self.belief_state_act[i])): # 1개 turn
                 if self.belief_state_act[i][index]=="None":
-                    utter_list.append([0])
+                    utter_list.append([0,0])
                 else:
                     utter_list.append(self.belief_state_act[i][index])
             batch["belief_state_act"].append(utter_list)
-        batch["belief_state_attr"] = []#
-        for i in sample_ids:
+        act_array = np.array(batch["belief_state_act"])
+        batch["belief_state_act"]=torch.from_numpy(act_array)    
+        batch["belief_state_attr"] = []#np.zeros(len(sample_ids), max_dialog_len)
+        for i in sample_ids: # 1개 dialog
             utter_list=[]
-            for index in range(len(self.belief_state_attr[i])):
+            for index in range(len(self.belief_state_attr[i])): # 1개 turn
                 if self.belief_state_attr[i][index]=="None":
-                    utter_list.append([0])
+                    utter_list.append([0,0])
                 else:
                     utter_list.append(self.belief_state_attr[i][index])
             batch["belief_state_attr"].append(utter_list)
+        attr_array = np.array(batch["belief_state_attr"])
+        batch["belief_state_attr"]=torch.from_numpy(attr_array)
 
         user_utt_id = self.raw_data["user_utt_id"][sample_ids]
         batch["user_utt"], batch["user_utt_len"] = self._sample_utterance_pool(

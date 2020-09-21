@@ -178,41 +178,81 @@ def build_multimodal_inputs(input_json_file):
             action_info["action_supervision"][datum_id][round_id] = (
                 cur_action_supervision
             );#import pdb;pdb.set_trace()
-            #action_info["belief_state"][datum_id][round_id]=round_datum["belief_state"]
+            act2ind['none']=0
+            attr2ind['none']=0
             act_list = []
-            attr_list=[]
-            for num in range(len(round_datum["belief_state"])):
-                if round_datum["belief_state"][num]["act"]==None:
-                    act = "ERR:UNSUPPORTED:OBJECT"
-                    act_list.append(act)
-                    attr_list.append('none')
-                else:
-                    if round_datum["belief_state"][num]["act"][0]=="E":
-                        act_list.append(round_datum["belief_state"][num]["act"])
-                        attr_list.append('none')
-                    elif round_datum["belief_state"][num]["act"][0]=="D":
-                        bel_list = round_datum["belief_state"][num]["act"].split('.')
-                        act_list.append(bel_list[0])
-                        if len(bel_list)==2:
-                            attr_list.append(bel_list[1])
-                        else:
-                            attr_list.append('none')
-                    else:
+            attr_list = []
+            intent_list = []
+            for num in range(2):
+                if len(round_datum["belief_state"])>=2:
+                    if round_datum["belief_state"][num]["act"]==None:
                         act = "ERR:UNSUPPORTED:OBJECT"
                         act_list.append(act)
                         attr_list.append('none')
+                    else: 
+                        if round_datum["belief_state"][num]["act"][0]=="E":
+                            act_list.append(round_datum["belief_state"][num]["act"])
+                            attr_list.append('none')
+                        elif round_datum["belief_state"][num]["act"][0]=="D":
+                            bel_list = round_datum["belief_state"][num]["act"].split('.')
+                            act_list.append(bel_list[0])
+                            if len(bel_list)>=2 and bel_list[1] not in attr_list:
+                                attr_list.append(bel_list[1])
+                            else:
+                                attr_list.append('none')
+                        else:
+                            act = "ERR:UNSUPPORTED:OBJECT"
+                            act_list.append(act)
+                            attr_list.append('none')
+                elif len(round_datum["belief_state"])==1:
+                    if round_datum["belief_state"][num]["act"]==None:
+                        act = "ERR:UNSUPPORTED:OBJECT"
+                        act_list.append(act)
+                        act_list.append(act)
+                        attr_list.append('none')
+                        attr_list.append('none')
+                    else: 
+                        if round_datum["belief_state"][num]["act"][0]=="E":
+                            act_list.append(round_datum["belief_state"][num]["act"])
+                            act_list.append(round_datum["belief_state"][num]["act"])
+                            attr_list.append('none')
+                            attr_list.append('none')
+                        elif round_datum["belief_state"][num]["act"][0]=="D":
+                            bel_list = round_datum["belief_state"][num]["act"].split('.')
+                            act_list.append(bel_list[0])
+                            act_list.append(bel_list[0])
+                            if len(bel_list)>=2 and bel_list[1] not in attr_list:
+                                attr_list.append(bel_list[1])
+                                attr_list.append(bel_list[1])
+                            else:
+                                attr_list.append('none')
+                                attr_list.append('none')
+                        else:
+                            act = "ERR:UNSUPPORTED:OBJECT"
+                            act_list.append(act)
+                            act_list.append(act)
+                            attr_list.append('none')
+                            attr_list.append('none')
+                    break
+                else:
+                    act = "ERR:UNSUPPORTED:OBJECT"
+                    act_list.append(act)
+                    act_list.append(act)
+                    attr_list.append('none')
+                    attr_list.append('none')
             belief_state_act = []
             belief_state_attr = []
             for a in act_list:
                 try:
                     belief_state_act.append(act2ind[a])
                 except KeyError:
-                    belief_state_act.append("ERR:UNSUPPORTED:OBJECT")
+                    belief_state_act.append(act2ind["ERR:UNSUPPORTED:OBJECT"])
             for a in attr_list:
                 try:
                     belief_state_attr.append(attr2ind[a])
                 except KeyError:
-                    belief_state_attr.append('unk')
+                    belief_state_attr.append(len(attr2ind)+1) #'unk'
+
             action_info["belief_state_act"][datum_id][round_id]=belief_state_act
             action_info["belief_state_attr"][datum_id][round_id]=belief_state_attr
             for key in action_keys:
