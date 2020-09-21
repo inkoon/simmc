@@ -11,6 +11,7 @@ from tools import weight_init, torch_support
 import models
 import models.encoders as encoders
 
+from .encoders.belief_state import BeliefStateEncoder
 
 class Assistant(nn.Module):
     """SIMMC Assistant Agent.
@@ -22,6 +23,9 @@ class Assistant(nn.Module):
 
         self.encoder = encoders.ENCODER_REGISTRY[params["encoder"]](params)
         self.decoder = models.GenerativeDecoder(params)
+
+        # B : belief state encoder
+        self.state_encoder = BeliefStateEncoder
 
         if params["encoder"] == "pretrained_transformer":
             self.decoder.word_embed_net = (
@@ -44,7 +48,7 @@ class Assistant(nn.Module):
             ):
                 self.decoder.word_embed_net = self.encoder.word_embed_net
 
-    def forward(self, batch, mode=None):
+    def forward(self, batch, state=None, mode=None):
         """Forward propagation.
 
         Args:
@@ -53,6 +57,10 @@ class Assistant(nn.Module):
                 BEAMSEARCH / SAMPLE / MAX to generate text
         """
         outputs = self.encoder(batch)
+        # B : belief state encoder
+        # state_output = self.state_encoder(state)
+        # outputs.update(state_output)
+
         action_output = self.action_executor(batch, outputs)
         outputs.update(action_output)
         decoder_output = self.decoder(batch, outputs)
