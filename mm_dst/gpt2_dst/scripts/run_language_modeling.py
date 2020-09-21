@@ -213,7 +213,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
         tb_writer = SummaryWriter()
 
     # B : add parameters in tensorboardX
-    tb_writer.add_hparams({'warmup_step': args.warmup_step, 'learning_rate': args.learning_rate, 'per_gpu_train_batch_size': args.per_gpu_train_batch_size, 'num_training_epochs':args.num_train_epochs, 'mul_gpu': args.mul_gpu}) 
+    # tb_writer.add_hparams({'warmup_step': args.warmup_steps, 'learning_rate': args.learning_rate, 'per_gpu_train_batch_size': args.per_gpu_train_batch_size, 'num_training_epochs':args.num_train_epochs, 'mul_gpu': args.mul_gpu}) 
 
 
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
