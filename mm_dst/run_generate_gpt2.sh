@@ -1,15 +1,16 @@
 #!/bin/bash
 
 # parameters	defaut value
-NUM_GEN=500	# 100000
+NUM_GEN=100000	# 100000
 NUM_BEAMS=2	# 1
 LENGTH=100	# 100
-NGRAM=4		# 0
+NGRAM=0		# 0
 TOKEN=0		# 0
 GPU_ID='0'	# '0'
-TOP_P=1.0 # 0.9
-TOP_K=1    # 0
-TEMPERATURE=1  # 1 
+TOP_P=0.9	# 0.9
+TOP_K=0   	# 0
+TEMPERATURE=1 	# 1 
+ 
 PARAMETERS="NUM_GEN		$NUM_GEN
 NUM_BEAMS	$NUM_BEAMS
 LENGTH		$LENGTH
@@ -57,6 +58,7 @@ python -m gpt2_dst.scripts.run_generation \
     --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/furniture_to/"${MODEL}" \
     --num_return_sequences=1 \
     --length=$LENGTH \
+    --gpu_id=$GPU_ID \
     --stop_token='<EOS>' \
     --num_beams=$NUM_BEAMS \
     --no_repeat_ngram_size=$NGRAM \
@@ -88,6 +90,7 @@ python -m gpt2_dst.scripts.run_generation \
     --gpu_id=$GPU_ID \
     --p=$TOP_P \
     --k=$TOP_K \
+    --gpu_id=$GPU_ID \
     --temperature=$TEMPERATURE \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/furniture/"${KEYWORD}"/furniture_devtest_dials_predicted.txt
@@ -111,6 +114,7 @@ python -m gpt2_dst.scripts.run_generation \
     --p=$TOP_P \
     --k=$TOP_K \
     --temperature=$TEMPERATURE \
+    --gpu_id=$GPU_ID \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/fashion_to/fashion_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/fashion_to/"${KEYWORD}"/fashion_devtest_dials_predicted.txt
 echo "$PARAMETERS" > "${PATH_DIR}"/gpt2_dst/results/fashion_to/"${KEYWORD}"/parameters.txt
@@ -132,6 +136,7 @@ python -m gpt2_dst.scripts.run_generation \
     --gpu_id=$GPU_ID \
     --p=$TOP_P \
     --k=$TOP_K \
+    --gpu_id=$GPU_ID \
     --temperature=$TEMPERATURE \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/fashion/"${KEYWORD}"/fashion_devtest_dials_predicted.txt
