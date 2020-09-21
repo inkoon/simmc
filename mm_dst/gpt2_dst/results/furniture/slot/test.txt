@@ -1,0 +1,1 @@
+System : Do you have a style you want? User : Not particularly. Just browsing right now. <SOM>  <EOM> System : Ok. Do you have a price range you want to stick to? User : I would be willing to pay about $100. <SOM>  <EOM> => Belief State :  DA:INFORM:REFINE:FURNITURE  price [ furniture price = $100 ] <EOB>  Ok. Do you have a budget? 
