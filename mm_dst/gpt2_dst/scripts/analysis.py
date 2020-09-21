@@ -20,34 +20,34 @@ def analyze_from_flat_list(d_true, d_pred):
         pred_turn = d_pred[turn_idx]
         #ipdb.set_trace(context=20) # BREAKPOINT
         analyze_turn(turn_idx,true_turn, pred_turn)
-    
+
     # Save report
     with open(os.path.join(output_dir, "analysis.json"), 'w') as f_out:
         json.dump(acts, f_out)
 
 def analyze_turn(turn_idx,true_turn, pred_turn):
-    global wrong_index
+    global wrong_act_wrong_slot
+    global right_act_wrong_slot
+    global wrong_act_right_slot
+    global right_act_right_slot
+    global no_prediction
     # Must preserve order in which frames appear.
     for frame_idx in range(len(true_turn)):
         # For each frame
         true_frame = true_turn[frame_idx]
         if frame_idx >= len(pred_turn): ## less prediction made 
             pred_frame = {}
-            wrong_index.add(turn_idx) ## wrong overall
+            wrong_act_wrong_slot.add(turn_idx) ## wrong overall
+            no_prediction+=1
         else:
             pred_frame = pred_turn[frame_idx]
-            if analyze_frame(turn_idx,true_frame,pred_frame, strict=False) == 0 :
-                wrong_index.add(turn_idx)
-                if turn_idx in perfect :
-                    perfect.remove(turn_idx)
-
-
-               
+            analyze_frame(turn_idx,true_frame,pred_frame)
 
 
 
 
-def analyze_frame(idx,true_frame, pred_frame, strict=True):
+
+def analyze_frame(idx,true_frame, pred_frame):
     """
         If strict=True,
             For each dialog_act (frame), set(slot values) must match.
@@ -56,13 +56,14 @@ def analyze_frame(idx,true_frame, pred_frame, strict=True):
     global total_act
     global total_correct
     global acts 
+    global k 
     global slots
-    global wrong_index
-    global slot_part_right
-    global perfect
+    global wrong_act_wrong_slot
+    global right_act_wrong_slot
+    global right_act_right_slot
+    global wrong_act_right_slot
     # Compare Dialog Actss
     flag = 0 
-    total_act = total_act + 1
     true_act = true_frame['act'] if 'act' in true_frame else None
     pred_act = pred_frame['act'] if 'act' in pred_frame else None
 
@@ -71,9 +72,11 @@ def analyze_frame(idx,true_frame, pred_frame, strict=True):
     true_act_detail = ':'.join(true_act_split[2:])
 
     if pred_act is None : 
+        wrong_act_wrong_slot.add(idx)
         return None 
     pred_act_split = pred_act.split(":")
     if pred_act != "ERR:CHITCHAT" and pred_act != "ERR:MISSING_CONTEXT" and len(pred_act_split) < 3 : 
+        wrong_act_wrong_slot.add(idx)
         return None 
     pred_act_simple = pred_act_split[1] 
     pred_act_detail = ':'.join(pred_act_split[2:])
@@ -115,13 +118,17 @@ def analyze_frame(idx,true_frame, pred_frame, strict=True):
     
     if true_act == pred_act : ## Act correctly predicted 
         flag = 1
+        right_act_right_slot.add(idx)
         total_correct = total_correct + 1
+        total_act = total_act + 1 
         acts[true_act_simple]['correct'] += 1
         if acts[true_act_simple]['detail'].get(true_act_detail) is None : 
             acts[true_act_simple]['detail'][true_act_detail]['correct'] = 1
         else : 
             acts[true_act_simple]['detail'][true_act_detail]['correct'] = acts[true_act_simple]['detail'][true_act_detail]['correct'] + 1
     else : 
+
+        total_act = total_act + 1 
         #ipdb.set_trace(context=20) 
         if true_act_simple == pred_act_simple : ## Correct DA but wrong activities
             if not acts[true_act_simple]['detail'].get(true_act_detail)['part-wrong'] : 
@@ -153,16 +160,15 @@ def analyze_frame(idx,true_frame, pred_frame, strict=True):
    
     if flag == 1 : ## if right DA, check slots 
         if true_frame_slot_values == pred_frame_slot_values : ## perfect prediction made 
-            perfect.add(idx)
-            slot_part_right.add(idx) 
-        if len(true_frame_slot_values.intersection(pred_frame_slot_values)) > 0 :
-            slot_part_right.add(idx)   ## partially right 
-        else :
-            flag = 0 ## correct act but wrong slot values 
+            right_act_right_slot.add(idx)
+        else : 
+            right_act_wrong_slot.add(idx)
     else :
         if true_frame_slot_values == pred_frame_slot_values : 
             wrong_act_right_slot.add(idx)
-    return flag 
+        else :
+            wrong_act_wrong_slot.add(idx)
+         
 
 
 
@@ -191,6 +197,7 @@ if __name__ == '__main__':
     list_target = parse_flattened_results_from_file(input_path_target)
     list_predicted = parse_flattened_results_from_file(input_path_predicted)
     
+    no_prediction = 0
     total_act = 0
     total_correct = 0
     acts = {
@@ -201,40 +208,43 @@ if __name__ == '__main__':
 
     }
 
-    wrong_index = set()
-    slot_part_right = set()
-    perfect = set() 
+    k = 0
+
+    wrong_act_wrong_slot = set()
+    right_act_wrong_slot = set()
+    right_act_right_slot = set() 
     wrong_act_right_slot = set() 
 
     analyze_from_flat_list(list_target, list_predicted)
-
-    slot_part_right = slot_part_right - slot_part_right.intersection(wrong_index) - slot_part_right.intersection(perfect)
-    perfect = perfect - perfect.intersection(wrong_index)
-    wrong_index = wrong_index - wrong_index.intersection(perfect) - wrong_index.intersection(slot_part_right) - wrong_index.intersection(wrong_act_right_slot)
     # Save report
 
+    right_act_right_slot = right_act_right_slot - right_act_right_slot.intersection(wrong_act_wrong_slot) - right_act_right_slot.intersection(wrong_act_right_slot)
+    wrong_act_wrong_slot = wrong_act_wrong_slot - wrong_act_wrong_slot.intersection(right_act_wrong_slot) - wrong_act_wrong_slot.intersection(wrong_act_right_slot) - wrong_act_wrong_slot.intersection(right_act_right_slot)
+    right_act_wrong_slot = right_act_wrong_slot - right_act_wrong_slot.intersection(right_act_right_slot)
+    wrong_act_right_slot = wrong_act_right_slot - wrong_act_right_slot.intersection(wrong_act_wrong_slot)
     results = []
     idx = -1
     
-    comparison = open(os.path.join(output_dir, "all_wrong.txt"),'w') ## Wrong DA or slot
-    comparison.write('')
-    comparison = open(os.path.join(output_dir, "all_wrong.txt"),'a') 
-    slot_comparison = open(os.path.join(output_dir, "right_act_wrong_slot.txt"),'w')  ## Right DA but wrong slot 
-    slot_comparison.write('')
-    slot_comparison = open(os.path.join(output_dir, "right_act_wrong_slot.txt"),'a+') 
-    all_correct = open(os.path.join(output_dir, "perfect.txt"),'w') 
-    all_correct.write('')
-    all_correct = open(os.path.join(output_dir, "perfect.txt"),'a+') 
-    wrong_act =  open(os.path.join(output_dir, "wrong_act_right_slot.txt"),'w')
-    wrong_act.write('') 
-    wrong_act =  open(os.path.join(output_dir, "wrong_act_right_slot.txt"),'a+') 
+    all_wrong_f = open(os.path.join(output_dir, "all_wrong.txt"),'w') ## Wrong DA or slot
+    all_wrong_f .write('')
+    all_wrong_f  = open(os.path.join(output_dir, "all_wrong.txt"),'a') 
+    right_act_wrong_slot_f = open(os.path.join(output_dir, "right_act_wrong_slot.txt"),'w')  ## Right DA but wrong slot 
+    right_act_wrong_slot_f.write('')
+    right_act_wrong_slot_f = open(os.path.join(output_dir, "right_act_wrong_slot.txt"),'a+') 
+    all_correct_f = open(os.path.join(output_dir, "perfect.txt"),'w') 
+    all_correct_f.write('')
+    all_correct_f = open(os.path.join(output_dir, "perfect.txt"),'a+') 
+    wrong_act_right_slot_f =  open(os.path.join(output_dir, "wrong_act_right_slot.txt"),'w')
+    wrong_act_right_slot_f.write('') 
+    wrong_act_right_slot_f =  open(os.path.join(output_dir, "wrong_act_right_slot.txt"),'a+') 
 
     with open(os.path.join(output_dir, "analysis.json"), 'w') as f_out:
         json.dump(acts, f_out)
     
     with open(os.path.join(output_dir,"dialogue_analysis.txt"),'w') as f_out :
         f_out.write("*************************************** DIALOG ACT ANALYSIS ***********************************\n")
-        f_out.write("[ Resullts : {:.2f} % .... {} correct prediction made out of {} Dialog acts ] \n ".format(100*(total_correct/total_act),total_correct,total_act))
+        f_out.write("[ Resullts : {:.2f} % .... {} correct prediction made out of {} frames ] \n ".format(100*(total_correct/total_act),total_correct,total_act))
+        f_out.write("no frame prediction made for {} times\n".format(no_prediction))
         for act in acts :
             f_out.write("=======================================DA:{}===========================================\n".format(act))
             f_out.write(" Accuracy : {:.2f} % =>  {} Correct prediction out of Total {}\n".format(100* acts[act]['correct']/acts[act]['total'], acts[act]['correct'],acts[act]['total']))
@@ -264,30 +274,30 @@ if __name__ == '__main__':
             target = x.split(START_BELIEF_STATE)
             predicted = y.split(START_BELIEF_STATE)
             idx+=1
-            if idx in wrong_index : 
-                comparison.write("=============================DIALOGUE #{}====================\n".format(idx))
-                comparison.write("{0}\n".format(target[0]))
-                comparison.write("------------------------------------------------------------\n")
-                comparison.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
-            if idx in slot_part_right : 
-                slot_comparison.write("=============================DIALOGUE #{}====================\n".format(idx))
-                slot_comparison.write("{0}\n".format(target[0]))
-                slot_comparison.write("------------------------------------------------------------\n")
-                slot_comparison.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
-            if idx in perfect : 
-                all_correct.write("=============================DIALOGUE #{}====================\n".format(idx))
-                all_correct.write("{0}\n".format(target[0]))
-                all_correct.write("------------------------------------------------------------\n")
-                all_correct.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
+            if idx in wrong_act_wrong_slot : 
+                all_wrong_f.write("=============================DIALOGUE #{}====================\n".format(idx))
+                all_wrong_f.write("{0}\n".format(target[0]))
+                all_wrong_f.write("------------------------------------------------------------\n")
+                all_wrong_f.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
+            if idx in right_act_wrong_slot : 
+                right_act_wrong_slot_f.write("=============================DIALOGUE #{}====================\n".format(idx))
+                right_act_wrong_slot_f.write("{0}\n".format(target[0]))
+                right_act_wrong_slot_f.write("------------------------------------------------------------\n")
+                right_act_wrong_slot_f.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
+            if idx in right_act_right_slot : 
+                all_correct_f.write("=============================DIALOGUE #{}====================\n".format(idx))
+                all_correct_f.write("{0}\n".format(target[0]))
+                all_correct_f.write("------------------------------------------------------------\n")
+                all_correct_f.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
             if idx in wrong_act_right_slot : 
-                wrong_act.write("=============================DIALOGUE #{}====================\n".format(idx))
-                wrong_act.write("{0}\n".format(target[0]))
-                wrong_act.write("------------------------------------------------------------\n")
-                wrong_act.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
+                wrong_act_right_slot_f.write("=============================DIALOGUE #{}====================\n".format(idx))
+                wrong_act_right_slot_f.write("{0}\n".format(target[0]))
+                wrong_act_right_slot_f.write("------------------------------------------------------------\n")
+                wrong_act_right_slot_f.write("Target : {0}\nPredicted : {1}\n\n".format(target[1],predicted[1]))
 
-    print("Out of {} total turns..".format(turn))
-    print("{} right DA and slot predictions made... {:.2f}%".format(len(perfect), 100*len(perfect)/turn))
-    print("{} right DA but wrong slot predictions....{:.2f}%".format(len(slot_part_right), 100*len(slot_part_right)/turn))
+    print("Out of {} total dialogues..".format(turn))
+    print("{} right DA and slot predictions made... {:.2f}%".format(len(right_act_right_slot), 100*len(right_act_right_slot)/turn))
+    print("{} right DA but wrong slot predictions....{:.2f}%".format(len(right_act_wrong_slot), 100*len(right_act_wrong_slot)/turn))
     print("{} wrong DA and right slot predictions....{:.2f}%".format(len(wrong_act_right_slot), 100*len(wrong_act_right_slot)/turn))
-    print("{} wrong DA and wrong slot predictions....{:.2f}%\n".format(len(wrong_index), 100*len(wrong_index)/turn))
+    print("{} wrong DA and wrong slot predictions....{:.2f}%\n".format(len(wrong_act_wrong_slot), 100*len(wrong_act_wrong_slot)/turn))
     print("Analysis completed..!\nDetailed analysis saved in {}".format(output_dir))
