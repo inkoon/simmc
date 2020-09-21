@@ -21,8 +21,11 @@ EOB = " <EOB> "
 token_match_path = open("./special_token_match.json", 'r')
 token_match = json.load(token_match_path)
 
+l = []
+
 def postprocess(reader, writer):
-    for line in reader.readlines():
+    for i, line in enumerate(reader.readlines()):
+        # writer.write(str(i) + '\t')
         split = line.split(BELIEF_STATE)
         prompt = split[0]
         bs = split[1]
@@ -44,9 +47,9 @@ def postprocess(reader, writer):
 
         writer.write(EOB)
         writer.write(response)
+        l.append(i)
 
 # postprocess(target, target_processed)
 postprocess(predicted, predicted_processed)
-
 
 
