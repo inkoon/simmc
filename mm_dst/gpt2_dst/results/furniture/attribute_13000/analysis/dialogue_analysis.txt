@@ -1,0 +1,263 @@
+*************************************** DIALOG ACT ANALYSIS ***********************************
+[ Resullts : 84.33 % .... 506 correct prediction made out of 600 Dialog acts ] 
+ =======================================DA:REQUEST===========================================
+ Accuracy : 92.31 % =>  204 Correct prediction out of Total 221
+	GET:FURNITURE
+		=>  123 Correct prediction out of Total 128
+			 Wrongly predicted ROTATE:FURNITURE for 1 times ( 20.00% )
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE for 2 times (40.00% )
+			 Wrongly predicted ERR:CHITCHAT for 2 times (40.00% )
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.color
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted GET:FURNITURE for 1 times ( 100.00% )
+--------------------------------------------------------------------------------------
+	ADD_TO_CART:FURNITURE
+		=>  42 Correct prediction out of Total 46
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE for 1 times (25.00% )
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE.price for 2 times (50.00% )
+			 Wrongly predicted DA:CONFIRM:ADD_TO_CART:FURNITURE for 1 times (25.00% )
+--------------------------------------------------------------------------------------
+	ROTATE:FURNITURE
+		=>  39 Correct prediction out of Total 43
+			 Wrongly predicted GET:FURNITURE for 2 times ( 50.00% )
+			 Wrongly predicted DA:ASK:GET:FURNITURE.price for 1 times (25.00% )
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE.dimensions for 1 times (25.00% )
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.dimensions
+		=>  0 Correct prediction out of Total 2
+			 Wrongly predicted DA:ASK:GET:FURNITURE.dimensions for 2 times (100.00% )
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE.color
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted DA:INFORM:REFINE:FURNITURE.color for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+
+
+
+=======================================DA:INFORM===========================================
+ Accuracy : 74.59 % =>  138 Correct prediction out of Total 185
+	REFINE:FURNITURE.decorStyle
+		=>  6 Correct prediction out of Total 6
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE.price
+		=>  1 Correct prediction out of Total 2
+			 Wrongly predicted DA:ASK:GET:FURNITURE.price for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+	PREFER:FURNITURE
+		=>  70 Correct prediction out of Total 78
+			 Wrongly predicted DA:ASK:GET:FURNITURE.price for 2 times (25.00% )
+			 Wrongly predicted DA:ASK:GET:FURNITURE.color for 1 times (12.50% )
+			 Wrongly predicted DA:REQUEST:ROTATE:FURNITURE for 1 times (12.50% )
+			 Wrongly predicted DA:REQUEST:GET:FURNITURE for 2 times (25.00% )
+			 Wrongly predicted DA:REQUEST:ADD_TO_CART:FURNITURE for 2 times (25.00% )
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE.color
+		=>  20 Correct prediction out of Total 29
+			 Wrongly predicted REFINE:FURNITURE.decorStyle for 2 times ( 22.22% )
+			 Wrongly predicted REFINE:FURNITURE.height for 1 times ( 11.11% )
+			 Wrongly predicted REFINE:FURNITURE.info for 1 times ( 11.11% )
+			 Wrongly predicted DISPREFER:FURNITURE.color for 1 times ( 11.11% )
+			 Wrongly predicted DA:REQUEST:GET:FURNITURE for 2 times (22.22% )
+			 Wrongly predicted DA:CONFIRM:REFINE:FURNITURE.color for 2 times (22.22% )
+--------------------------------------------------------------------------------------
+	PREFER:FURNITURE.price
+		=>  7 Correct prediction out of Total 10
+			 Wrongly predicted DA:ASK:GET:FURNITURE.info for 1 times (33.33% )
+			 Wrongly predicted DA:REQUEST:ADD_TO_CART:FURNITURE for 2 times (66.67% )
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE.info
+		=>  2 Correct prediction out of Total 9
+			 Wrongly predicted REFINE:FURNITURE.decorStyle for 3 times ( 42.86% )
+			 Wrongly predicted REFINE:FURNITURE.color for 2 times ( 28.57% )
+			 Wrongly predicted DA:REQUEST:GET:FURNITURE for 2 times (28.57% )
+--------------------------------------------------------------------------------------
+	PREFER:FURNITURE.material
+		=>  0 Correct prediction out of Total 2
+			 Wrongly predicted PREFER:FURNITURE for 1 times ( 50.00% )
+			 Wrongly predicted DA:ASK:GET:FURNITURE.price for 1 times (50.00% )
+--------------------------------------------------------------------------------------
+	PREFER:FURNITURE.depth
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted PREFER:FURNITURE.height for 1 times ( 100.00% )
+--------------------------------------------------------------------------------------
+	PREFER:FURNITURE.dimensions
+		=>  4 Correct prediction out of Total 7
+			 Wrongly predicted PREFER:FURNITURE for 1 times ( 33.33% )
+			 Wrongly predicted DA:REQUEST:ADD_TO_CART:FURNITURE for 1 times (33.33% )
+			 Wrongly predicted DA:ASK:GET:FURNITURE.price for 1 times (33.33% )
+--------------------------------------------------------------------------------------
+	PREFER:FURNITURE.finish
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted DA:ASK:GET:FURNITURE.decorStyle for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+	ADD_TO_CART:FURNITURE
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted DA:REQUEST:ADD_TO_CART:FURNITURE for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+	DISPREFER:FURNITURE.price
+		=>  3 Correct prediction out of Total 3
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE.dimensions
+		=>  5 Correct prediction out of Total 8
+			 Wrongly predicted REFINE:FURNITURE.height for 1 times ( 33.33% )
+			 Wrongly predicted DA:REQUEST:GET:FURNITURE for 2 times (66.67% )
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE.material
+		=>  2 Correct prediction out of Total 2
+--------------------------------------------------------------------------------------
+	PREFER:FURNITURE.color
+		=>  0 Correct prediction out of Total 2
+			 Wrongly predicted PREFER:FURNITURE for 1 times ( 50.00% )
+			 Wrongly predicted DA:ASK:GET:FURNITURE.decorStyle for 1 times (50.00% )
+--------------------------------------------------------------------------------------
+	GET:FURNITURE
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted DA:REQUEST:GET:FURNITURE for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE
+		=>  1 Correct prediction out of Total 4
+			 Wrongly predicted REFINE:FURNITURE.info for 1 times ( 33.33% )
+			 Wrongly predicted REFINE:FURNITURE.color for 1 times ( 33.33% )
+			 Wrongly predicted ERR:UNSUPPORTED:ATTRIBUTE for 1 times (33.33% )
+--------------------------------------------------------------------------------------
+	DISPREFER:FURNITURE
+		=>  9 Correct prediction out of Total 10
+			 Wrongly predicted ERR:CHITCHAT for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE.pattern
+		=>  2 Correct prediction out of Total 2
+--------------------------------------------------------------------------------------
+	PREFER:FURNITURE.upholstery
+		=>  1 Correct prediction out of Total 1
+--------------------------------------------------------------------------------------
+	DISPREFER:FURNITURE.dimensions
+		=>  1 Correct prediction out of Total 1
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE.upholstery
+		=>  1 Correct prediction out of Total 1
+--------------------------------------------------------------------------------------
+	PREFER:FURNITURE.decorStyle
+		=>  1 Correct prediction out of Total 2
+			 Wrongly predicted REFINE:FURNITURE.decorStyle for 1 times ( 100.00% )
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE.intendedRoom
+		=>  1 Correct prediction out of Total 1
+--------------------------------------------------------------------------------------
+	DISPREFER:FURNITURE.decorStyle
+		=>  1 Correct prediction out of Total 1
+--------------------------------------------------------------------------------------
+
+
+
+=======================================DA:ASK===========================================
+ Accuracy : 89.84 % =>  115 Correct prediction out of Total 128
+	GET:FURNITURE.price
+		=>  43 Correct prediction out of Total 43
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.info
+		=>  15 Correct prediction out of Total 19
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE for 3 times (75.00% )
+			 Wrongly predicted ERR:UNSUPPORTED:ATTRIBUTE for 1 times (25.00% )
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.material
+		=>  15 Correct prediction out of Total 16
+			 Wrongly predicted CHECK:FURNITURE.material for 1 times ( 100.00% )
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.dimensions
+		=>  33 Correct prediction out of Total 34
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.height
+		=>  1 Correct prediction out of Total 2
+			 Wrongly predicted GET:FURNITURE.dimensions for 1 times ( 100.00% )
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.finish
+		=>  1 Correct prediction out of Total 1
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.color
+		=>  4 Correct prediction out of Total 4
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.width
+		=>  2 Correct prediction out of Total 2
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.hasStorage
+		=>  0 Correct prediction out of Total 2
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE for 2 times (100.00% )
+--------------------------------------------------------------------------------------
+	CHECK:FURNITURE.decorStyle
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted DA:INFORM:REFINE:FURNITURE.decorStyle for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+	ADD_TO_CART:FURNITURE
+		=>  0 Correct prediction out of Total 2
+			 Wrongly predicted GET:FURNITURE.dimensions for 1 times ( 50.00% )
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE.price for 1 times (50.00% )
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.isAdjustable
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted CHECK:FURNITURE.hasStorage for 1 times ( 100.00% )
+--------------------------------------------------------------------------------------
+	GET:FURNITURE.decorStyle
+		=>  1 Correct prediction out of Total 1
+--------------------------------------------------------------------------------------
+
+
+
+=======================================DA:CHITCHAT===========================================
+ Accuracy : 89.09 % =>  49 Correct prediction out of Total 55
+	
+		=>  49 Correct prediction out of Total 55
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE for 3 times (50.00% )
+			 Wrongly predicted DA:INFORM:REFINE:FURNITURE.color for 1 times (16.67% )
+			 Wrongly predicted DA:INFORM:REFINE:FURNITURE.decorStyle for 1 times (16.67% )
+			 Wrongly predicted DA:ASK:GET:FURNITURE.price for 1 times (16.67% )
+--------------------------------------------------------------------------------------
+
+
+
+=======================================DA:CONFIRM===========================================
+ Accuracy : 0.00 % =>  0 Correct prediction out of Total 9
+	PREFER:FURNITURE
+		=>  0 Correct prediction out of Total 3
+			 Wrongly predicted ROTATE:FURNITURE for 1 times ( 33.33% )
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE for 2 times (66.67% )
+--------------------------------------------------------------------------------------
+	ROTATE:FURNITURE
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted DA:REQUEST:ROTATE:FURNITURE for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+	GET:FURNITURE
+		=>  0 Correct prediction out of Total 3
+			 Wrongly predicted REFINE:FURNITURE.color for 1 times ( 33.33% )
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE for 2 times (66.67% )
+--------------------------------------------------------------------------------------
+	REFINE:FURNITURE.color
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted REFINE:FURNITURE.info for 1 times ( 100.00% )
+--------------------------------------------------------------------------------------
+	ADD_TO_CART:FURNITURE
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted DA:REQUEST:ADD_TO_CART:FURNITURE for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+
+
+
+=======================================DA:PROMPT===========================================
+ Accuracy : 0.00 % =>  0 Correct prediction out of Total 1
+	PREFER:FURNITURE
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted DA:INFORM:PREFER:FURNITURE for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+
+
+
+=======================================DA:UNSUPPORTED===========================================
+ Accuracy : 0.00 % =>  0 Correct prediction out of Total 1
+	ATTRIBUTE
+		=>  0 Correct prediction out of Total 1
+			 Wrongly predicted DA:CONFIRM:REFINE:FURNITURE for 1 times (100.00% )
+--------------------------------------------------------------------------------------
+
+
+
