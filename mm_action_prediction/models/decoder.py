@@ -299,6 +299,7 @@ class GenerativeDecoder(nn.Module):
                         pad_token_id=self.params['pad_token'],
                         bos_token_id=self.params['start_token'],
                         eos_token_id=self.params['end_token'],
+                        decoder_start_token_id=self.params['start_token'],
                         bad_word_ids=self.badword_list,
                     )
                     top_beam = beam_out[0][e_len+1:e_len+d_len+1].reshape(-1, 1)

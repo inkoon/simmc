@@ -52,6 +52,7 @@ if args["eval_data_path"]:
         "get_retrieval_candidates": args["retrieval_evaluation"]
     }
     dataloader_args.update(args)
+    import ipdb; ipdb.set_trace(context=10)
     val_loader = loaders.DataloaderSIMMC(dataloader_args)
 else:
     val_loader = None

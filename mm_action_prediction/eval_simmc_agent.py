@@ -106,7 +106,7 @@ def evaluate_agent(wizard, val_loader, args):
         model_responses = None
         bleu_score = -1.
 
-    print(model_response[0]['predictions'])
+    print(model_responses[0]['predictions'])
 
     # Evaluate retrieval score.
     if args["retrieval_evaluation"]:
