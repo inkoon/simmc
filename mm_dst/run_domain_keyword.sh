@@ -24,7 +24,7 @@ PATH_DATA_DIR=$(realpath ../data)
 # "${DOMAIN}"
 # Multimodal Data
 # Train split
-
+'
 python -m gpt2_dst.scripts.preprocess_input \
     --input_path_json="${PATH_DATA_DIR}"/simmc_"${DOMAIN}"/"${DOMAIN}"_train_dials.json \
     --output_path_predict="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_train_dials_predict.txt \
@@ -54,7 +54,7 @@ python -m gpt2_dst.scripts.preprocess_input \
     --total \
     --use_multimodal_contexts=1 \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
-
+'
 # Train ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
