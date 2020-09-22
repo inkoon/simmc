@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # parameters	defaut value
-NUM_GEN=1000000	# 100000
+NUM_GEN=500 # 100000
 NUM_BEAMS=2	# 1
 LENGTH=100	# 100
 NGRAM=0		# 0
 TOKEN=0		# 0
-GPU_ID='1'	# '0'
-TOP_P=0.9	# 0.9
+GPU_ID='0'	# '0'
+TOP_P=0.5 	# 0.9
 TOP_K=0		# 0
 TEMPERATURE=1	# 1
 
@@ -92,8 +92,8 @@ python -m gpt2_dst.scripts.run_generation \
     --k=$TOP_K \
     --gpu_id=$GPU_ID \
     --temperature=$TEMPERATURE \
-    --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_devtest_dials_predict.txt \
-    --path_output="${PATH_DIR}"/gpt2_dst/results/furniture/"${KEYWORD}"/furniture_devtest_dials_predicted.txt
+    --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_train_dials_predict.txt \
+    --path_output="${PATH_DIR}"/gpt2_dst/results/furniture/"${KEYWORD}"/furniture_train_dials_predicted.txt
 #echo "$PARAMETERS" > "${PATH_DIR}"/gpt2_dst/results/furniture/"${KEYWORD}"/parameters.txt
 fi
 

@@ -9,7 +9,7 @@ predicted = open(args.path + 'furniture_devtest_dials_predicted.txt', 'r')
 
 predicted_processed = open(args.path + "furniture_devtest_dials_predicted_processed.txt", 'w')
 
-act_path = open("gpt2_dst/data/act.json", 'r')
+act_path = open("../data/act.json", 'r')
 
 act_list = json.load(act_path)
 

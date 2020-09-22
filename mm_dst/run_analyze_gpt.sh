@@ -1,4 +1,3 @@
-
 PATH_DIR=$(realpath .)
 
 if [[ $# -eq 0 ]] 

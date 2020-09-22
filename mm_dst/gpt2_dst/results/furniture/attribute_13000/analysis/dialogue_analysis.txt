@@ -1,6 +1,7 @@
 *************************************** DIALOG ACT ANALYSIS ***********************************
-[ Resullts : 84.33 % .... 506 correct prediction made out of 600 Dialog acts ] 
- =======================================DA:REQUEST===========================================
+[ Resullts : 84.33 % .... 506 correct prediction made out of 600 frames ] 
+ no frame prediction made for 25 times
+=======================================DA:REQUEST===========================================
  Accuracy : 92.31 % =>  204 Correct prediction out of Total 221
 	GET:FURNITURE
 		=>  123 Correct prediction out of Total 128
