@@ -39,6 +39,7 @@ def convert_json_to_flattened(
         noresp=False,
         attribute=False,
         slot=False,
+        total=False,
         use_multimodal_contexts=True,
         input_path_special_tokens='',
         output_path_special_tokens=''):
