@@ -70,7 +70,9 @@ def evaluate_agent(wizard, val_loader, args):
                 mode = None
             batch_outputs = wizard(batch, mode)
             # Stringify model responses.
+
             # batch_outputs["beam_output"] = idx of str
+
             if args["bleu_evaluation"]:
                 batch_outputs["model_response"] = (
                     val_loader.stringify_beam_outputs(
@@ -81,9 +83,11 @@ def evaluate_agent(wizard, val_loader, args):
                 del batch_outputs["beam_output"]
             matches.append(batch_outputs)
 
+
             # Toy
             # print("###############TOY TESTING!!###############")
             # break
+
     wizard.train()
 
     # Compute perplexity.
@@ -112,11 +116,11 @@ def evaluate_agent(wizard, val_loader, args):
     action_metrics = val_loader.evaluate_action_prediction(action_predictions)
     print(action_metrics["confusion_matrix"])
     print_str = (
-        "\nEvaluation\n\tLoss: {:.4f}\n\t"
-        "Perplexity: {:.4f}\n\tBLEU: {:.4f}\n\t"
-        "Action: {:.4f}\n\t"
-        "Action Perplexity: {:.4f}\n\t"
-        "Action Attribute Accuracy: {:.4f}"
+        "\nEvaluation\n\tLoss: {:.2f}\n\t"
+        "Perplexity: {:.2f}\n\tBLEU: {:.3f}\n\t"
+        "Action: {:.2f}\n\t"
+        "Action Perplexity: {:.2f}\n\t"
+        "Action Attribute Accuracy: {:.2f}"
     )
     print(
         print_str.format(

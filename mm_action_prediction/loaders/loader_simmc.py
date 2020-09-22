@@ -108,7 +108,6 @@ class DataloaderSIMMC(loaders.LoaderParent):
         else:
             raise ValueError("Domain must be either furniture/fashion!")
 
-
         # Additional data constructs (post-processing).
         if params["encoder"] == "memory_network":
             self._construct_fact()
@@ -130,7 +129,9 @@ class DataloaderSIMMC(loaders.LoaderParent):
             "start_token": self.start_token,
             "sample_ids": sample_ids,
         }
+
         batch["ind2word"] = self.raw_data["ind2word"]
+
         batch["dialog_len"] = self.raw_data["dialog_len"][sample_ids]
         batch["dialog_id"] = self.raw_data["dialog_id"][sample_ids]
         max_dialog_len = max(batch["dialog_len"])

@@ -14,6 +14,8 @@ from tools import torch_support as support
 from models import encoders
 import spacy
 import gensim
+
+
 @encoders.register_encoder("hierarchical_recurrent")
 class HierarchicalRecurrentEncoder(nn.Module):
     def __init__(self, params):

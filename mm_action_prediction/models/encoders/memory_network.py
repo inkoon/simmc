@@ -15,6 +15,7 @@ from tools import torch_support as support
 from models import encoders
 import gensim
 import spacy
+
 @encoders.register_encoder("memory_network")
 class MemoryNetworkEncoder(nn.Module):
     def __init__(self, params):

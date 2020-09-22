@@ -12,6 +12,7 @@ import models
 import models.encoders as encoders
 import spacy
 import gensim
+
 class Assistant(nn.Module):
     """SIMMC Assistant Agent.
     """

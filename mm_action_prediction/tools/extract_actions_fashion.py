@@ -7,6 +7,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from absl import flags
 from absl import app
+import ast
 import json
 import os
 
@@ -124,6 +125,7 @@ def extract_info_attributes(round_datum):
     assistant_annotation = eval(round_datum["transcript_annotated"])
     annotation = user_annotation + assistant_annotation
     # annotation = user_annotation
+    annotation = user_annotation
     all_intents = [ii["intent"] for ii in annotation]
     get_attribute_matches = []
     for index, intent in enumerate(all_intents):

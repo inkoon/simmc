@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+# B : Usera added
+*.bin
+mm_dst/gpt2_dst/save/
+data/
+
+>>>>>>> f615a41e454a622dd7fc78f39975707a3f823479
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -128,6 +136,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+
 # Checkpoint file
 mm_action_prediction/checkpoints
 mm_dst/gpt2_dst/save
@@ -135,3 +144,4 @@ outputs/
 mm_action_prediction/.vector_cache
 mm_action_prediction/scripts/yeonseok_simmc_all_model.sh
 mm_action_prediction/scripts/yeonseok_simmc_model.sh
+

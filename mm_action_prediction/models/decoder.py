@@ -15,6 +15,7 @@ from tools import rnn_support as rnn
 from tools import torch_support as support
 import gensim
 import spacy
+
 class GenerativeDecoder(nn.Module):
     def __init__(self, params):
         super(GenerativeDecoder, self).__init__()

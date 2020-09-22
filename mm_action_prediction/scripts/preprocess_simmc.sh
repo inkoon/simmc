@@ -1,5 +1,6 @@
 #!/bin/bash
 
+<<<<<<< HEAD
 
 DOMAIN="furniture"
 #DOMAIN="fashion"
