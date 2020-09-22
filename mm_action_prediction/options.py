@@ -234,6 +234,13 @@ def read_command_line():
         default="random",
         help="choose embedding"
     )
+    parser.add_argument(
+        "--use_gate",
+        dest="use_gate",
+        action="store_true",
+        default=False,
+        help="use Multimodal Adaptation Gate",
+    )
     try:
         parsed_args = vars(parser.parse_args())
     except (IOError) as msg:

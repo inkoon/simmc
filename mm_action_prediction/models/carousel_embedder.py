@@ -100,20 +100,21 @@ class CarouselEmbedder(nn.Module):
 
         ###using gate for carousel, query
         #MAG+encoder_state
-        carousel_encode = torch.cat([self.MAG(query, carousel_states).squeeze(0), encoder_state], dim=-1)
         
+        if self.params['use_gate']:
+            carousel_encode = torch.cat([self.MAG(query, carousel_states).squeeze(0), encoder_state], dim=-1)
+        else:
+            ##original
+            attended_query, attended_wts = self.carousel_attend(
+                query,
+                carousel_states,
+                carousel_states,
+                key_padding_mask = self.carousel_mask[carousel_len-1]
+            )
+            carousel_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
+
+
         """
-        ##original
-        attended_query, attended_wts = self.carousel_attend(
-            query,
-            carousel_states,
-            carousel_states,
-            key_padding_mask = self.carousel_mask[carousel_len-1]
-        )
-        carousel_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
-
-
-        
         #MAG_only
         #carousel_encode = self.MAG_only(query, carousel_states).squeeze(0)        
         ###
