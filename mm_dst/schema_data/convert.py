@@ -44,9 +44,9 @@ def convert_json_to_flattened(
             utterance = key['utterance']
             contextSize += 1 
             if speaker == 'SYSTEM' : ## For SYSTEM utterance
-                result += ' ' + utterance + ' ' +  '\n'  
+                result += ' ' + utterance + ' ' + END_OF_SENTENCE +  '\n'  
                 output.write(result)  ## print to output file 
-                previousUtt += "SYSTEM : {}".format(utterance) + ' ' ## store utterance history
+                previousUtt += "System : {}".format(utterance) + ' ' ## store utterance history
                 result = previousUtt ## initialize result 
                 if contextSize >= context*2 : ## if bigger than context size 
                     contextSize = 0   # reset utterance history and context size 
