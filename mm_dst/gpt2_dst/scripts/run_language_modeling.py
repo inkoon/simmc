@@ -625,12 +625,11 @@ def main():
     parser.add_argument("--n_gpu", type=int, default=1) 
     args = parser.parse_args()
     
-
-    
     # B : gpu setting
-    os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-    if args.n_gpu == 1:
-        os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu_id
+    if args.mul_gpu == 0:
+        os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+        if args.n_gpu == 1:
+            os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu_id
 
     if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
         raise ValueError(
