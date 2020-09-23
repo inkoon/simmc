@@ -640,6 +640,13 @@ def main():
     )
     parser.add_argument("--mul_gpu", type=int, default=0)
     args = parser.parse_args()
+    
+    # B : gpu setting
+    if args.mul_gpu == 0:
+        os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+        if args.n_gpu == 1:
+            os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu_id
+
     if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
         raise ValueError(
             "BERT and RoBERTa-like models do not have LM heads but masked LM heads. They must be run using the --mlm "
