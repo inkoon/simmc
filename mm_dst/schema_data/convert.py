@@ -25,7 +25,8 @@ END_OF_MULTIMODAL_CONTEXTS = '<EOM>'
 START_BELIEF_STATE = '=> Belief State :'
 END_OF_BELIEF = '<EOB>'
 END_OF_SENTENCE = '<EOS>'
-
+START_OF_INTENT = '['
+END_OF_INTENT = ']'
 TEMPLATE_PREDICT = '{context} {START_BELIEF_STATE} '
 TEMPLATE_TARGET = '{context} {START_BELIEF_STATE} {belief_state} ' \
     '{END_OF_BELIEF} {response} {END_OF_SENTENCE}'
@@ -34,34 +35,49 @@ TEMPLATE_TARGET_NORESP = '{context} {START_BELIEF_STATE} {belief_state} {END_OF_
 
 def convert_json_to_flattened(
         input_path_json,
-        output_path_target):
+        output_path_target, context):
     """
         Input: JSON representation of the dialogs
         Output: line-by-line stringified representation of each turn
     """
 
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     with open(input_path_json, 'r') as f_in:
         ds = json.load(f_in)
     i = 0
-    previousSystemUtt = ' '
+    
     for data in ds : 
-       for key in data['turns'] :  
-           speaker = key['speaker'] 
-           utterance = key['utterance']
-           if speaker == 'System' : 
-               previousSystemUtt = utterance 
+        previousSystemUtt = ' '
+        result = ""
+        contextSize =  0
+        for key in data['turns'] :  
+            speaker = key['speaker'] 
+            utterance = key['utterance']
+            import ipdb; ipdb.set_trace()
+            if speaker == 'SYSTEM' : 
+               previousSystemUtt = ' ' + utterance 
+               result += ' ' + utterance 
+               contextSize += 1 
+               print(result)
+               if contextSize == context : 
+                   result = [] 
                break 
-           for element in key['frames'] : 
-               for action in element['actions'] : 
-                   print(action)
-                   print(action['action'])
-                   print(action['slot'])
+            result+= "User : {}".format(utterance)
+            result+=START_OF_MULTIMODAL_CONTEXTS+' '
+            result+=END_OF_MULTIMODAL_CONTEXTS + ' '
+            result+=START_BELIEF_STATE 
+            for element in key['frames'] : 
+                for action in element['actions'] : 
+                    result += ' da ' + action['act'].replace('_'," ").lower() + ' ' + element['state']['active_intent'].lower()
+                    result += START_OF_INTENT + ' ' 
+                    if element['state']['slot_values'] is not None : 
+                        result += element['slot'] + ' = '.join(element['state']['slot_values'])
+                    result += END_OF_INTENT
 
-               for slot in element['slots'] : 
-                   print(slot)
+                #for slot in element['slots'] : 
+                  #  print(slot)
 
-               print(element['service'])
+                #print(element['service'])
            
 
 def parse_flattened_results_from_file(path):
@@ -137,8 +153,8 @@ if __name__ == '__main__':
                         help='path for input, line-separated format (.json)')
     parser.add_argument('--output_dir',
                         help='output directory for saving analysis summary files')
-    parser.add_argument('--limit',
-                        help='percentage', type=float,default=0.3)
+    parser.add_argument('--context',
+                        help='context size', type=int,default=1)
     args = parser.parse_args()
    
-    convert_json_to_flattened(args.input_path_json,args.output_dir)
+    convert_json_to_flattened(args.input_path_json,args.output_dir,args.context)
