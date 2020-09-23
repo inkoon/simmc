@@ -9,7 +9,7 @@ predicted = open(args.path + 'furniture_devtest_dials_predicted.txt', 'r')
 
 predicted_processed = open(args.path + "furniture_devtest_dials_predicted_processed.txt", 'w')
 
-act_path = open("gpt2_dst/data/act.json", 'r')
+act_path = open("../data/act.json", 'r')
 
 act_list = json.load(act_path)
 
@@ -20,12 +20,19 @@ EOB = " <EOB> "
 def postprocess(reader, writer):
     for line in reader.readlines():
         split = line.split(BELIEF_STATE)
-        prompt = split[0]
-        bs = split[1]
+        if len(split) != 2:
+            print("ERROR!!")
+        else:
+            prompt = split[0]
+            bs = split[1]
         
         split = bs.split(EOB)
-        state = split[0]
-        response = split[1]
+        if len(split) < 2:
+            state = split[0]
+            response = ""
+        else:
+            state = split[0]
+            response = split[1]
 
         writer.write(prompt)
         writer.write(BELIEF_STATE)

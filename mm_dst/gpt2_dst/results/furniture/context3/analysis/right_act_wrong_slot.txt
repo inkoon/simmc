@@ -1,0 +1,66 @@
+=============================DIALOGUE #57====================
+System : This comes in a salvaged grey finish and also has a leaf for the extra space. Or we have this walnut finished leaf table also. User : Okay, and what is the wood made of? <SOM> OBJECT_1 : pos focus color ['Black'] class_name Dining Tables decor_style ['French-inspired', 'Traditional', 'Farmhouse'] <EOM> System : It doesn't specify the wood, however it says it is made from solid and manufactured woods with a solid acacia vaneer. Bonus it actually has 2 leafs! User : That is exactly what I'm looking for! What are the measurements?  i want to be sure it will fit in my kitchen. <SOM> OBJECT_1 : pos focus color ['Black'] class_name Dining Tables decor_style ['French-inspired', 'Traditional', 'Farmhouse'] <EOM> 
+------------------------------------------------------------
+Target :  DA:INFORM:PREFER:FURNITURE.material [ furniture-O = OBJECT_1, furniture-attentionOn = That ] DA:ASK:GET:FURNITURE.dimensions [ furniture-O = OBJECT_1, furniture-intendedRoom = kitchen ] <EOB> Excellent, it is a big one. Width is 112", Depth 42", and height of 30". Perhaps one of these dining chairs to go with it? <EOS>
+Predicted :   DA:INFORM:PREFER:FURNITURE  [ furniture-O  = OBJECT_1, furniture-attentionOn  = That ] DA:ASK:GET:FURNITURE.dimensions [ furniture-O  = OBJECT_1 ] <EOB>  The width is 112, depth is 42 and height is 30.
+
+=============================DIALOGUE #58====================
+System : It doesn't specify the wood, however it says it is made from solid and manufactured woods with a solid acacia vaneer. Bonus it actually has 2 leafs! User : That is exactly what I'm looking for! What are the measurements?  i want to be sure it will fit in my kitchen. <SOM> OBJECT_1 : pos focus color ['Black'] class_name Dining Tables decor_style ['French-inspired', 'Traditional', 'Farmhouse'] <EOM> System : Excellent, it is a big one. Width is 112", Depth 42", and height of 30". Perhaps one of these dining chairs to go with it? User : That is a perfect fit! Can you please add it to my cart? Also, thank you for the recommendation on the chairs.  Can you also add six of those as well? <SOM> OBJECT_2 : pos left color ['White'] class_name Dining Chairs decor_style ['Modern'] OBJECT_3 : pos center color ['Blue', 'Red', 'Green'] class_name Dining Chairs OBJECT_4 : pos right color ['Brown'] class_name Dining Chairs <EOM> 
+------------------------------------------------------------
+Target :  DA:INFORM:PREFER:FURNITURE.dimensions [ furniture-O = OBJECT_1, furniture-attentionOn = That ] DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_1 ] DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-amount = six ] <EOB> Sure can which one did you prefer? <EOS>
+Predicted :   DA:INFORM:PREFER:FURNITURE  [ furniture-O  = OBJECT_2, furniture-attentionOn  = That ] DA:REQUEST:ADD_TO_CART:FURNITURE  [ furniture-O  = OBJECT_2, furniture-amount  = six, furniture-amount  = six ] <EOB>  Sure thing! I have added six chairs to your cart. Is there anything else I can help you with today?
+
+=============================DIALOGUE #82====================
+System : Of couse. This is the side view. User : How much is it? <SOM> OBJECT_0 : pos focus color ['Black'] class_name Sofas decor_style ['Vintage'] <EOM> System : It cost $759.99. User : That's a nice price. Please add it to my cart <SOM>  <EOM> 
+------------------------------------------------------------
+Target :  DA:INFORM:PREFER:FURNITURE.price [  ] DA:INFORM:ADD_TO_CART:FURNITURE [  ] <EOB> Sure. It is already added to your car. there are something else that I can help you today> <EOS>
+Predicted :   DA:INFORM:PREFER:FURNITURE.price  [ furniture-O  = OBJECT_0 ] DA:REQUEST:ADD_TO_CART:FURNITURE  [ furniture-O  = OBJECT_0 ] <EOB>  I have added it to your cart.
+
+=============================DIALOGUE #131====================
+System : Are you sure about this choice? User : Actually, do you have this in a different color? <SOM>  <EOM> System : What about this one? User : I do like this grey a lot better! Can you add this to the cart instead? <SOM> OBJECT_1 : pos focus color ['Gray'] class_name Ottomans decor_style ['Traditional', 'Modern''] <EOM> 
+------------------------------------------------------------
+Target :  DA:INFORM:PREFER:FURNITURE.color [ furniture-color = grey ] DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-attentionOn = this ] <EOB> Sure! I will add this to your cart right now! <EOS>
+Predicted :   DA:INFORM:PREFER:FURNITURE  [ furniture-O  = OBJECT_1, furniture-attentionOn  = this, furniture-color  = grey ] DA:REQUEST:ADD_TO_CART:FURNITURE  [ furniture-O  = OBJECT_1, furniture-attentionOn  = this ] <EOB>  I sure can! Is there anything else I can help you with today?
+
+=============================DIALOGUE #181====================
+System : Hope i have the right one the price is 233.99 User : Okay. And what are the dimensions? <SOM> OBJECT_0 : pos center color ['Black'] class_name Bookcases OBJECT_3 : pos left color ['Black'] class_name Bookcases OBJECT_4 : pos right color ['White'] class_name Bookcases <EOM> System : The dimensions are as follows width 40.14 inches, depth 13.01 inches and the height is 72.03 inches tall User : Okay. The price is a little high. Do you have any similar options under 200? <SOM>  <EOM> 
+------------------------------------------------------------
+Target :  DA:INFORM:DISPREFER:FURNITURE.price [  ] DA:INFORM:REFINE:FURNITURE.info [ furniture-decorStyle = similar, furniture-price = under 200 ] <EOB> All of these are priced between 66.99 and 200.00 <EOS>
+Predicted :   DA:INFORM:DISPREFER:FURNITURE.price [ furniture-O  = OBJECT_0 ] DA:REQUEST:GET:FURNITURE  [ furniture-O  = OBJECT_0, furniture-color  = under 200 ] <EOB>  Here is a similar one in black
+
+=============================DIALOGUE #199====================
+System : Here is a view of the back. User : I like it. What are the dimensions? <SOM> OBJECT_2 : pos focus color ['Gray'] class_name Accent Chairs decor_style ['Traditional'] <EOM> System : Sure, W x 32.22 D 30.44 and H is 31.99. User : Love it! Put it in my cart please. I'm buying it. <SOM>  <EOM> 
+------------------------------------------------------------
+Target :  DA:INFORM:PREFER:FURNITURE.dimensions [ furniture-O = OBJECT_3 ] DA:REQUEST:ADD_TO_CART:FURNITURE [ furniture-O = OBJECT_3 ] <EOB> Great! Can I help you find anything else today? <EOS>
+Predicted :   DA:INFORM:PREFER:FURNITURE  [ furniture-O  = OBJECT_2 ] DA:REQUEST:ADD_TO_CART:FURNITURE  [ furniture-O  = OBJECT_2 ] <EOB>  I have added it to your cart.
+
+=============================DIALOGUE #210====================
+System : I have this Randall Armchair. Do you like this? User : can i see it up close <SOM>  <EOM> System : How about that? User : Thats great i will take it can you add it to my account and can you show me a sofa <SOM> OBJECT_0 : pos focus color ['Black'] class_name Accent Chairs <EOM> 
+------------------------------------------------------------
+Target :  DA:PROMPT:PREFER:FURNITURE [ furniture-attentionOn = Thats ] DA:REQUEST:ADD_TO_CART:FURNITURE [  ] DA:REQUEST:GET:FURNITURE [  ] <EOB> Perfect! I will add this to your cart. Do you like any of these sofas? <EOS>
+Predicted :   DA:INFORM:PREFER:FURNITURE  [ furniture-O  = OBJECT_0, furniture-attentionOn  = Thats ] DA:REQUEST:ADD_TO_CART:FURNITURE  [ furniture-O  = OBJECT_0 ] <EOB>  I have added it to your account.
+
+=============================DIALOGUE #275====================
+User : Can you assist me with find a bookcase? <SOM>  <EOM> System : Certainly! Can you tell me what color you are looking for? User : Yes I am looking for a lite wood color with an open bacK. <SOM>  <EOM> 
+------------------------------------------------------------
+Target :  DA:CONFIRM:REFINE:FURNITURE.color [  ] DA:INFORM:REFINE:FURNITURE.color [ furniture-color = lite wood ] <EOB> What do you think about this one? <EOS>
+Predicted :   DA:CONFIRM:REFINE:FURNITURE.info [  ] DA:INFORM:REFINE:FURNITURE.color [ furniture-color  = lite, furniture-material  = wood ] <EOB>  Here is a lite wood bookcase.
+
+=============================DIALOGUE #461====================
+System : Great. Will this brown modern style sofa fit your needs? User : Almost, can you show me one that is a little larger please? <SOM> OBJECT_1 : pos focus color ['Brown'] class_name Sofas decor_style ['Modern', 'Vintage'] <EOM> System : Sure. Is this a better option for you? User : no that one looks a little too traditional for my tastes. the first one you showed me was much much closer to what i had imagined.  can you go back to that one? <SOM> OBJECT_0 : pos focus color ['Brown'] class_name Sofas decor_style ['Traditional', 'Farmhouse'] <EOM> 
+------------------------------------------------------------
+Target :  DA:INFORM:DISPREFER:FURNITURE.decorStyle [ furniture-O = OBJECT_0, furniture-decorStyle = traditional ] DA:REQUEST:GET:FURNITURE [ furniture-sequential = first ] <EOB> Sure. I can can show this option again if you like. <EOS>
+Predicted :   DA:INFORM:DISPREFER:FURNITURE  [ furniture-O  = OBJECT_0, furniture-attentionOn  = that ] DA:REQUEST:GET:FURNITURE  [ furniture-O  = OBJECT_1, furniture-sequential  = first ] <EOB>  This is the Alvarado Loveseat. It is a little smaller than the first one you showed me.
+
+=============================DIALOGUE #481====================
+User : Hello. I'm looking to buy an end table for my bedroom. Can you assist me this evening? <SOM>  <EOM> System : Yes of course. Is there a style or color you like? User : Something simple and small. It doesn't have to be one that has drawers. I just need a basic tabletop to place my water, tv remote, and and phone on at night. <SOM>  <EOM> 
+------------------------------------------------------------
+Target :  DA:INFORM:REFINE:FURNITURE.info [ furniture-decorStyle = simple, furniture-dimensions = small ] DA:INFORM:REFINE:FURNITURE.hasStorage [ furniture-NEG = drawers ] <EOB> Ok what do you think about these? <EOS>
+Predicted :   DA:INFORM:REFINE:FURNITURE.info  [ furniture-decorStyle  = simple, furniture-dimensions  = small, furniture-intendedRoom  = bedroom ] <EOB>  Here are a few examples I have.
+
+=============================DIALOGUE #490====================
+System : Here you go. It is a very nice choice. Would you like to know more about it? User : It's not quite what I was looking for. do you have another one that is similar to this one? <SOM> OBJECT_0 : pos focus color ['Black'] class_name Ottomans decor_style ['Traditional'] <EOM> System : Here is a couple more that is similar to what you are wanting. I think the far right one is a pretty good piece. User : It is nice, but he one in the middle I think fits better. May I see it closer up? <SOM> OBJECT_1 : pos right color ['Black', 'Gray'] class_name Ottomans OBJECT_2 : pos center color ['Black'] class_name Ottomans decor_style ['Modern'] OBJECT_5 : pos left color ['Gray,Black'] class_name Ottomans <EOM> 
+------------------------------------------------------------
+Target :  DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_1 ] DA:INFORM:PREFER:FURNITURE [ furniture-O = OBJECT_2, furniture-displaySecond = middle ] DA:REQUEST:GET:FURNITURE [ furniture-O = OBJECT_2 ] <EOB> Here you go, Would you like to know more about it? <EOS>
+Predicted :   DA:INFORM:PREFER:FURNITURE  [ furniture-O  = OBJECT_1, furniture-displayThird  = middle ] DA:REQUEST:GET:FURNITURE  [ furniture-O  = OBJECT_1 ] <EOB>  Here you go.
+
