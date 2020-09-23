@@ -9,7 +9,7 @@ import copy
 import torch
 import torch.nn as nn
 from torch.distributions import categorical
-import torchtext
+# import torchtext
 import models
 from tools import rnn_support as rnn
 from tools import torch_support as support
@@ -31,10 +31,10 @@ class GenerativeDecoder(nn.Module):
             )
         elif self.params["embedding_type"]=="glove":
             self.nlp = spacy.load("en_vectors_web_lg")
-        elif self.params["embedding_type"]=="word2vec":
-            self.w2v_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/GoogleNews-vectors-negative300.bin', binary=True)
-        elif self.params["embedding_type"]=="fasttext":
-            self.fasttext_model = torchtext.vocab.FastText('en')
+        # elif self.params["embedding_type"]=="word2vec":
+        #     self.w2v_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/GoogleNews-vectors-negative300.bin', binary=True)
+        # elif self.params["embedding_type"]=="fasttext":
+        #     self.fasttext_model = torchtext.vocab.FastText('en')
         # Text encoder.
         if params["text_encoder"] == "transformer":
             if params["encoder"] != "pretrained_transformer":

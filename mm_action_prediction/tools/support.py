@@ -116,6 +116,87 @@ def sort_eval_metrics(eval_metrics):
     return sorted_evals
 
 
+def sort_task1_eval_metrics(eval_metrics):
+    """Sort a dictionary of evaluation metrics.
+
+    Args:
+        eval_metrics: Dict of evaluation metrics.
+
+    Returns:
+        sorted_evals: Sorted evaluated metrics, best first.
+    """
+    # Sort based on 'perplexity' (lower is better).
+    # sorted_evals = sorted(eval_metrics.items(), key=lambda x: x[1]['perplexity'])
+    # return sorted_evals
+
+    # Sort based on average %increase across all metrics (higher is better).
+    def mean_relative_increase(arg1, arg2):
+        _, metric1 = arg1
+        _, metric2 = arg2
+        rel_gain = []
+        # higher_better is +1 if true and -1 if false.
+        for higher_better, key in [
+            (1, "action_accuracy"),
+            (-1, "action_perperplexity"),
+            (1, "action_attribute"),
+        ]:
+            rel_gain.append(
+                higher_better
+                * (metric1[key] - metric2[key])
+                / (metric1[key] + metric2[key] + 1e-5)
+            )
+        return np.mean(rel_gain)
+
+    sorted_evals = sorted(
+        eval_metrics.items(),
+        key=functools.cmp_to_key(mean_relative_increase),
+        reverse=True,
+    )
+    return sorted_evals
+
+
+def sort_task2_eval_metrics(eval_metrics):
+    """Sort a dictionary of evaluation metrics.
+
+    Args:
+        eval_metrics: Dict of evaluation metrics.
+
+    Returns:
+        sorted_evals: Sorted evaluated metrics, best first.
+    """
+    # Sort based on 'perplexity' (lower is better).
+    # sorted_evals = sorted(eval_metrics.items(), key=lambda x: x[1]['perplexity'])
+    # return sorted_evals
+
+    # Sort based on average %increase across all metrics (higher is better).
+    def mean_relative_increase(arg1, arg2):
+        _, metric1 = arg1
+        _, metric2 = arg2
+        rel_gain = []
+        # higher_better is +1 if true and -1 if false.
+        for higher_better, key in [
+            (1, "bleu"),
+            (1, "r1"),
+            (1, "r5"),
+            (1, "r10"),
+            (-1, "mean"),
+            (1, "mrr"),
+        ]:
+            rel_gain.append(
+                higher_better
+                * (metric1[key] - metric2[key])
+                / (metric1[key] + metric2[key] + 1e-5)
+            )
+        return np.mean(rel_gain)
+
+    sorted_evals = sorted(
+        eval_metrics.items(),
+        key=functools.cmp_to_key(mean_relative_increase),
+        reverse=True,
+    )
+    return sorted_evals
+
+
 def extract_split_from_filename(file_name):
     """Extract the split from the filename.
 

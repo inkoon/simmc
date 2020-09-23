@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 import torch
 import torch.nn as nn
-import torchtext
+# import torchtext
 from tools import rnn_support as rnn
 from tools import torch_support as support
 # import models.encoders as encoders
@@ -30,10 +30,10 @@ class MemoryNetworkEncoder(nn.Module):
                 params["vocab_size"], params["word_embed_size"])
         elif self.params["embedding_type"]=="glove":
             self.nlp = spacy.load("en_vectors_web_lg")
-        elif self.params["embedding_type"]=="word2vec":
-            self.w2v_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/GoogleNews-vectors-negative300.bin', binary=True)
-        elif self.params["embedding_type"]=="fasttext":
-            self.fasttext_model = torchtext.vocab.FastText('en')
+        # elif self.params["embedding_type"]=="word2vec":
+        #     self.w2v_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/GoogleNews-vectors-negative300.bin', binary=True)
+        # elif self.params["embedding_type"]=="fasttext":
+        #     self.fasttext_model = torchtext.vocab.FastText('en')
         self.encoder_unit = nn.LSTM(
             encoder_input_size,
             params["hidden_size"],

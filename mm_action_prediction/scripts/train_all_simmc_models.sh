@@ -6,8 +6,8 @@ if [ $# -lt 2 ];then
     exit 1
 fi
 
-DOMAIN="furniture"
-# DOMAIN="fashion"
+# DOMAIN="furniture"
+DOMAIN="fashion"
 ROOT="../data/simmc_${DOMAIN}/"
 DETAILS=$1
 GPU_ID=$2

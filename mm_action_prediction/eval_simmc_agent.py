@@ -85,8 +85,8 @@ def evaluate_agent(wizard, val_loader, args):
 
 
             # Toy
-            # print("###############TOY TESTING!!###############")
-            # break
+            print("###############TOY TESTING!!###############")
+            break
 
     wizard.train()
 
@@ -144,7 +144,8 @@ def evaluate_agent(wizard, val_loader, args):
     eval_dict.update(retrieval_metrics)
     eval_outputs = {
         "model_actions": action_predictions,
-        "model_responses": model_responses
+        "model_responses": model_responses,
+        "cadidate_scores": candidate_scores
     }
     return eval_dict, eval_outputs
 

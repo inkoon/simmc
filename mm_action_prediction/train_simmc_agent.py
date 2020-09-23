@@ -75,6 +75,8 @@ num_iters_per_epoch = train_loader.num_instances / args["batch_size"]
 print("Number of iterations per epoch: {:.2f}".format(num_iters_per_epoch))
 eval_dict = {}
 best_epoch = -1
+task1_best_epoch = -1
+task2_best_epoch = -1
 
 # first_batch = None
 for iter_ind, batch in enumerate(train_loader.get_batch()):
@@ -126,14 +128,27 @@ for iter_ind, batch in enumerate(train_loader.get_batch()):
         )
         # Print the best epoch so far.
         best_epoch, best_epoch_dict = support.sort_eval_metrics(eval_dict)[0]
+        task1_best_epoch, task1_best_epoch_dict = support.sort_task1_eval_metrics(eval_dict)[0]
+        task2_best_epoch, task2_best_epoch_dict = support.sort_task2_eval_metrics(eval_dict)[0]
+
         print("\nBest Val Performance: Ep {}".format(best_epoch))
-        # items : loss, perplexity, bleu, action_accuracy, acction_perplexity, action_attribute, r1, r5, r10, mean, mrr
+        # items : bleu, action_accuracy, acction_perplexity, action_attribute, r1, r5, r10, mean, mrr
         for item in best_epoch_dict.items():
             print("\t{}: {:.4f}".format(*item))
 
             # plot eval performances to tensorboard
             if args["tensorboard_path"] is not None:
                 tensorboard_writer.add_scalar(f'eval/{item[0]}', item[1], iter_ind)
+
+        print("\nBest Task1 Val Performance: Ep {}".format(task1_best_epoch))
+        # items : action_accuracy, acction_perplexity, action_attribute
+        for item in task1_best_epoch_dict.items():
+            print("\t{}: {:.4f}".format(*item))
+
+        print("\nBest Task2 Val Performance: Ep {}".format(task2_best_epoch))
+        # items : bleu, r1, r5, r10, mean, mrr
+        for item in task2_best_epoch_dict.items():
+            print("\t{}: {:.4f}".format(*item))
 
     # Save the model every epoch.
     if (
@@ -150,8 +165,13 @@ for iter_ind, batch in enumerate(train_loader.get_batch()):
             "epoch": best_epoch,
         }
         if args["save_prudently"]:
-            if best_epoch == int(epoch):
-                save_path = os.path.join(args["snapshot_path"], "epoch_best.tar")
+            # if best_epoch == int(epoch):
+            if task1_best_epoch == int(epoch):
+                save_path = os.path.join(args["snapshot_path"], "epoch_best_task1.tar")
+                print("Saving the model: {}".format(save_path))
+                torch.save(checkpoint_dict, save_path)
+            if task2_best_epoch == int(epoch):
+                save_path = os.path.join(args["snapshot_path"], "epoch_best_task2.tar")
                 print("Saving the model: {}".format(save_path))
                 torch.save(checkpoint_dict, save_path)
         else:
