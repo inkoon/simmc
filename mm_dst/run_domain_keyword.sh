@@ -15,7 +15,8 @@ then
 	VERSION=$3
 fi
 
-GPU_ID='0'
+GPU_ID=0
+MUL_GPU=1
 NUM_GEN=100000
 
 PATH_DIR=$(realpath .)
@@ -46,7 +47,7 @@ python -m gpt2_dst.scripts.preprocess_input \
     --use_multimodal_contexts=1 \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
     --output_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
-'
+
 # Devtest split
 python -m gpt2_dst.scripts.preprocess_input \
     --input_path_json="${PATH_DATA_DIR}"/simmc_"${DOMAIN}"/"${DOMAIN}"_devtest_dials.json \
@@ -59,24 +60,27 @@ python -m gpt2_dst.scripts.preprocess_input \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
 
 # Train ("${DOMAIN}", multi-modal)
-CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
+python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2-large \
-    --model_name_or_path=gpt2-large \
+    --model_type=gpt2 \
+    --model_name_or_path=gpt2 \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
     --do_train \
     --train_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_target.txt \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_target.txt \
-    --evaluate_during_training \
     --num_train_epochs=1 \
     --overwrite_output_dir \
-    --per_gpu_train_batch_size=4 \
+    --gpu_id=$GPU_ID \
+    --mul_gpu=$MUL_GPU \
+    --fp16 \
+    --per_gpu_train_batch_size=8 \
     --per_gpu_eval_batch_size=32 \
     --warmup_steps=2000 \
-    --save_steps=1000
-
+    --logging_step=100 \
+    --save_steps=100
+'
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
@@ -96,4 +100,5 @@ python -m gpt2_dst.scripts.evaluate \
     --input_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_target.txt \
     --input_path_predicted="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predicted.txt \
     --output_path_report="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}"/"${DOMAIN}"_devtest_dials_report.json
+'
 

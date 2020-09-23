@@ -467,14 +467,13 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefi
 
     result = {"perplexity": perplexity}
 
-    output_eval_file = os.path.join(eval_output_dir, prefix, "eval_results.txt"
+    output_eval_file = os.path.join(eval_output_dir, prefix, "eval_results.txt")
     prev_results = []
     if os.path.isfile(output_eval_file):
         with open(output_eval_file, 'r') as reader:
             for line in reader.readlines():
                 prev_results.append(line)
 
-)
     with open(output_eval_file, "w") as writer:
         logger.info("***** Eval results {} *****".format(prefix))
         for prev_r in prev_results:
@@ -639,6 +638,7 @@ def main():
     parser.add_argument(
         "--gpu_id", type=int, default=-1, help="GPU id to use, -1 for CPU"
     )
+    parser.add_argument("--mul_gpu", type=int, default=0)
     args = parser.parse_args()
     if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
         raise ValueError(
@@ -680,14 +680,15 @@ def main():
         ptvsd.wait_for_attach()
 
     # Setup GPU
-    gpu_id = args.gpu_id
-    if gpu_id < 0:
-        print("Running on CPU...")
-        os.environ["CUDA_VISIBLE_DEVICES"] = ""
-    else:
-        print("Running on GPU {0}...".format(gpu_id))
-        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+
+    # gpu_id = args.gpu_id
+    # if gpu_id < 0:
+        # print("Running on CPU...")
+        # os.environ["CUDA_VISIBLE_DEVICES"] = ""
+    # else:
+        # print("Running on GPU {0}...".format(gpu_id))
+        # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        # os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
 
     # Setup CUDA, GPU & distributed training
     if args.local_rank == -1 or args.no_cuda:
