@@ -58,8 +58,8 @@ python -m gpt2_dst.scripts.preprocess_input \
 # Train ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2 \
-    --model_name_or_path=gpt2 \
+    --model_type=gpt2-large \
+    --model_name_or_path=gpt2-large \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
     --do_train \
@@ -70,10 +70,12 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
     --num_train_epochs=5 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=8 \
-    --per_gpu_eval_batch_size=32 \
-    --warmup_steps=4000 \
-    --save_steps=1000
+    --per_gpu_train_batch_size=2 \
+    --per_gpu_eval_batch_size=8 \
+    --warmup_steps=16000 \
+    --fp16 \
+    --logging_steps=2000 \
+    --save_steps=2000
 
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
