@@ -11,13 +11,6 @@ import re
 import os
 import argparse
 import ipdb 
-# DSTC style dataset fieldnames
-FIELDNAME_DIALOG = 'dialogue'
-FIELDNAME_USER_UTTR = 'transcript'
-FIELDNAME_ASST_UTTR = 'system_transcript'
-FIELDNAME_BELIEF_STATE = 'belief_state'
-FIELDNAME_STATE_GRAPH_0 = 'state_graph_0'
-FIELDNAME_VISUAL_OBJECTS = 'visual_objects'
 
 # Templates for GPT-2 formatting
 START_OF_MULTIMODAL_CONTEXTS = '<SOM>'
@@ -27,11 +20,6 @@ END_OF_BELIEF = '<EOB>'
 END_OF_SENTENCE = '<EOS>'
 START_OF_SLOT = ' [ '
 END_OF_SLOT = ' ] '
-TEMPLATE_PREDICT = '{context} {START_BELIEF_STATE} '
-TEMPLATE_TARGET = '{context} {START_BELIEF_STATE} {belief_state} ' \
-    '{END_OF_BELIEF} {response} {END_OF_SENTENCE}'
-TEMPLATE_TARGET_NORESP = '{context} {START_BELIEF_STATE} {belief_state} {END_OF_SENTENCE}'
-
 
 def convert_json_to_flattened(
         input_path_json,
@@ -40,11 +28,12 @@ def convert_json_to_flattened(
         Input: JSON representation of the dialogs
         Output: line-by-line stringified representation of each turn
     """
-
+    output = open(output_path_target,'a') 
+    
     #import ipdb; ipdb.set_trace()
     with open(input_path_json, 'r') as f_in:
         ds = json.load(f_in)
-    i = 0
+
     result = ""
     previousUtt = ""
     for data in ds : 
@@ -54,113 +43,59 @@ def convert_json_to_flattened(
             speaker = key['speaker'] 
             utterance = key['utterance']
             contextSize += 1 
-            if speaker == 'SYSTEM' : 
-                result += ' ' + utterance + ' ' +  '\n'
-                print(result)
-                previousUtt += "SYSTEM : {}".format(utterance) + ' '
-                result = previousUtt
-                if contextSize == context*2 : 
-                    contextSize = 0
+            if speaker == 'SYSTEM' : ## For SYSTEM utterance
+                result += ' ' + utterance + ' ' +  '\n'  
+                output.write(result)  ## print to output file 
+                previousUtt += "SYSTEM : {}".format(utterance) + ' ' ## store utterance history
+                result = previousUtt ## initialize result 
+                if contextSize >= context*2 : ## if bigger than context size 
+                    contextSize = 0   # reset utterance history and context size 
                     result = previousUtt
                     previousUtt = "" 
-            else : 
-            #import ipdb; ipdb.set_trace()
+            else :    ## For USER utterance
                 result+= "User : {}".format(utterance)
-                previousUtt  += "User : {}".format(utterance)
-                result+=START_OF_MULTIMODAL_CONTEXTS+' '
-                result+=END_OF_MULTIMODAL_CONTEXTS + ' '
-                previousUtt+=START_OF_MULTIMODAL_CONTEXTS+' '
+                previousUtt  += "User : {}".format(utterance) ## store utterance history 
+                result+= ' ' + START_OF_MULTIMODAL_CONTEXTS+' '  ## Start of multimodal
+                result+=END_OF_MULTIMODAL_CONTEXTS + ' '    ## multimodal is empty for now.
+                previousUtt+= ' ' + START_OF_MULTIMODAL_CONTEXTS+' '
                 previousUtt+=END_OF_MULTIMODAL_CONTEXTS + ' '
-                result+=START_BELIEF_STATE 
-                for element in key['frames'] : 
+                result+=START_BELIEF_STATE   ## start belief state
+                for element in key['frames'] :  ## loop through frames 
                     for action in element['actions'] : 
-                        result += ' da ' + action['act'].replace('_'," ").lower() 
-                        result += START_OF_SLOT
+                        if action['act'] == 'GOODBYE' or action['act'] == 'THANK_YOU' : 
+                            result += ' err chitchat '   ## convert DA GOODBYE and THANKYOU to CHITCHAT
+                        else : 
+                            result += ' da ' + action['act'].replace('_'," ").lower()  ## convert DA to simmc format
+
                         if action['slot'] is not None : 
-                            result += action['slot'].lower() 
-                            if len(action['values']) > 0 : 
+                            if len(action['values'])==0 :  ## if slot value is not defined
+                                result += ' ' + action['slot'].lower()  ## make slot name into object 
+                                result += START_OF_SLOT ## make empty slot 
+                            else : 
+                                result += START_OF_SLOT     ## if slot value is defined
+                                result += action['slot'].lower() 
                                 result += ' = ' 
-                                for values in action['values'] : 
-                                    result += " " + values 
+                                for values in action['values'] :  ## loop through slot value 
+                                    lst = re.findall('[A-Z][^A-Z]*',values) ## split for each capital letters
+                                    if len(lst) == 0 or len(lst) == len(values) : 
+                                        result += values   ## just add raw slot value if it has no capital, or all capital letters
+                                    else :
+                                        for ele in re.findall('[A-Z][^A-Z]*',values) : 
+                                            result += " " + ele.lower()  # Seperate each capital letter
                             result += END_OF_SLOT 
                             result += END_OF_BELIEF  + ' '
                 
-
-def parse_flattened_results_from_file(path):
-    results = []
-    with open(path, 'r') as f_in:
-        for line in f_in:
-            parsed = parse_flattened_result(line)
-            results.append(parsed)
-
-    return results
-
-
-def parse_flattened_result(to_parse):
-    """
-        Parse out the belief state from the raw text.
-        Return an empty list if the belief state can't be parsed
-
-        Input:
-        - A single <str> of flattened result
-          e.g. 'User: Show me something else => Belief State : DA:REQUEST ...'
-
-        Output:
-        - Parsed result in a JSON format, where the format is:
-            [
-                {
-                    'act': <str>  # e.g. 'DA:REQUEST',
-                    'slots': [
-                        <str> slot_name,
-                        <str> slot_value
-                    ]
-                }, ...  # End of a frame
-            ]  # End of a dialog
-    """
-    dialog_act_regex = re.compile(r'([\w:?.?]*)  *\[([^\]]*)\]')
-    slot_regex = re.compile(r'([A-Za-z0-9_.-:]*)  *= ([^,]*)')
-
-    belief = []
-
-    # Parse
-    splits = to_parse.strip().split(START_BELIEF_STATE)
-    if len(splits) == 2:
-        to_parse = splits[1].strip()
-        splits = to_parse.split(END_OF_BELIEF)
-
-        if len(splits) == 2:
-            # to_parse: 'DIALOG_ACT_1 : [ SLOT_NAME = SLOT_VALUE, ... ] ...'
-            to_parse = splits[0].strip()
-
-            for dialog_act in dialog_act_regex.finditer(to_parse):
-                d = {
-                    'act': dialog_act.group(1),
-                    'slots': []
-                }
-
-                for slot in slot_regex.finditer(dialog_act.group(2)):
-                    d['slots'].append(
-                        [
-                            slot.group(1).strip(),
-                            slot.group(2).strip()
-                        ]
-                    )
-
-                if d != {}:
-                    belief.append(d)
-
-    return belief
 
 
 if __name__ == '__main__':
     # Parse input args
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_path_json',
-                        help='path for input, line-separated format (.json)')
-    parser.add_argument('--output_dir',
-                        help='output directory for saving analysis summary files')
+                        help='path for input, line-separated format (.json)',required=True)
+    parser.add_argument('--output_path',
+                        help='output text file path (.txt)', required=True)
     parser.add_argument('--context',
                         help='context size', type=int,default=1)
     args = parser.parse_args()
-   
-    convert_json_to_flattened(args.input_path_json,args.output_dir,args.context)
+
+    convert_json_to_flattened(args.input_path_json,args.output_path,args.context)
