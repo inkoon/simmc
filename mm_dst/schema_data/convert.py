@@ -25,8 +25,8 @@ END_OF_MULTIMODAL_CONTEXTS = '<EOM>'
 START_BELIEF_STATE = '=> Belief State :'
 END_OF_BELIEF = '<EOB>'
 END_OF_SENTENCE = '<EOS>'
-START_OF_INTENT = '['
-END_OF_INTENT = ']'
+START_OF_SLOT = ' [ '
+END_OF_SLOT = ' ] '
 TEMPLATE_PREDICT = '{context} {START_BELIEF_STATE} '
 TEMPLATE_TARGET = '{context} {START_BELIEF_STATE} {belief_state} ' \
     '{END_OF_BELIEF} {response} {END_OF_SENTENCE}'
@@ -45,40 +45,46 @@ def convert_json_to_flattened(
     with open(input_path_json, 'r') as f_in:
         ds = json.load(f_in)
     i = 0
-    
+    result = ""
+    previousUtt = ""
     for data in ds : 
-        previousSystemUtt = ' '
-        result = ""
         contextSize =  0
+        #previousUtt = ""
         for key in data['turns'] :  
             speaker = key['speaker'] 
             utterance = key['utterance']
-            import ipdb; ipdb.set_trace()
+            contextSize += 1 
             if speaker == 'SYSTEM' : 
-               previousSystemUtt = ' ' + utterance 
-               result += ' ' + utterance 
-               contextSize += 1 
-               print(result)
-               if contextSize == context : 
-                   result = [] 
-               break 
-            result+= "User : {}".format(utterance)
-            result+=START_OF_MULTIMODAL_CONTEXTS+' '
-            result+=END_OF_MULTIMODAL_CONTEXTS + ' '
-            result+=START_BELIEF_STATE 
-            for element in key['frames'] : 
-                for action in element['actions'] : 
-                    result += ' da ' + action['act'].replace('_'," ").lower() + ' ' + element['state']['active_intent'].lower()
-                    result += START_OF_INTENT + ' ' 
-                    if element['state']['slot_values'] is not None : 
-                        result += element['slot'] + ' = '.join(element['state']['slot_values'])
-                    result += END_OF_INTENT
-
-                #for slot in element['slots'] : 
-                  #  print(slot)
-
-                #print(element['service'])
-           
+                result += ' ' + utterance + ' ' +  '\n'
+                print(result)
+                previousUtt += "SYSTEM : {}".format(utterance) + ' '
+                result = previousUtt
+                if contextSize == context*2 : 
+                    contextSize = 0
+                    result = previousUtt
+                    previousUtt = "" 
+            else : 
+            #import ipdb; ipdb.set_trace()
+                result+= "User : {}".format(utterance)
+                previousUtt  += "User : {}".format(utterance)
+                result+=START_OF_MULTIMODAL_CONTEXTS+' '
+                result+=END_OF_MULTIMODAL_CONTEXTS + ' '
+                previousUtt+=START_OF_MULTIMODAL_CONTEXTS+' '
+                previousUtt+=END_OF_MULTIMODAL_CONTEXTS + ' '
+                result+=START_BELIEF_STATE 
+                for element in key['frames'] : 
+                    for action in element['actions'] : 
+                        result += ' da ' + action['act'].replace('_'," ").lower() 
+                        result += START_OF_SLOT
+                        if action['slot'] is not None : 
+                            result += action['slot'].lower() 
+                            if len(action['values']) > 0 : 
+                                result += ' = ' 
+                                for values in action['values'] : 
+                                    result += " " + values 
+                            result += END_OF_SLOT 
+                            result += END_OF_BELIEF  + ' '
+                
 
 def parse_flattened_results_from_file(path):
     results = []
