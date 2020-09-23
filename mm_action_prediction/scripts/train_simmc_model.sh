@@ -55,25 +55,38 @@ COMMON_FLAGS="
     --learning_rate=0.0001 --gpu_id=$GPU_ID --use_action_attention \
     --num_epochs=100 --eval_every_epoch=1 --batch_size=20 \
     --save_every_epoch=1 --word_embed_size=256 --num_layers=2 \
-    --hidden_size=512 --use_gate\
+    --hidden_size=512 \
     --use_multimodal_state --use_action_output --use_bahdanau_attention \
     --domain=${DOMAIN} --save_prudently --tensorboard_path=${TENSORBOARD_PATH}"
 
 
-# Train history-agnostic model.
-# For other models, please look at scripts/train_all_simmc_models.sh
+# History-agnostic model.
 python -u train_simmc_agent.py $COMMON_FLAGS \
-     --encoder="history_agnostic" \
-     --text_encoder="lstm" \
-     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/output.log" &
+     --encoder="history_agnostic" --text_encoder="lstm" \
+     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
 
-# Transformer model.
-#python -u train_simmc_agent.py $COMMON_FLAGS \
-#    --encoder="history_agnostic" \
-#    --text_encoder="transformer" \
-#    --num_heads_transformer=4 --num_layers_transformer=4 \
-#    --hidden_size_transformer=2048 --hidden_size=256\
-#    --snapshot_path="${CHECKPOINT_PATH}/transf/" &> "${LOG_PATH}/transf.log" &
+# # Hierarchical recurrent encoder model.
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="hierarchical_recurrent" --text_encoder="lstm" \
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
+#
+# # Memory encoder model.
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="memory_network" --text_encoder="lstm" \
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
+#
+# # TF-IDF model.
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="tf_idf" --text_encoder="lstm" \
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/tf_idf.log" &
+#
+# # Transformer model.
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="history_agnostic" \
+#     --text_encoder="transformer" \
+#     --num_heads_transformer=4 --num_layers_transformer=4 \
+#     --hidden_size_transformer=2048 --hidden_size=256\
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/transf.log" &
 
 # Evaluate a trained model checkpoint.
 # CHECKPOINT_PATH="checkpoints/hae/epoch_20.tar"
