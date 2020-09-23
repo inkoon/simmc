@@ -417,7 +417,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
     return global_step, tr_loss / global_step
 
 
-def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefix="") -> Dict:
+def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, global_step, prefix="") -> Dict:
     # Loop to handle MNLI double evaluation (matched, mis-matched)
     eval_output_dir = args.output_dir
 
@@ -636,7 +636,7 @@ def main():
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
     # B: user added args
     parser.add_argument(
-        "--gpu_id", type=int, default=-1, help="GPU id to use, -1 for CPU"
+        "--gpu_id", type=str, default='-1', help="GPU id to use, -1 for CPU"
     )
     parser.add_argument("--mul_gpu", type=int, default=0)
     args = parser.parse_args()
@@ -681,14 +681,14 @@ def main():
 
     # Setup GPU
 
-    # gpu_id = args.gpu_id
-    # if gpu_id < 0:
-        # print("Running on CPU...")
-        # os.environ["CUDA_VISIBLE_DEVICES"] = ""
-    # else:
-        # print("Running on GPU {0}...".format(gpu_id))
-        # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-        # os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+    gpu_id = args.gpu_id
+    if gpu_id == '-1':
+        print("Running on CPU...")
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""
+    else:
+        print("Running on GPU {0}...".format(gpu_id))
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
 
     # Setup CUDA, GPU & distributed training
     if args.local_rank == -1 or args.no_cuda:
