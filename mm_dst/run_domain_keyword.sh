@@ -46,7 +46,7 @@ python -m gpt2_dst.scripts.preprocess_input \
     --use_multimodal_contexts=1 \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
     --output_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
-
+'
 # Devtest split
 python -m gpt2_dst.scripts.preprocess_input \
     --input_path_json="${PATH_DATA_DIR}"/simmc_"${DOMAIN}"/"${DOMAIN}"_devtest_dials.json \
@@ -61,21 +61,20 @@ python -m gpt2_dst.scripts.preprocess_input \
 # Train ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2 \
-    --model_name_or_path=gpt2 \
+    --model_type=gpt2-large \
+    --model_name_or_path=gpt2-large \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
     --do_train \
-    --train_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_train_dials_target.txt \
+    --train_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_target.txt \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_target.txt \
     --evaluate_during_training \
-    --num_train_epochs=5 \
+    --num_train_epochs=1 \
     --overwrite_output_dir \
-    --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=8 \
+    --per_gpu_train_batch_size=4 \
     --per_gpu_eval_batch_size=32 \
-    --warmup_steps=4000 \
+    --warmup_steps=2000 \
     --save_steps=1000
 
 # Generate sentences ("${DOMAIN}", multi-modal)
