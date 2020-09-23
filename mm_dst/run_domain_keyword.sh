@@ -56,7 +56,7 @@ python -m gpt2_dst.scripts.preprocess_input \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
 '
 # Train ("${DOMAIN}", multi-modal)
-CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
+python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
     --model_type=gpt2-large \
     --model_name_or_path=gpt2-large \
@@ -67,7 +67,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_language_modeling \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_target.txt \
     --evaluate_during_training \
-    --num_train_epochs=5 \
+    --num_train_epochs=10 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
     --per_gpu_train_batch_size=2 \
@@ -88,11 +88,11 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --num_beams=2 \
     --num_gen=$NUM_GEN \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predict.txt \
-    --path_output="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predicted.txt
+    --path_output="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt
 
 # Evaluate ("${DOMAIN}, multi-modal)
 python -m gpt2_dst.scripts.evaluate \
     --input_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_target.txt \
-    --input_path_predicted="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predicted.txt \
-    --output_path_report="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}"/"${DOMAIN}"_devtest_dials_report.json
+    --input_path_predicted="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt \
+    --output_path_report="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_report.json
 
