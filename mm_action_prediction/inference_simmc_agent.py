@@ -37,8 +37,9 @@ def main(args):
     val_loader = loaders.DataloaderSIMMC(dataloader_args)
     saved_args.update(val_loader.get_data_related_arguments())
 
-    # Model.
-    wizard = models.Assistant(saved_args)
+    # Models.
+    task1_wizard = models.Assistant(saved_args)
+    task2_wizard = models.Assistant(saved_args)
     # Load the checkpoint.
     wizard.load_state_dict(checkpoint["model_state"])
 
@@ -48,9 +49,6 @@ def main(args):
     print("Saving results: {}".format(save_path))
     with open(save_path, "w") as file_id:
         json.dump(eval_dict, file_id)
-    # if args["test"]:
-    #     with open(args["pred_save_path"], 'r') as f:
-
 
 
 def evaluate_agent(wizard, val_loader, args):
@@ -156,7 +154,8 @@ def evaluate_agent(wizard, val_loader, args):
 if __name__ == "__main__":
     # Read command line options.
     parser = argparse.ArgumentParser()
-    parser.add_argument("--checkpoint", required=True, help="Checkpoint to load")
+    parser.add_argument("--task1_checkpoint", required=True, help="Task1 checkpoint to load")
+    parser.add_argument("--task2_checkpoint", required=True, help="Task2 checkpoint to load")
     parser.add_argument("--batch_size", default=10, type=int, help="Batch size")
     parser.add_argument(
         "--eval_data_path", required=True, help="Evaluation data split"
@@ -181,12 +180,6 @@ if __name__ == "__main__":
         default=None,
         choices=["furniture", "fashion"],
         help="Domain to train the model on",
-    )
-    parser.add_argument(
-        "--test",
-        action="store_true",
-        default=False,
-        help="Eval at inference time",
     )
     parser.add_argument(
         "--pred_save_path", default=None, help="Paht to save predicted result"
