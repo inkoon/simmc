@@ -15,7 +15,7 @@ then
 	VERSION=$3
 fi
 
-GPU_ID=1
+GPU_ID=0
 MUL_GPU=0
 NUM_GEN=100000
 
@@ -60,8 +60,8 @@ python -m gpt2_dst.scripts.preprocess_input \
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2-large \
-    --model_name_or_path=gpt2-large \
+    --model_type=gpt2 \
+    --model_name_or_path=gpt2 \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
     --do_train \
@@ -69,15 +69,15 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_target.txt \
     --evaluate_during_training \
-    --num_train_epochs=5 \
+    --num_train_epochs=10 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=2 \
-    --per_gpu_eval_batch_size=8 \
-    --warmup_steps=16000 \
+    --per_gpu_train_batch_size=8 \
+    --per_gpu_eval_batch_size=32 \
+    --warmup_steps=4000 \
     --fp16 \
-    --logging_steps=2000 \
-    --save_steps=2000
+    --logging_steps=1000 \
+    --save_steps=1000
 
 
 
