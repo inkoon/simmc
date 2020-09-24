@@ -26,10 +26,12 @@ for line in f.readlines():
         token_match[new_token+' '] = token+ ' '
         match_token[token+ ' '] = new_token+ ' '
 
+
     elif ':' in token:
         new_token = token.lower().replace(':', ' ').replace('_', ' ')
         token_match[new_token+' '] = token+ ' '
         match_token[token+ ' '] = new_token+ ' '
+
 
     elif '-' in token:
         sp = token.split('-')
@@ -37,20 +39,17 @@ for line in f.readlines():
         if sp[1] == 'DISPLAY_1':
             new = 'DISPLAY_1'
         elif sp[1] == 'NEG':
-            new = 'negative'
-        elif sp[1] == 'SITUATION_1':
-            new = 'situation 1'
+            new = 'NEG'
         elif sp[1] == 'O':
             new = 'o'
         else:
-            if '_' in sp[1]:
-                sp[1] = sp[1].replace('_', ' ')
             for c in sp[1]:
                 if c.isupper():
                     new+=' ' + c.lower()
                 else:
                     new+=c
         new_token = sp[0] + ' ' + new
+
         token_match[new_token+' '] = token+ ' '
         match_token[token+ ' '] = new_token+ ' '
 

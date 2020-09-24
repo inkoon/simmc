@@ -26,10 +26,12 @@ for line in f.readlines():
         token_match[new_token+' '] = token+ ' '
         match_token[token+ ' '] = new_token+ ' '
 
+
     elif ':' in token:
         new_token = token.lower().replace(':', ' ').replace('_', ' ')
         token_match[new_token+' '] = token+ ' '
         match_token[token+ ' '] = new_token+ ' '
+
 
     elif '-' in token:
         sp = token.split('-')

@@ -1,6 +1,6 @@
 import json
 
-domain = 'fashion'
+domain = 'fashion_to'
 
 f = open(f"../data/{domain}/special_tokens.json", 'r')
 w = open(f"./{domain}/tokenlist.txt",'w')
