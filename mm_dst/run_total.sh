@@ -72,9 +72,9 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --per_gpu_train_batch_size=8 \
     --per_gpu_eval_batch_size=32 \
     --warmup_steps=4000 \
-    --fp16 \
-    --logging_steps=1000 \
-    --save_steps=1000
+    --logging_steps=0 \
+    --save_steps=0 \
+    --fp16 
 
 
 # Generate sentences ("${DOMAIN}", multi-modal)
