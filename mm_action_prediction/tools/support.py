@@ -137,7 +137,7 @@ def sort_task1_eval_metrics(eval_metrics):
         # higher_better is +1 if true and -1 if false.
         for higher_better, key in [
             (1, "action_accuracy"),
-            (-1, "action_perperplexity"),
+            (-1, "action_perplexity"),
             (1, "action_attribute"),
         ]:
             rel_gain.append(

@@ -53,28 +53,28 @@ COMMON_FLAGS="
     --metainfo_path=${MODEL_METAINFO} \
     --attr_vocab_path=${ATTR_VOCAB_FILE} \
     --learning_rate=0.0001 --gpu_id=$GPU_ID --use_action_attention \
-    --num_epochs=50 --eval_every_epoch=1 --batch_size=64 \
-    --save_every_epoch=1 --word_embed_size=300 --num_layers=2 \
+    --num_epochs=60 --eval_every_epoch=3 --batch_size=20 \
+    --save_every_epoch=3 --word_embed_size=300 --num_layers=2 \
     --hidden_size=512 \
     --use_multimodal_state --use_action_output --use_bahdanau_attention \
     --domain=${DOMAIN} --save_prudently --tensorboard_path=${TENSORBOARD_PATH}"
 
 
 # History-agnostic model.
-python -u train_simmc_agent.py $COMMON_FLAGS \
-     --encoder="history_agnostic" --text_encoder="lstm" \
-     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#      --encoder="history_agnostic" --text_encoder="lstm" \
+#      --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
 
-# # Hierarchical recurrent encoder model.
+# Hierarchical recurrent encoder model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
 #     --encoder="hierarchical_recurrent" --text_encoder="lstm" \
 #     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
-#
-# # Memory encoder model.
-# python -u train_simmc_agent.py $COMMON_FLAGS \
-#     --encoder="memory_network" --text_encoder="lstm" \
-#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
-#
+
+# Memory encoder model.
+python -u train_simmc_agent.py $COMMON_FLAGS \
+    --encoder="memory_network" --text_encoder="lstm" \
+    --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
+
 # # TF-IDF model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
 #     --encoder="tf_idf" --text_encoder="lstm" \

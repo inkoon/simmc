@@ -85,8 +85,8 @@ def evaluate_agent(wizard, val_loader, args):
 
 
             # Toy
-            print("###############TOY TESTING!!###############")
-            break
+            # print("###############TOY TESTING!!###############")
+            # break
 
     wizard.train()
 
@@ -122,7 +122,7 @@ def evaluate_agent(wizard, val_loader, args):
         "Action Perplexity: {:.2f}\n\t"
         "Action Attribute Accuracy: {:.2f}"
     )
-    print(
+    print(?!?jedi=0, ?!?              (*_**args*_*, **kwargs) ?!?jedi?!?
         print_str.format(
             avg_loss_eval,
             math.exp(avg_loss_eval),
