@@ -36,6 +36,7 @@ class UserMemoryEmbedder(nn.Module):
         self.multimodal_attend = nn.MultiheadAttention(output_size, 1)
 
         self.MAG = Multimodal_Adaptation_Gate(params)
+        self.Visualgate = VisualGate(params)
 
     def forward(self, multimodal_state, encoder_state, encoder_size):
         """Multimodal Embedding.
@@ -67,13 +68,32 @@ class UserMemoryEmbedder(nn.Module):
         query = encoder_state.unsqueeze(0)
 
         #MAG
-        if self.params['use_gate']:
+        if self.params['gate_type']=="MAG":
             multimodal_encode = torch.cat([self.MAG(query, multimodal_memory).squeeze(0), encoder_state], dim=-1)
-        else:
+        elif self.params['gate_type']=="none":
             attended_query, attented_wts = self.multimodal_attend(
                 query, multimodal_memory, multimodal_memory
             )
             multimodal_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
+        elif self.params['gate_type'] == "MMI":
+            attended_query_q, attended_wts_q = self.multimodal_attend(
+                query, multimodal_memory, multimodal_memory
+            )
+            v_input = multimodal_memory.mean(dim=0)
+            v_input = v_input.unsqueeze(0)
+            attended_query_p, attended_wts_p = self.multimodal_attend(
+                v_input,
+                query,
+                query
+            )
+            attended_query_a, attended_wts_a = self.multimodal_attend(
+                query,
+                attended_query_p,
+                attended_query_p
+            )
+            b = self.Visualgate(attended_query_a, attended_query_q)
+            multimodal_encode  =torch.cat([attended_query_a.squeeze(0), b.squeeze(0)], dim =-1)
+                
 
 
         return multimodal_encode
@@ -95,6 +115,22 @@ class UserMemoryEmbedder(nn.Module):
             ],
             dim=0,
         ).unsqueeze(0)
+
+class VisualGate(nn.Module):
+    def __init__(self, params):
+        super(VisualGate, self).__init__()
+        if params["text_encoder"] == "lstm":
+            output_size = params["hidden_size"]
+        else:
+            output_size = params["word_embed_size"]
+        self.a_linear = nn.Linear(output_size, output_size)
+        self.q_linear = nn.Linear(output_size, output_size)
+    def forward(self, a, q):
+        wa = self.a_linear(a)
+        wq = self.q_linear(q)
+        wa_wq = wa + wq
+        g = torch.sigmoid(wa_wq)
+        return g
 
 
 class Multimodal_Adaptation_Gate(nn.Module):
