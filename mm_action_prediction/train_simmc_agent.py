@@ -173,15 +173,14 @@ for iter_ind, batch in enumerate(train_loader.get_batch()):
                 save_path = os.path.join(args["snapshot_path"], "epoch_best_task1.tar")
                 print("Saving the model: {}".format(save_path))
                 torch.save(checkpoint_dict, save_path)
-                with open(f'{args["snapshot_path"]}task1_predict.json') as file_id:
-                    json.dump(eval_outputs, file_id)
-
+                # with open(f'{args["snapshot_path"]}task1_predict.json', 'w') as file_id:
+                #     json.dump(eval_outputs, file_id)
             if task2_best_epoch == int(epoch):
                 save_path = os.path.join(args["snapshot_path"], "epoch_best_task2.tar")
                 print("Saving the model: {}".format(save_path))
                 torch.save(checkpoint_dict, save_path)
-                with open(f'{args["snapshot_path"]}task2_predict.json') as file_id:
-                    json.dump(eval_outputs, file_id)
+                # with open(f'{args["snapshot_path"]}task2_predict.json', 'w') as file_id:
+                #     json.dump(eval_outputs, file_id)
         else:
             save_path = os.path.join(
                 args["snapshot_path"], "epoch_{}.tar".format(int(epoch))
