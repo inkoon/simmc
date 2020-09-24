@@ -30,6 +30,7 @@ import glob
 import json
 import logging
 import os
+import pickle
 import random
 import re
 import shutil
@@ -74,14 +75,33 @@ class TextDataset(Dataset):
 
         block_size = block_size - (tokenizer.max_len - tokenizer.max_len_single_sentence)
 
-        self.examples = []
-        with open(file_path, encoding="utf-8") as f:
-            text = f.read()
+        directory, filename = os.path.split(file_path)
+        cached_features_file = os.path.join(
+            directory, args.model_type + "_cached_lm_" + str(block_size) + "_" + filename
+        )
 
-        tokenized_text = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
+        if os.path.exists(cached_features_file) and not args.overwrite_cache:
+            logger.info("Loading features from cached file %s", cached_features_file)
+            with open(cached_features_file, "rb") as handle:
+                self.examples = pickle.load(handle)
+        else:
+            logger.info("Creating features from dataset file at %s", directory)
 
-        for i in range(0, len(tokenized_text) - block_size + 1, block_size):  # Truncate in block of block_size
-            self.examples.append(tokenizer.build_inputs_with_special_tokens(tokenized_text[i : i + block_size]))
+            self.examples = []
+            with open(file_path, encoding="utf-8") as f:
+                text = f.read()
+
+            tokenized_text = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
+
+            for i in range(0, len(tokenized_text) - block_size + 1, block_size):  # Truncate in block of block_size
+                self.examples.append(tokenizer.build_inputs_with_special_tokens(tokenized_text[i : i + block_size]))
+            # Note that we are loosing the last truncated example here for the sake of simplicity (no padding)
+            # If your dataset is small, first you should loook for a bigger one :-) and second you
+            # can change this behavior by adding (model specific) padding.
+
+            logger.info("Saving features into cached file %s", cached_features_file)
+            with open(cached_features_file, "wb") as handle:
+                pickle.dump(self.examples, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def __len__(self):
         return len(self.examples)
@@ -211,10 +231,6 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
     """ Train the model """
     if args.local_rank in [-1, 0]:
         tb_writer = SummaryWriter()
-
-    # B : add parameters in tensorboardX
-    # tb_writer.add_hparams({'warmup_step': args.warmup_steps, 'learning_rate': args.learning_rate, 'per_gpu_train_batch_size': args.per_gpu_train_batch_size, 'num_training_epochs':args.num_train_epochs, 'mul_gpu': args.mul_gpu}) 
-
 
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
 
@@ -466,7 +482,7 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, globa
         # for key in sorted(result.keys()):
             # logger.info("  %s = %s", key, str(result[key]))
             # writer.write("%s = %s\n" % (key, str(result[key])))
-        # B : track every results
+
         writer.write(str(global_step)+'\t'+str(result['perplexity'])+'\n')
 
     return result
@@ -565,7 +581,7 @@ def main():
         type=int,
         default=1,
         help="Number of updates steps to accumulate before performing a backward/update pass.",
-        )
+    )
     parser.add_argument("--learning_rate", default=5e-5, type=float, help="The initial learning rate for Adam.")
     parser.add_argument("--weight_decay", default=0.0, type=float, help="Weight decay if we apply some.")
     parser.add_argument("--adam_epsilon", default=1e-8, type=float, help="Epsilon for Adam optimizer.")
@@ -618,11 +634,11 @@ def main():
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
-
     # B: user added args
-    parser.add_argument("--gpu_id", type=str, default='0')
+    parser.add_argument(
+        "--gpu_id", type=str, default='-1', help="GPU id to use, -1 for CPU"
+    )
     parser.add_argument("--mul_gpu", type=int, default=0)
-    parser.add_argument("--n_gpu", type=int, default=1) 
     args = parser.parse_args()
     
     # B : gpu setting
@@ -670,6 +686,17 @@ def main():
         ptvsd.enable_attach(address=(args.server_ip, args.server_port), redirect_output=True)
         ptvsd.wait_for_attach()
 
+    # Setup GPU
+
+    gpu_id = args.gpu_id
+    if gpu_id == '-1':
+        print("Running on CPU...")
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""
+    else:
+        print("Running on GPU {0}...".format(gpu_id))
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
+
     # Setup CUDA, GPU & distributed training
     if args.local_rank == -1 or args.no_cuda:
         device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
@@ -678,7 +705,7 @@ def main():
         torch.cuda.set_device(args.local_rank)
         device = torch.device("cuda", args.local_rank)
         torch.distributed.init_process_group(backend="nccl")
-        #args.n_gpu = 1
+        args.n_gpu = 1
     args.device = device
 
     # Setup logging
@@ -806,10 +833,9 @@ def main():
     if args.do_eval and args.local_rank in [-1, 0]:
         checkpoints = [args.output_dir]
         if args.eval_all_checkpoints:
-            checkpoints = [
-                os.path.dirname(c)
-                for c in sorted(glob.glob(args.output_dir + "/**/" + WEIGHTS_NAME, recursive=True))
-            ]
+            checkpoints = list(
+                os.path.dirname(c) for c in sorted(glob.glob(args.output_dir + "/**/" + WEIGHTS_NAME, recursive=True))
+            )
             logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)  # Reduce logging
         logger.info("Evaluate the following checkpoints: %s", checkpoints)
         for checkpoint in checkpoints:
@@ -819,7 +845,7 @@ def main():
             model = AutoModelWithLMHead.from_pretrained(checkpoint)
             model.to(args.device)
             result = evaluate(args, model, tokenizer, global_step, prefix=prefix)
-            result = {k + "_{}".format(global_step): v for k, v in result.items()}
+            result = dict((k + "_{}".format(global_step), v) for k, v in result.items())
             results.update(result)
 
     return results

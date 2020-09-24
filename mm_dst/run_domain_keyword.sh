@@ -15,7 +15,8 @@ then
 	VERSION=$3
 fi
 
-GPU_ID='0'
+GPU_ID=0
+MUL_GPU=1
 NUM_GEN=100000
 
 PATH_DIR=$(realpath .)
@@ -54,7 +55,7 @@ python -m gpt2_dst.scripts.preprocess_input \
     --total \
     --use_multimodal_contexts=1 \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
-
+'
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
