@@ -94,16 +94,16 @@ class CarouselEmbedder(nn.Module):
         carousel_states = torch.stack(carousel_states, dim=1)
         # Mask: (N,S)
         carousel_len = self.host.LongTensor(carousel_sizes)
-        #query_len = torch.ones(len(carousel_sizes), dtype=torch.long)
-        #query_len = query_len.cuda()
+        query_len = torch.ones(len(carousel_sizes), dtype=torch.long)
+        query_len = query_len.cuda()
         query = encoder_state.unsqueeze(0)
 
         ###using gate for carousel, query
         #MAG+encoder_state
         
-        if self.params['use_gate']:
+        if self.params['gate_type'] == "MAG":
             carousel_encode = torch.cat([self.MAG(query, carousel_states).squeeze(0), encoder_state], dim=-1)
-        else:
+        elif self.params['gate_type'] == "none":
             ##original
             attended_query, attended_wts = self.carousel_attend(
                 query,
@@ -112,48 +112,31 @@ class CarouselEmbedder(nn.Module):
                 key_padding_mask = self.carousel_mask[carousel_len-1]
             )
             carousel_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
-
-
-        """
-        #MAG_only
-        #carousel_encode = self.MAG_only(query, carousel_states).squeeze(0)        
-        ###
-        tv_input = torch.cat([query, carousel_states], dim =0)
-        tv_input = tv_input.mean(dim=0)
-        tv_input = tv_input.unsqueeze(0)
-        attended_query, attented_wts = self.carousel_attend(
-            tv_input,          #query
-            query,             #carousel_states
-            query,             #carousel_states
-            key_padding_mask=self.query_mask[query_len - 1],  #self.carousel_mask[carousel_len-1]
-        )
-        #carousel_encode = torch.cat([attended_query.squeeze(0), encoder_state], dim=-1)
-        
-        #inkoon gate
-        attended_query_q, attended_wts_q = self.carousel_attend(
-            query,
-            carousel_states,
-            carousel_states,
-            key_padding_mask=self.carousel_mask[carousel_len-1],
-        )
-        v_input = carousel_states.mean(dim=0)
-        v_input = v_input.unsqueeze(0)
-        attended_query_p, atteded_wts_p = self.carousel_attend(
-            v_input,
-            query,
-            query,
-            key_padding_mask=self.query_mask[query_len -1],
-        )
-        attended_query_a, attended_wts_a = self.carousel_attend(
-            query,
-            attended_query_p,
-            attended_query_p,
-            key_padding_mask = self.query_mask[query_len-1],
-        )
-        b = self.Visualgate(attended_query_a, attended_query_q)
-        carousel_encode = torch.cat([attended_query_a.squeeze(0), b.squeeze(0)], dim=-1)
-        ############end
-        """
+        elif self.params['gate_type'] == "MMI":
+            #inkoon gate
+            attended_query_q, attended_wts_q = self.carousel_attend(
+                query,
+                carousel_states,
+                carousel_states,
+                key_padding_mask=self.carousel_mask[carousel_len-1],
+            )
+            v_input = carousel_states.mean(dim=0)
+            v_input = v_input.unsqueeze(0)
+            attended_query_p, atteded_wts_p = self.carousel_attend(
+                v_input,
+                query,
+                query,
+                key_padding_mask=self.query_mask[query_len -1],
+            )
+            attended_query_a, attended_wts_a = self.carousel_attend(
+                query,
+                attended_query_p,
+                attended_query_p,
+                key_padding_mask = self.query_mask[query_len-1],
+            )
+            b = self.Visualgate(attended_query_a, attended_query_q)
+            carousel_encode = torch.cat([attended_query_a.squeeze(0), b.squeeze(0)], dim=-1)
+            ############end
 
         return carousel_encode
 

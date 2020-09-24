@@ -235,11 +235,12 @@ def read_command_line():
         help="choose embedding"
     )
     parser.add_argument(
-        "--use_gate",
-        dest="use_gate",
-        action="store_true",
-        default=False,
-        help="use Multimodal Adaptation Gate",
+        "--gate_type",
+        dest="gate_type",
+        choices=["none", "MAG", "MMI"],
+        type=str,
+        default="none",
+        help="use MAG or MMI",
     )
     try:
         parsed_args = vars(parser.parse_args())
