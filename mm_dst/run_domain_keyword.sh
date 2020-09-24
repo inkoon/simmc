@@ -15,7 +15,7 @@ then
 	VERSION=$3
 fi
 
-GPU_ID=0
+GPU_ID=1
 MUL_GPU=0
 
 
@@ -50,7 +50,7 @@ python -m gpt2_dst.scripts.run_language_modeling \
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
-    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/checkpoint-26000 \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
     --num_return_sequences=1 \
     --length=100 \
     --gpu_id=$GPU_ID \
