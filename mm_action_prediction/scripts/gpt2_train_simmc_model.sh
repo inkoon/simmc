@@ -63,16 +63,19 @@ COMMON_FLAGS="
 # History-agnostic model.
 python -u train_simmc_agent.py $COMMON_FLAGS \
      --encoder="history_agnostic" --text_encoder="lstm" \
+     --gpt2 --root=${ROOT} \
      --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
 
 # Hierarchical recurrent encoder model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
 #     --encoder="hierarchical_recurrent" --text_encoder="lstm" \
+#     --gpt2 --root=${ROOT} \
 #     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
 
 # Memory encoder model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
 #     --encoder="memory_network" --text_encoder="lstm" \
+#     --gpt2 --root=${ROOT} \
 #     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
 
 # # TF-IDF model.

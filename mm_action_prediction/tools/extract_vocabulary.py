@@ -18,6 +18,7 @@ def main(args):
         train_data = json.load(file_id)
     dialog_data = train_data["dialogue_data"]
 
+    # Load pretrained GPT2Tokenizer
     if args["gpt2"]:
         tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 
@@ -51,8 +52,13 @@ def main(args):
     # Save answers and vocabularies.
     print("Identified {} words..".format(len(words)))
     print("Saving dictionary: {}".format(args["vocab_save_path"]))
-    with open(args["vocab_save_path"], "w") as file_id:
-        json.dump(vocabulary, file_id)
+    if args['gpt2']:
+        tokenizer.save_vocabulary(args["vocab_save_path"])
+        with open(f'{args["vocab_save_path"]}gpt2_vocab.json', "w") as file_id:
+            json.dump(vocabulary, file_id)
+    else:
+        with open(f'{args["vocab_save_path"]}_vocabulary.json', "w") as file_id:
+            json.dump(vocabulary, file_id)
 
 
 if __name__ == "__main__":

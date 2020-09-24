@@ -13,8 +13,14 @@ from torch.distributions import categorical
 import models
 from tools import rnn_support as rnn
 from tools import torch_support as support
+
 import gensim
 import spacy
+
+from transformers import (
+    GPT2LMHeadModel,
+    GPT2Tokenizer,
+)
 
 class GenerativeDecoder(nn.Module):
     def __init__(self, params):
@@ -37,7 +43,13 @@ class GenerativeDecoder(nn.Module):
         #     self.fasttext_model = torchtext.vocab.FastText('en')
         # Text encoder.
         if params["text_encoder"] == "transformer":
-            if params["encoder"] != "pretrained_transformer":
+            if params["gpt2"]:
+                self.decoder_unit = GPT2LMHeadModel.from_pretrained('gpt2')
+                # self.decoder_unit.resize_token_embeddings(params["vocab_size"])
+                self.decoder_unit.resize_token_embeddings(50258)
+                self.badword_list = params["badword_list"]
+                # self.decoder_unit.config.add_cross_attention=True
+            elif params["encoder"] != "pretrained_transformer":
                 decoder_layer = nn.TransformerDecoderLayer(
                     params["word_embed_size"],
                     params["num_heads_transformer"],
@@ -158,7 +170,18 @@ class GenerativeDecoder(nn.Module):
             enc_pad_mask = support.flatten(enc_pad_mask, batch_size, num_rounds)
             dec_pad_mask = batch["assist_in"] == batch["pad_token"]
             dec_pad_mask = support.flatten(dec_pad_mask, batch_size, num_rounds)
-            if self.params["encoder"] != "pretrained_transformer":
+            if self.params["gpt2"]:
+                # decoder_steps_in = [200, 26, h_d]
+                # decoder_in = [200, 26]
+                # decoder_out = [200, 26]
+                outputs = self.decoder_unit(
+                    inputs_embeds=decoder_steps_in,
+                    labels=decoder_out,
+                    # encoder_hidden_states=hidden_state,
+                    # encoder_attention_mask=~enc_pad_mask,
+                )
+                outputs = outputs[1]
+            elif self.params["encoder"] != "pretrained_transformer":
                 dec_embeds = self.pos_encoder(decoder_steps_in).transpose(0, 1)
                 outputs = self.decoder_unit(
                     dec_embeds,
@@ -218,7 +241,7 @@ class GenerativeDecoder(nn.Module):
                     decoder_len,
                     init_state=hidden_state,
                 )
-        if self.params["encoder"] == "pretrained_transformer":
+        if self.params["encoder"] == "pretrained_transformer" or self.params["gpt2"]:
             output_logits = outputs
         else:
             # Logits over vocabulary.
@@ -368,7 +391,12 @@ class GenerativeDecoder(nn.Module):
                     beam_tokens_embed = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
                     beam_tokens_embed.requires_grad=True
 
-                if self.params["encoder"] != "pretrained_transformer":
+                if self.params["gpt2"]:
+                    outputs = self.decoder_unit(
+                        inputs_embeds=beam_tokens_embed.transpose(0, 1),
+                    )
+                    logits = outputs[0]
+                elif self.params["encoder"] != "pretrained_transformer":
                     dec_embeds = self.pos_encoder(beam_tokens_embed).transpose(0, 1)
                     output = self.decoder_unit(
                         dec_embeds,
@@ -446,6 +474,11 @@ class GenerativeDecoder(nn.Module):
                 # For the first step, make all but first beam
                 # probabilities -inf.
                 log_probs[1:, :] = float("-inf")
+
+            # reshape log_probs when using gpt2
+            if self.params["gpt2"]:
+                log_probs = log_probs.reshape(beam_size, -1)
+
             new_scores = log_probs * cur_weight + beam_scores * prev_weight
             finished_beam_scores = beam_scores * finished_beams.float()
             new_scores.scatter_add_(1, zero_tensor, finished_beam_scores)

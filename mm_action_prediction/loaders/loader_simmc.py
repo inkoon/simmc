@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import json
 import numpy as np
 from nltk.tokenize import word_tokenize
+from transformers import BertTokenizer, GPT2Tokenizer
 
 import loaders
 from tools import support, torch_support
@@ -28,10 +29,30 @@ class DataloaderSIMMC(loaders.LoaderParent):
         # Load the dataset.
         raw_data = np.load(params["data_read_path"], allow_pickle=True)
         self.raw_data = raw_data[()]
-        if self.params["gpt2"]:
+        if self.params['gpt2']:
+            # Get GPT2 vocabulary
             self.raw_data["vocabulary"] = self.raw_data["vocabulary"]["word"]
+            self.words = loaders.Vocabulary()
+            self.words.set_vocabulary_state(self.raw_data["vocabulary"]["word"])
 
-        if self.params["encoder"] != "pretrained_transformer":
+            # Set badwords
+            with open(f'{params["root_path"]}gpt2_vocab.json', 'r') as file_id:
+                goodwords = json.load(file_id)
+            self.badword_list = []
+            for i, w in enumerate(self.words._words):
+                if w not in goodwords["word"]:
+                    self.badword_list.append([i])
+            self.badword_list.append([50257])
+            params["badword_list"] = self.badword_list
+
+            # Add special tokens
+            self.tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+            self.tokenizer.add_special_tokens({'pad_token': '<pad>'})
+            self.start_token = self.tokenizer.bos_token_id
+            self.end_token = self.tokenizer.eos_token_id
+            self.pad_token = self.tokenizer.pad_token_id
+            self.unk_token = self.tokenizer.eos_token_id
+        elif self.params["encoder"] != "pretrained_transformer":
             self.words = loaders.Vocabulary()
             self.words.set_vocabulary_state(self.raw_data["vocabulary"]["word"])
             # Aliases.
@@ -40,7 +61,6 @@ class DataloaderSIMMC(loaders.LoaderParent):
             self.pad_token = self.words.index("<pad>")
             self.unk_token = self.words.index("<unk>")
         else:
-            from transformers import BertTokenizer
             self.words = BertTokenizer.from_pretrained(self.raw_data["vocabulary"])
             # Aliases.
             self.start_token = self.words.added_tokens_encoder["[start]"]
@@ -472,6 +492,31 @@ class DataloaderSIMMC(loaders.LoaderParent):
             }
         )
         return self._ship_torch_batch(batch)
+
+    def gpt2_stringify_beam_outputs(self, beam_outputs, batch):
+        """Stringifies beamsearch outputs.
+
+        Args:
+            beam_outputs: Outputs of beamsearch generation
+            batch: Current batch
+        """
+        # def stringify(indices):
+        #     if indices is None:
+        #         print('NONE')
+        #     else:
+        #         self.tokenizer.decode(indices)
+        stringified_beam_output = [
+            {
+                "dialog_id": batch["dialog_id"][ii].item(),
+                "predictions": [
+                    # {"response": stringify(beam_outputs[ii][jj])}
+                    {"response": self.tokenizer.decode(beam_outputs[ii][jj])}
+                    for jj in range(batch["dialog_len"][ii])
+                ]
+            }
+            for ii in range(beam_outputs.shape[0])
+        ]
+        return stringified_beam_output
 
     def stringify_beam_outputs(self, beam_outputs, batch):
         """Stringifies beamsearch outputs.

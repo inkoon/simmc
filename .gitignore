@@ -1,11 +1,8 @@
-<<<<<<< HEAD
-=======
 # B : Usera added
 *.bin
 mm_dst/gpt2_dst/save/
 data/
 
->>>>>>> f615a41e454a622dd7fc78f39975707a3f823479
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

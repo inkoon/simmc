@@ -2,8 +2,7 @@
 
 DOMAIN="furniture"
 # DOMAIN="fashion"
-
-ROOT="../data/gpt2_simmc_${DOMAIN}/"
+ROOT="../data/bert2gpt2_simmc_${DOMAIN}/"
 
 # Input files.
 TRAIN_JSON_FILE="${ROOT}${DOMAIN}_train_dials.json"
@@ -51,7 +50,7 @@ python tools/extract_vocabulary.py \
     --train_json_path="${TRAIN_JSON_FILE}" \
     --vocab_save_path="${ROOT}" \
     --threshold_count=5 \
-    --gpt2
+    --bert2gpt2
 
 
 # Step 3: Read and embed shopping assets.
@@ -79,7 +78,7 @@ for SPLIT_JSON_FILE in "${SPLIT_JSON_FILES[@]}" ; do
         --action_json_path="${SPLIT_JSON_FILE/.json/_api_calls.json}" \
         --retrieval_candidate_file="${SPLIT_JSON_FILE/.json/_retrieval_candidates.json}" \
         --domain="${DOMAIN}" \
-        --gpt2
+        --bert2gpt2
 done
 
 

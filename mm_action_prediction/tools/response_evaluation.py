@@ -42,6 +42,7 @@ def evaluate_response_generation(gt_responses, model_responses):
             gt_datum = gt_responses_pool[dialog_id]["dialogue"][round_id]
             gt_response = gt_datum["system_transcript"]
 
+            # import ipdb; ipdb.set_trace(context=10)
             bleu_score = nltk.translate.bleu_score.sentence_bleu(
                 # [gt_response], response, smoothing_function=chencherry.method1
                 [normalize_sentence(gt_response)],
