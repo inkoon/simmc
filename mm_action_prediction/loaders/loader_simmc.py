@@ -28,6 +28,9 @@ class DataloaderSIMMC(loaders.LoaderParent):
         # Load the dataset.
         raw_data = np.load(params["data_read_path"], allow_pickle=True)
         self.raw_data = raw_data[()]
+        if self.params["gpt2"]:
+            self.raw_data["vocabulary"] = self.raw_data["vocabulary"]["word"]
+
         if self.params["encoder"] != "pretrained_transformer":
             self.words = loaders.Vocabulary()
             self.words.set_vocabulary_state(self.raw_data["vocabulary"]["word"])

@@ -85,8 +85,8 @@ def evaluate_agent(wizard, val_loader, args):
 
 
             # Toy
-            # print("###############TOY TESTING!!###############")
-            # break
+            print("###############TOY TESTING!!###############")
+            break
 
     wizard.train()
 
@@ -178,6 +178,17 @@ if __name__ == "__main__":
         default=None,
         choices=["furniture", "fashion"],
         help="Domain to train the model on",
+    )
+    parser.add_argument(
+        "--gpt2", action="store_true", default=False, help="GPT2"
+    )
+    parser.add_argument(
+        "--gate_type",
+        dest="gate_type",
+        choices=["none", "MAG", "MMI"],
+        type=str,
+        default="none",
+        help="use MAG or MMI",
     )
     try:
         args = vars(parser.parse_args())

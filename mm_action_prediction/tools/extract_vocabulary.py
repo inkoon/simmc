@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import argparse
 from nltk.tokenize import word_tokenize
+from transformers import GPT2Tokenizer
 
 
 def main(args):
@@ -17,15 +18,23 @@ def main(args):
         train_data = json.load(file_id)
     dialog_data = train_data["dialogue_data"]
 
+    if args["gpt2"]:
+        tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+
     counts = {}
     for datum in dialog_data:
         dialog_utterances = [
             ii[key] for ii in datum["dialogue"]
             for key in ("transcript", "system_transcript")
         ]
-        dialog_tokens = [
-            word_tokenize(ii.lower()) for ii in dialog_utterances
-        ]
+        if args["gpt2"]:
+            dialog_tokens = [
+                tokenizer.tokenize(ii.lower()) for ii in dialog_utterances
+            ]
+        else:
+            dialog_tokens = [
+                word_tokenize(ii.lower()) for ii in dialog_utterances
+            ]
         for turn in dialog_tokens:
             for word in turn:
                 counts[word] = counts.get(word, 0) + 1
@@ -64,6 +73,12 @@ if __name__ == "__main__":
         default=0,
         type=int,
         help="Words are included if beyond this threshold",
+    )
+    parser.add_argument(
+        "--gpt2",
+        action="store_true",
+        default=False,
+        help="Use gpt2 tokenizer"
     )
     try:
         parsed_args = vars(parser.parse_args())

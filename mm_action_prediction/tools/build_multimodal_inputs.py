@@ -44,6 +44,9 @@ flags.DEFINE_enum(
 flags.DEFINE_boolean(
     "pretrained_tokenizer", False, "Use pretrained tokenizer instead of nltk"
 )
+flags.DEFINE_boolean(
+    "gpt2", False, "Use gpt2 tokenizer"
+)
 
 
 def build_multimodal_inputs(input_json_file):
@@ -207,12 +210,39 @@ def build_multimodal_inputs(input_json_file):
 
     # If token-wise encoding is to be used.
     print("Vocabulary: {}".format(FLAGS.vocab_file))
-    if not FLAGS.pretrained_tokenizer:
+    if FLAGS.gpt2:
+        from transformers import GPT2Tokenizer
+        tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+        tokenizer.add_special_tokens({'pad_token': '<pad>'})
+        with open(FLAGS.vocab_file, "r") as file_id:
+            vocabulary = json.load(file_id)
+        mm_inputs["vocabulary"] = dict()
+        mm_inputs["vocabulary"]["word"] = vocabulary
+        word2ind = {word: index for index, word in enumerate(vocabulary)}
+        ind2word = {index: word for index, word in enumerate(vocabulary["word"])} # for pretrained embedding
+        token2ind = {tokenizer.convert_tokens_to_ids(vocabulary["word"][i]): i for i in range(len(vocabulary["word"]))} # KKKKKKKK
+
+        mm_inputs["user_sent"], mm_inputs["user_sent_len"] = (
+            convert_pool_matrices_pretrained_tokenizer(
+                utterance_list["user"], tokenizer, token2ind
+            )
+        )
+        mm_inputs["assist_sent"], mm_inputs["assist_sent_len"] = (
+            convert_pool_matrices_pretrained_tokenizer(
+                utterance_list["assistant"], tokenizer, token2ind
+            )
+        )
+
+        # Token aliases.
+        pad_token = tokenizer.pad_token_id
+        start_token = tokenizer.bos_token_id
+        end_token = tokenizer.eos_token_id
+    elif not FLAGS.pretrained_tokenizer:
         with open(FLAGS.vocab_file, "r") as file_id:
             vocabulary = json.load(file_id)
         mm_inputs["vocabulary"] = vocabulary
         word2ind = {word: index for index, word in enumerate(vocabulary["word"])}
-        ind2word = {index: word for index, word in enumerate(vocabulary["word"])} # pretrained embedding에 필요
+        ind2word = {index: word for index, word in enumerate(vocabulary["word"])} # for pretrained embedding
 
         mm_inputs["user_sent"], mm_inputs["user_sent_len"] = convert_pool_matrices(
             utterance_list["user"], word2ind
@@ -325,6 +355,39 @@ def convert_pool_matrices_pretrained_tokenizer(pool_input, pretrained_tokenizer)
     """
     def tokenizer(x):
         return pretrained_tokenizer.encode(x, add_special_tokens=True)
+
+    if isinstance(pool_input, dict):
+        pool_list = sorted(pool_input, key=lambda x: pool_input[x])
+    else:
+        pool_list = pool_input
+
+    tokenized_items = [tokenizer(item) for item in progressbar(pool_list)]
+    max_item_len = max(len(ii) for ii in tokenized_items)
+    item_tokens = np.zeros((len(tokenized_items), max_item_len)).astype("int32")
+    item_tokens.fill(pretrained_tokenizer.pad_token_id)
+    item_lens = np.zeros(len(tokenized_items)).astype("int32")
+    for item_id, tokens in progressbar(enumerate(tokenized_items)):
+        item_lens[item_id] = len(tokens)
+        item_tokens[item_id, : item_lens[item_id]] = np.array(tokens)
+    return item_tokens, item_lens
+
+
+def convert_pool_matrices_gpt2_tokenizer(pool_input, pretrained_tokenizer, token2ind):
+    """Converts a dictionary of pooled captions/questions into matrices.
+
+    Args:
+        pool_input: Dictionary of pooled captions/questions
+        pretrained_tokenizer: Huggingface tokenizer for pretrained models.
+
+    Returns:
+        item_tokens: Items in the pool tokenized and converted into a matrix.
+        item_lens: Length of items in the matrix.
+    """
+    def tokenizer(x):
+        encoded = pretrained_tokenizer.encode(x, add_special_tokens=True)
+        for i in range(len(encoded)):
+            encoded[i] = token2ind[encoded[i]]
+        return encoded
 
     if isinstance(pool_input, dict):
         pool_list = sorted(pool_input, key=lambda x: pool_input[x])

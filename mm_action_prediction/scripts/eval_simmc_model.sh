@@ -12,10 +12,10 @@ DEVTEST_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials.json"
 
 
 # Evaluate a trained model checkpoint.
-CHECKPOINT_PATH="outputs/test_a_0831_00:14/checkpoints/transf/epoch_best.tar"
+CHECKPOINT_PATH="outputs/HAE_R300_lr3_b32_la3_0924_11:50/checkpoints/epoch_best_task2.tar"
 python -u eval_simmc_agent.py \
     --eval_data_path=${DEVTEST_JSON_FILE/.json/_mm_inputs.npy} \
     --checkpoint="$CHECKPOINT_PATH" \
     --gpu_id=$GPU_ID \
-    --batch_size=50 \
+    --batch_size=5 \
     --domain="$DOMAIN"

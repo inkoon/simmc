@@ -95,7 +95,7 @@ class HistoryAgnosticEncoder(nn.Module):
             )
             encoder_out["hidden_states_all"] = enc_states.transpose(0, 1)
         return encoder_out
-    
+
     def word_to_vec(self, encoder_in, row, col, ind2word):
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         try:

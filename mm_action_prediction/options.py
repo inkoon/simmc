@@ -242,6 +242,9 @@ def read_command_line():
         default="none",
         help="use MAG or MMI",
     )
+    parser.add_argument(
+        "--gpt2", action="store_true", default=False, help="Use gpt2 tokenizer"
+    )
     try:
         parsed_args = vars(parser.parse_args())
     except (IOError) as msg:
