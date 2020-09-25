@@ -1,15 +1,16 @@
 #!/bin/bash
 
 # PARAMETERS	DEFAUT VALUE
-EPOCHS=5	# 1
+EPOCHS=10	# 1
 TRAIN_BATCH=8	# 4
 VAL_BATCH=32	# 4
 MUL_GPU=1	# 1
 GPU_ID='0'	# '0'
-WARM_UP=2000	# 0
+WARM_UP=1000	# 0
 LR=5e-5		# 5e-5
 LOGGING=1000	# 500
-N_GPU=2
+SAVE=0		# 500
+
 PARAMETERS="EPOCHS		$EPOCHS
 TRAIN_BATCH	$TRAIN_BATCH
 VAL_BATCH	$VAL_BATCH
@@ -52,13 +53,13 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture_to/furniture_dev_dials_target.txt \
     --evaluate_during_training \
     --logging_steps=$LOGGING \
+    --save_steps=$SAVE \
     --num_train_epochs=$EPOCHS \
     --overwrite_output_dir \
     --learning_rate=$LR \
     --warmup_steps=$WARM_UP \
     --gpu_id=$GPU_ID \
     --mul_gpu=$MUL_GPU \
-    --n_gpu=$N_GPU \
     --per_gpu_train_batch_size=$TRAIN_BATCH \
     --per_gpu_eval_batch_size=$VAL_BATCH
 fi
@@ -78,13 +79,13 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_dev_dials_target.txt \
     --evaluate_during_training \
     --logging_steps=$LOGGING \
+    --save_steps=$SAVE \
     --num_train_epochs=$EPOCHS \
     --overwrite_output_dir \
     --learning_rate=$LR \
     --warmup_steps=$WARM_UP \
     --gpu_id=$GPU_ID \
     --mul_gpu=$MUL_GPU \
-    --n_gpu=$N_GPU \
     --per_gpu_train_batch_size=$TRAIN_BATCH \
     --per_gpu_eval_batch_size=$VAL_BATCH
 fi
@@ -104,13 +105,13 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/fashion_to/fashion_dev_dials_target.txt \
     --evaluate_during_training \
     --logging_steps=$LOGGING \
+    --save_steps=$SAVE \
     --num_train_epochs=$EPOCHS \
     --overwrite_output_dir \
     --learning_rate=$LR \
     --warmup_steps=$WARM_UP \
     --mul_gpu=$MUL_GPU \
     --gpu_id=$GPU_ID \
-    --n_gpu=$N_GPU \
     --mul_gpu=$MUL_GPU \
     --per_gpu_train_batch_size=$TRAIN_BATCH \
     --per_gpu_eval_batch_size=$VAL_BATCH
@@ -131,13 +132,13 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_dev_dials_target.txt \
     --evaluate_during_training \
     --logging_steps=$LOGGING \
+    --save_steps=$SAVE \
     --num_train_epochs=$EPOCHS \
     --overwrite_output_dir \
     --learning_rate=$LR \
     --warmup_steps=$WARM_UP \
     --mul_gpu=$MUL_GPU \
     --gpu_id=$GPU_ID \
-    --n_gpu=$N_GPU \
     --mul_gpu=$MUL_GPU \
     --per_gpu_train_batch_size=$TRAIN_BATCH \
     --per_gpu_eval_batch_size=$VAL_BATCH

@@ -36,6 +36,7 @@ if __name__ == '__main__':
     parser.add_argument('--attribute', action='store_true')
     parser.add_argument('--slot', action='store_true')
     parser.add_argument('--total', action='store_true')
+    parser.add_argument('--api', action='store_true')
 
     args = parser.parse_args()
     input_path_json = args.input_path_json

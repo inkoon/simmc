@@ -40,6 +40,7 @@ def convert_json_to_flattened(
         attribute=False,
         slot=False,
         total=False,
+        api=False,
         use_multimodal_contexts=True,
         input_path_special_tokens='',
         output_path_special_tokens=''):
@@ -47,6 +48,8 @@ def convert_json_to_flattened(
         Input: JSON representation of the dialogs
         Output: line-by-line stringified representation of each turn
     """
+    with open(input_path_json, 'r') as f_in:
+        raw_data = json.load(f_in)
 
     with open(input_path_json, 'r') as f_in:
         data = json.load(f_in)['dialogue_data']
