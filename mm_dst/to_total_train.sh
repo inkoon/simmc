@@ -22,8 +22,8 @@ PATH_DIR=$(realpath .)
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2-large \
-    --model_name_or_path=gpt2-large \
+    --model_type=gpt2-medium \
+    --model_name_or_path=gpt2-medium \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_to/special_tokens.json \
     --do_train \
