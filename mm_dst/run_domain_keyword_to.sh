@@ -15,8 +15,8 @@ then
 	VERSION=$3
 fi
 
-GPU_ID=1
-#MUL_GPU=0
+GPU_ID=0
+MUL_GPU=0
 
 
 PATH_DIR=$(realpath .)
@@ -24,7 +24,7 @@ PATH_DIR=$(realpath .)
 # "${DOMAIN}"
 # Multimodal Data
 # Train split
-
+'
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}" \
@@ -44,8 +44,14 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --per_gpu_eval_batch_size=32 \
     --warmup_steps=16000 \
     --fp16 \
+<<<<<<< HEAD
     --logging_steps=5000 \
     --save_steps=10000
+=======
+    --logging_steps=1000 \
+    --save_steps=0
+'
+>>>>>>> ff650f425bae2263771232f86060d78ffacb4d2d
 
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
@@ -59,6 +65,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_to/"${DOMAIN}"_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt
 
+'
 python -m gpt2_dst.utils.total_postprocess \
     --path="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/ \
     --domain="${DOMAIN}"
@@ -72,3 +79,4 @@ python -m gpt2_dst.scripts.evaluate \
     --input_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_to/"${DOMAIN}"_devtest_dials_target.txt \
     --input_path_predicted="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt \
     --output_path_report="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_report.json
+'

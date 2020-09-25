@@ -1,9 +1,11 @@
 # B : Usera added
+mm_dst/gpt2_dst/data/
+mm_dst/schema_data/
 *.bin
-mm_dst/gpt2_dst/save/
 mm_dst/runs/
 data/
 mm_dst/runs/
+mm_dst/gpt2_dst/save/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
