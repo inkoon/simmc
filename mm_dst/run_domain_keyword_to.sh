@@ -16,7 +16,7 @@ then
 fi
 
 GPU_ID=1
-MUL_GPU=0
+#MUL_GPU=0
 
 
 PATH_DIR=$(realpath .)
@@ -28,8 +28,8 @@ PATH_DIR=$(realpath .)
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2 \
-    --model_name_or_path=gpt2 \
+    --model_type=gpt2-large \
+    --model_name_or_path=gpt2-large \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_to/special_tokens.json \
     --do_train \
@@ -40,12 +40,12 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --num_train_epochs=10 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=8 \
+    --per_gpu_train_batch_size=4 \
     --per_gpu_eval_batch_size=32 \
-    --warmup_steps=4000 \
+    --warmup_steps=16000 \
     --fp16 \
-    --logging_steps=1000 \
-    --save_steps=0
+    --logging_steps=5000 \
+    --save_steps=10000
 
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
@@ -60,7 +60,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --path_output="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt
 
 python -m gpt2_dst.utils.total_postprocess \
-    --path="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt \
+    --path="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/ \
     --domain="${DOMAIN}"
 
 mv "${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt "${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.org

@@ -21,25 +21,11 @@ GPU_ID=1
 
 PATH_DIR=$(realpath .)
 
-# "${DOMAIN}"
-# Multimodal Data
-# Train split
-
-# Devtest split
-python -m gpt2_dst.scripts.preprocess_input \
-    --input_path_json="${PATH_DATA_DIR}"/simmc_"${DOMAIN}"/"${DOMAIN}"_devtest_dials.json \
-    --output_path_predict="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predict.txt \
-    --output_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_target.txt \
-    --len_context=2 \
-    --total \
-    --use_multimodal_contexts=1 \
-    --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
-
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2-xl \
-    --model_name_or_path=gpt2-xl \
+    --model_type=gpt2-large \
+    --model_name_or_path=gpt2-large \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/special_tokens.json \
     --do_train \
@@ -50,12 +36,12 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --num_train_epochs=5 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=8 \
-    --per_gpu_eval_batch_size=32 \
-    --warmup_steps=4000 \
+    --per_gpu_train_batch_size=4 \
+    --per_gpu_eval_batch_size=16 \
+    --warmup_steps=8000 \
     --fp16 \
-    --logging_steps=0 \
-    --save_steps=0
+    --logging_steps=10000 \
+    --save_steps=10000
 
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
@@ -70,7 +56,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --path_output="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt
 
 python -m gpt2_dst.utils.total_postprocess \
-    --path="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt \
+    --path="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/ \
     --domain="${DOMAIN}"
 
 mv "${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt "${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.org
