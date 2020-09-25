@@ -1,22 +1,22 @@
 PATH_DIR=$(realpath .)
 # PARAMETERS	DEFAUT VALUE
-EPOCHS=10	# 1
+EPOCHS=15	# 1
 TRAIN_BATCH=24	# 4
 VAL_BATCH=32	# 4
 MUL_GPU=0	# 1
 GPU_ID='1'	# '0'
-WARM_UP=1000	# 0
+WARM_UP=4000	# 0
 LR=5e-5		# 5e-5
 LOGGING=1000	# 500:
 PARAMETERS="EPOCHS		$EPOCHS
 TRAIN_BATCH	$TRAIN_BATCH
-VAL_BATCH	$VAL_BATCH
+VAL_BATCH:	$VAL_BATCH
 MUL_GPU		$MUL_GPU
 N_GPU 		$N_GPU
 "
 
 python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/fine_tune/ \
+    --output_dir="${PATH_DIR}"/gpt2_dst/save/fine_tune2/ \
     --model_type=gpt2 \
     --model_name_or_path=gpt2 \
     --line_by_line \
