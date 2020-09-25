@@ -22,18 +22,18 @@ PATH_DIR=$(realpath .)
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2-medium \
-    --model_name_or_path=gpt2-medium \
+    --model_type=gpt2 \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fine_tune \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_to/special_tokens.json \
     --do_train \
     --train_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_to/"${DOMAIN}"_total_dials_target.txt \
-    --num_train_epochs=5 \
+    --num_train_epochs=15 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=16 \
-    --warmup_steps=8000 \
+    --per_gpu_train_batch_size=16 \
+    --per_gpu_eval_batch_size=64 \
+    --warmup_steps=4000 \
     --logging_steps=0 \
     --save_steps=0 \
     --fp16 
