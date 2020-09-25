@@ -15,10 +15,10 @@ then
 	VERSION=$3
 fi
 
-GPU_ID=1
+GPU_ID=0
 
 PATH_DIR=$(realpath .)
-'
+
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
@@ -30,7 +30,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --num_beams=2 \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/"${DOMAIN}"_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt
-'
+
 python -m gpt2_dst.utils.total_postprocess \
     --path="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/ \
     --domain="${DOMAIN}"
