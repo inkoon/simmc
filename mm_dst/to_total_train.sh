@@ -31,11 +31,11 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --num_train_epochs=5 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=2 \
-    --per_gpu_eval_batch_size=8 \
-    --warmup_steps=16000 \
+    --per_gpu_train_batch_size=4 \
+    --per_gpu_eval_batch_size=16 \
+    --warmup_steps=8000 \
     --logging_steps=0 \
     --save_steps=0 \
     --fp16 
 
-echo "Train Complete! Model saved in save/$DOMAIN_to/$KEYWORD$VERSION"
+echo "Train Complete! Text Only Model saved in save/$DOMAIN/$KEYWORD$VERSION"
