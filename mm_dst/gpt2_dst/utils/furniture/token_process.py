@@ -23,9 +23,13 @@ for line in f.readlines():
                 new2+=c
         
         new_token = new1 + ' ' + new2
+        token_match[new_token+' '] = token+ ' '
+        match_token[token+ ' '] = new_token+ ' '
 
     elif ':' in token:
         new_token = token.lower().replace(':', ' ').replace('_', ' ')
+        token_match[new_token+' '] = token+ ' '
+        match_token[token+ ' '] = new_token+ ' '
 
     elif '-' in token:
         sp = token.split('-')
@@ -34,6 +38,8 @@ for line in f.readlines():
             new = 'DISPLAY_1'
         elif sp[1] == 'NEG':
             new = 'NEG'
+        elif sp[1] == 'O':
+            new = 'o'
         else:
             for c in sp[1]:
                 if c.isupper():
@@ -42,8 +48,8 @@ for line in f.readlines():
                     new+=c
         new_token = sp[0] + ' ' + new
 
-    token_match[new_token+' '] = token+ ' '
-    match_token[token+ ' '] = new_token+ ' '
+        token_match[new_token+' '] = token+ ' '
+        match_token[token+ ' '] = new_token+ ' '
 
 json_dump  = json.dumps(token_match)
 json_dump2 = json.dumps(match_token)

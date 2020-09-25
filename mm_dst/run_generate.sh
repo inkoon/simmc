@@ -25,28 +25,6 @@ PATH_DIR=$(realpath .)
 # Multimodal Data
 # Train split
 
-# Train ("${DOMAIN}", multi-modal)
-python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2 \
-    --model_name_or_path=gpt2 \
-    --line_by_line \
-    --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/special_tokens.json \
-    --do_train \
-    --train_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/"${DOMAIN}"_train_dials_target.txt \
-    --do_eval \
-    --eval_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/"${DOMAIN}"_dev_dials_target.txt \
-    --evaluate_during_training \
-    --num_train_epochs=10 \
-    --overwrite_output_dir \
-    --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=8 \
-    --per_gpu_eval_batch_size=32 \
-    --warmup_steps=4000 \
-    --fp16 \
-    --logging_steps=0 \
-    --save_steps=0
-
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
