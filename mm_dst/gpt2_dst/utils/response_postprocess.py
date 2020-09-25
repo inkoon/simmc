@@ -16,11 +16,11 @@ def postprocess(reader, writer):
         writer.write(str(i) + '\t')
         split = line.split(BELIEF_STATE)
         prompt = split[0]
-        bs = split[1]
+        bs = split[-1]
         
         split = bs.split(EOB)
         state = split[0]
-        response = split[1]
+        response = split[-1]
         writer.write(response)
 
 # postprocess(target, target_processed)

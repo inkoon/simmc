@@ -7,7 +7,7 @@ def normalize_sen(sentence):
 
 with open('data/simmc_furniture/furniture_devtest_dials.json', 'r') as f:
     # with open('furniture_devtest_dials_predicted_response.txt', 'r') as f2:
-    with open('furniture_devtest_dials_predicted_response_warmup.txt', 'r') as f2:
+    with open('furniture_devtest_dials_predicted_response_large.txt', 'r') as f2:
         gt = json.load(f)
         ii = 0
         bleu_scores = []
