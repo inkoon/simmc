@@ -17,5 +17,5 @@ python -u eval_simmc_agent.py \
     --eval_data_path=${DEVTEST_JSON_FILE/.json/_mm_inputs.npy} \
     --checkpoint="$CHECKPOINT_PATH" \
     --gpu_id=$GPU_ID \
-    --batch_size=5 \
+    --batch_size=50 \
     --domain="$DOMAIN"

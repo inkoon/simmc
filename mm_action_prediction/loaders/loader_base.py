@@ -192,8 +192,6 @@ class LoaderParent:
             related_args["vocab_size"] += len(self.words.added_tokens_encoder)
         if hasattr(self, "asset_feature_size"):
             related_args["asset_feature_size"] = self.asset_feature_size
-        if self.params["gpt2"]:
-            related_args["badword_list"] = self.badword_list
         return related_args
 
     @staticmethod

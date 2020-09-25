@@ -43,13 +43,7 @@ class GenerativeDecoder(nn.Module):
         #     self.fasttext_model = torchtext.vocab.FastText('en')
         # Text encoder.
         if params["text_encoder"] == "transformer":
-            if params["gpt2"]:
-                self.decoder_unit = GPT2LMHeadModel.from_pretrained('gpt2')
-                # self.decoder_unit.resize_token_embeddings(params["vocab_size"])
-                self.decoder_unit.resize_token_embeddings(50258)
-                self.badword_list = params["badword_list"]
-                # self.decoder_unit.config.add_cross_attention=True
-            elif params["encoder"] != "pretrained_transformer":
+            if params["encoder"] != "pretrained_transformer":
                 decoder_layer = nn.TransformerDecoderLayer(
                     params["word_embed_size"],
                     params["num_heads_transformer"],
@@ -132,12 +126,12 @@ class GenerativeDecoder(nn.Module):
             word_embeds_dec = self.word_embed_net(decoder_in)
         elif self.params["embedding_type"]=="glove":
             word_embeds_dec = torch.tensor([[self.nlp(batch["ind2word"][int(decoder_in[row][col])]).vector for col in range(decoder_in.shape[1])] for row in range(decoder_in.shape[0])], requires_grad=True).to(device)
-        elif self.params["embedding_type"]=="word2vec":
-            word_embeds_dec = torch.stack([torch.stack([self.word_to_vec(decoder_in, row, col, batch["ind2word"]) for col in range(decoder_in.shape[1])]) for row in range(decoder_in.shape[0])])
-            word_embeds_dec.requires_grad_(requires_grad=True)
-        elif self.params["embedding_type"]=="fasttext":
-            word_list = [[batch["ind2word"][int(decoder_in[row][col])] for col in range(decoder_in.shape[1])] for row in range(decoder_in.shape[0])]
-            word_embeds_dec = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
+        # elif self.params["embedding_type"]=="word2vec":
+        #     word_embeds_dec = torch.stack([torch.stack([self.word_to_vec(decoder_in, row, col, batch["ind2word"]) for col in range(decoder_in.shape[1])]) for row in range(decoder_in.shape[0])])
+        #     word_embeds_dec.requires_grad_(requires_grad=True)
+        # elif self.params["embedding_type"]=="fasttext":
+        #     word_list = [[batch["ind2word"][int(decoder_in[row][col])] for col in range(decoder_in.shape[1])] for row in range(decoder_in.shape[0])]
+        #     word_embeds_dec = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
         if self.params["encoder"] in self.DIALOG_CONTEXT_ENCODERS:
             dialog_context = support.flatten(
                 encoder_output["dialog_context"], batch_size, num_rounds
@@ -241,7 +235,7 @@ class GenerativeDecoder(nn.Module):
                     decoder_len,
                     init_state=hidden_state,
                 )
-        if self.params["encoder"] == "pretrained_transformer" or self.params["gpt2"]:
+        if self.params["encoder"] == "pretrained_transformer":
             output_logits = outputs
         else:
             # Logits over vocabulary.

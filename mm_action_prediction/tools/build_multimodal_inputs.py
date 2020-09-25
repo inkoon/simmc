@@ -214,14 +214,19 @@ def build_multimodal_inputs(input_json_file):
         # use pretrained GPT2 tokenizer.
         from transformers import GPT2Tokenizer
         tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-        tokenizer.add_special_tokens({'pad_token': '<pad>'})
+        tokenizer.add_special_tokens({
+            'unk_token': '<unk>',
+            'bos_token': '<start>',
+            'eos_token': '<end>',
+            'pad_token': '<pad>'
+        })
         with open(FLAGS.vocab_file, "r") as file_id:
             vocabulary = json.load(file_id)
         mm_inputs["vocabulary"] = dict()
         mm_inputs["vocabulary"]["word"] = vocabulary
         word2ind = {word: index for index, word in enumerate(vocabulary)}
-        ind2word = {index: word for index, word in enumerate(vocabulary["word"])} # for pretrained embedding
-        token2ind = {tokenizer.convert_tokens_to_ids(vocabulary["word"][i]): i for i in range(len(vocabulary["word"]))} # KKKKKKKK
+        ind2word = {index: word for index, word in enumerate(vocabulary)} # for pretrained embedding
+        # token2ind = {tokenizer.convert_tokens_to_ids(vocabulary["word"][i]): i for i in range(len(vocabulary["word"]))} # KKKKKKKK
 
         mm_inputs["user_sent"], mm_inputs["user_sent_len"] = (
             convert_pool_matrices_pretrained_tokenizer(
@@ -235,9 +240,10 @@ def build_multimodal_inputs(input_json_file):
         )
 
         # Token aliases.
-        pad_token = tokenizer.pad_token_id # GPT2 dosen't have pad token.
-        start_token = tokenizer.bos_token_id
-        end_token = tokenizer.eos_token_id
+        start_token = tokenizer.convert_tokens_to_ids('<start>')
+        end_token = tokenizer.convert_tokens_to_ids('<end>')
+        pad_token = tokenizer.convert_tokens_to_ids('<pad>')
+        unk_token = tokenizer.convert_tokens_to_ids('<unk>')
     elif not FLAGS.pretrained_tokenizer:
         with open(FLAGS.vocab_file, "r") as file_id:
             vocabulary = json.load(file_id)

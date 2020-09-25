@@ -71,13 +71,14 @@ class HistoryAgnosticEncoder(nn.Module):
             word_embeds_enc = self.word_embed_net(encoder_in)
         elif self.params["embedding_type"]=="glove":
             word_embeds_enc = torch.tensor([[self.nlp(batch["ind2word"][int(encoder_in[row][col])]).vector for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])], requires_grad=True).to(device)
-        elif self.params["embedding_type"]=="word2vec":
-            word_embeds_enc = torch.stack([torch.stack([self.word_to_vec(encoder_in, row, col, batch["ind2word"]) for col in range(encoder_in.shape[1])]) for row in range(encoder_in.shape[0])])
-            word_embeds_enc.requires_grad_(requires_grad=True)
-        elif self.params["embedding_type"]=="fasttext":
-            word_list = [[batch["ind2word"][int(encoder_in[row][col])] for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]
-            word_embeds_enc = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
-            word_embeds_enc.requires_grad=True
+        # elif self.params["embedding_type"]=="word2vec":
+        #     word_embeds_enc = torch.stack([torch.stack([self.word_to_vec(encoder_in, row, col, batch["ind2word"]) for col in range(encoder_in.shape[1])]) for row in range(encoder_in.shape[0])])
+        #     word_embeds_enc.requires_grad_(requires_grad=True)
+        # elif self.params["embedding_type"]=="fasttext":
+        #     word_list = [[batch["ind2word"][int(encoder_in[row][col])] for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]
+        #     word_embeds_enc = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
+        #     word_embeds_enc.requires_grad=True
+
         # Text encoder: LSTM or Transformer.
         if self.params["text_encoder"] == "lstm":
             all_enc_states, enc_states = rnn.dynamic_rnn(

@@ -92,8 +92,8 @@ def evaluate_agent(wizard, val_loader, args):
 
 
             # Toy
-            print("###############TOY TESTING!!###############")
-            break
+            # print("###############TOY TESTING!!###############")
+            # break
 
     wizard.train()
 

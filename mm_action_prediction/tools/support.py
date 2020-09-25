@@ -175,6 +175,7 @@ def sort_task2_eval_metrics(eval_metrics):
         rel_gain = []
         # higher_better is +1 if true and -1 if false.
         for higher_better, key in [
+            (-1, "perplexity"),
             (1, "bleu"),
             (1, "r1"),
             (1, "r5"),
