@@ -32,8 +32,8 @@ def postprocess(reader, writer):
         
         split = line.split(BELIEF_STATE)
         if len(split) != 2:
-            print(f"ERROR : more than one belief state in line {i}!!")
-            exit(1)
+            prompt = split[0]
+            bs = split[-1]
         else:
             prompt = split[0]
             bs = split[1]
