@@ -37,6 +37,4 @@ python -m gpt2_dst.utils.total_postprocess \
 
 
 mv "${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt "${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.org
-
 mv "${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted_processed.txt "${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"_to/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt
-

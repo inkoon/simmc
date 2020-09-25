@@ -38,4 +38,4 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --save_steps=0 \
     --fp16 
 
-echo "Train Complete! Model saved in save/$DOMAIN_to/$KEYWORD$VERSION"
+echo "Train Complete! Text Only Model saved in save/$DOMAIN/$KEYWORD$VERSION"
