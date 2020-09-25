@@ -12,8 +12,8 @@ predicted = open(args.path + domain + '_devtest_dials_predicted.txt', 'r')
 
 predicted_processed = open(args.path + domain + "_devtest_dials_predicted_processed.txt", 'w')
 
-act_path = open(f"./{domain}/act.json", 'r')
-slot_path = open(f"./{domain}/slot.json", 'r')
+act_path = open(f"gpt2_dst/utils/{domain}/act.json", 'r')
+slot_path = open(f"gpt2_dst/utils/{domain}/slot.json", 'r')
 
 act_list = json.load(act_path)
 slot_list = json.load(slot_path)
@@ -21,7 +21,7 @@ slot_list = json.load(slot_path)
 BELIEF_STATE = " => Belief State : "
 EOB = " <EOB> "
 
-token_match_path = open(f"./{domain}/token_to_special.json", 'r')
+token_match_path = open(f"gpt2_dst/utils/{domain}/token_to_special.json", 'r')
 token_match = json.load(token_match_path)
 
 l = []

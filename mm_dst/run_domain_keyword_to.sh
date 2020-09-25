@@ -40,9 +40,9 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --num_train_epochs=10 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=16 \
-    --per_gpu_eval_batch_size=64 \
-    --warmup_steps=2000 \
+    --per_gpu_train_batch_size=8 \
+    --per_gpu_eval_batch_size=32 \
+    --warmup_steps=4000 \
     --fp16 \
     --logging_steps=1000 \
     --save_steps=0
