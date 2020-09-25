@@ -20,7 +20,7 @@ MUL_GPU=1
 NUM_GEN=100000
 
 PATH_DIR=$(realpath .)
-PATH_DATA_DIR=$(realpath ../data)
+#PATH_DATA_DIR=$(realpath ../data)
 
 # "${DOMAIN}"
 # Multimodal Data
@@ -55,12 +55,12 @@ python -m gpt2_dst.scripts.preprocess_input \
     --total \
     --use_multimodal_contexts=1 \
     --input_path_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
-'
+
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2 \
-    --model_name_or_path=gpt2 \
+    --model_type=gpt2-xl \
+    --model_name_or_path=gpt2-xl \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
     --do_train \
@@ -68,15 +68,16 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_target.txt \
     --evaluate_during_training \
-    --num_train_epochs=10 \
+    --num_train_epochs=5 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=2 \
-    --per_gpu_eval_batch_size=8 \
+    --per_gpu_train_batch_size=1 \
+    --per_gpu_eval_batch_size=4 \
+    --mul_gpu=$MUL_GPU \
     --warmup_steps=16000 \
     --fp16 \
-    --logging_steps=2000 \
-    --save_steps=2000
+    --logging_steps=4000 \
+    --save_steps=4000
 
 # Generate sentences ("${DOMAIN}", multi-modal)
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
@@ -90,10 +91,10 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --num_gen=$NUM_GEN \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt
-
+'
 # Evaluate ("${DOMAIN}, multi-modal)
 python -m gpt2_dst.scripts.evaluate \
     --input_path_target="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/"${DOMAIN}"_devtest_dials_target.txt \
     --input_path_predicted="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted_processed.txt \
-    --output_path_report="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_report22.json
+    --output_path_report="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_report2.json
 

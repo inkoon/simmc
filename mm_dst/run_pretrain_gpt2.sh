@@ -1,13 +1,13 @@
 PATH_DIR=$(realpath .)
 # PARAMETERS	DEFAUT VALUE
-EPOCHS=1	# 1
+EPOCHS=10	# 1
 TRAIN_BATCH=24	# 4
 VAL_BATCH=32	# 4
 MUL_GPU=0	# 1
 GPU_ID='1'	# '0'
-WARM_UP=2000	# 0
+WARM_UP=1000	# 0
 LR=5e-5		# 5e-5
-LOGGING=3000	# 500:
+LOGGING=1000	# 500:
 PARAMETERS="EPOCHS		$EPOCHS
 TRAIN_BATCH	$TRAIN_BATCH
 VAL_BATCH	$VAL_BATCH
@@ -22,6 +22,7 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --line_by_line \
     --do_train \
     --train_data_file="${PATH_DIR}"/schema_data/output_total.txt \
+    --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/furniture/special_tokens.json \
     --do_eval \
     --eval_data_file="${PATH_DIR}"/schema_data/output_dev.txt \
     --evaluate_during_training \

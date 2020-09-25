@@ -44,7 +44,7 @@ then
     echo "\n\nQuick summary furniture for keyword $KEYWORD"
 python -m gpt2_dst.scripts.analysis \
     --input_path_target="${PATH_DIR}"/gpt2_dst/data/$T_FURN/furniture_devtest_dials_target.txt \
-    --input_path_predicted="${PATH_DIR}"/gpt2_dst/results/furniture/$KEYWORD/furniture_devtest_dials_predicted.txt \
+    --input_path_predicted="${PATH_DIR}"/gpt2_dst/results/furniture/$KEYWORD/furniture_devtest_dials_predicted_processed.txt \
     --output_dir="${PATH_DIR}"/gpt2_dst/results/furniture/$KEYWORD/analysis \
     --limit=0.1
 fi

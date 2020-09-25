@@ -237,7 +237,7 @@ if __name__ == '__main__':
     wrong_act_right_slot_f =  open(os.path.join(output_dir, "wrong_act_right_slot.txt"),'w')
     wrong_act_right_slot_f.write('') 
     wrong_act_right_slot_f =  open(os.path.join(output_dir, "wrong_act_right_slot.txt"),'a+') 
-
+    #import ipdb; ipdb.set_trace() 
     with open(os.path.join(output_dir, "analysis.json"), 'w') as f_out:
         json.dump(acts, f_out)
     

@@ -57,5 +57,6 @@ if __name__ == '__main__':
         noresp=args.noresp,
         attribute=args.attribute,
         slot=args.slot,
+        total=args.total,
         use_multimodal_contexts=use_multimodal_contexts)
 

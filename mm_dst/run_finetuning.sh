@@ -15,8 +15,8 @@ then
 	VERSION=$3
 fi
 
-GPU_ID=0
-MUL_GPU=1
+GPU_ID='1'
+#MUL_GPU=0
 NUM_GEN=100000
 
 PATH_DIR=$(realpath .)
@@ -60,25 +60,26 @@ python -m gpt2_dst.scripts.preprocess_input \
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
     --model_type=gpt2 \
-    --model_name_or_path=gpt2 \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fine_tune/checkpoint-32000  \
     --line_by_line \
-    --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
     --do_train \
-    --train_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_train_dials_target.txt \
+    --train_data_file="${PATH_DIR}"/gpt2_dst/data/furniture_total/furniture_train_dials_target.txt \
     --do_eval \
-    --eval_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_dev_dials_target.txt \
+    --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture_total/furniture_dev_dials_target.txt \
+    --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/furniture/special_tokens.json \
     --evaluate_during_training \
-    --num_train_epochs=10 \
+    --num_train_epochs=35 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=2 \
-    --per_gpu_eval_batch_size=8 \
-    --warmup_steps=16000 \
+    --per_gpu_train_batch_size=24 \
+    --per_gpu_eval_batch_size=32 \
     --fp16 \
-    --logging_steps=2000 \
-    --save_steps=2000
+    --logging_steps=1000 \
+    --save_steps=1000
 
+#--add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/special_tokens.json \
 # Generate sentences ("${DOMAIN}", multi-modal)
+
 CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
     --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
@@ -88,7 +89,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --stop_token="<EOS>" \
     --num_beams=2 \
     --num_gen=$NUM_GEN \
-    --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_"${KEYWORD}"/"${DOMAIN}"_devtest_dials_predict.txt \
+    --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/furniture_total/furniture_devtest_dials_predict.txt \
     --path_output="${PATH_DIR}"/gpt2_dst/results/"${DOMAIN}"/"${KEYWORD}""${VERSION}"/"${DOMAIN}"_devtest_dials_predicted.txt
 
 # Evaluate ("${DOMAIN}, multi-modal)

@@ -24,7 +24,7 @@ Adapted from:
 https://github.com/huggingface/transformers/blob/master/examples/language-modeling/run_language_modeling.py
 """
 
-
+import ipdb
 import argparse
 import glob
 import json
@@ -362,6 +362,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
                 loss.backward()
 
             tr_loss += loss.item()
+            #import ipdb; ipdb.set_trace()
             if (step + 1) % args.gradient_accumulation_steps == 0:
                 if args.fp16:
                     torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), args.max_grad_norm)
