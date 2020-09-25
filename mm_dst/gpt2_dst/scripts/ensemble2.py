@@ -19,6 +19,11 @@ def ensemble_turn(domain,prompt,predictions,turn_idx) :
     prompt = prompt.rstrip() 
     total_model = len(predictions)
     longest_frame_len = 0  
+    act_dict = []
+    slot_dict = [] 
+    longest_slot_size = 0
+    slot_index = []
+    slots = ""
     for model_idx in range(total_model) :  # for the current turn_idx, find the longest frame length
         longest_frame_len = max(longest_frame_len, len(predictions[model_idx][turn_idx]))
 
@@ -27,21 +32,49 @@ def ensemble_turn(domain,prompt,predictions,turn_idx) :
         frame_index[len(predictions[model_idx][turn_idx])-1] += 1 
 
     voted_frame_index = frame_index.index(max(frame_index)) + 1 
+    for model_idx in range(total_model) : 
+        for frame_idx in range(len(predictions[model_idx][turn_idx])) : 
+            act_dict.append(predictions[model_idx][turn_idx][frame_idx]['act'])
 
-    for frame_idx in range(0,voted_frame_index) : 
-        frame_list = []
-        voted = "" 
+    c = Counter(act_dict) 
+    j = 0
+    for ac in c.most_common(voted_frame_index) : 
+        act = ac[0]
+        slot_index = []
+        j+=1
         for model_idx in range(total_model) : 
-            if len(predictions[model_idx][turn_idx]) > frame_idx : 
-                frame_list.append(predictions[model_idx][turn_idx][frame_idx])
-                
-        ensembled = ensemble_frame(domain,frame_list)
-        act = ensembled[0]
-        slot = ensembled[1] 
+            for frame_idx in range(len(predictions[model_idx][turn_idx])) : 
+                for i in range(1000) : 
+                    slot_index.append(0)
+                if predictions[model_idx][turn_idx][frame_idx]['act'] == act : 
+                    slot_index[len(predictions[model_idx][turn_idx][frame_idx]['slots'])] += 1 
+        
+        voted_slot_size = slot_index.index(max(slot_index)) 
+
+        for model_idx in range(total_model) : 
+            for frame_idx in range(len(predictions[model_idx][turn_idx])) : 
+                if predictions[model_idx][turn_idx][frame_idx]['act'] == act : 
+                    for slot_idx in range(len(predictions[model_idx][turn_idx][frame_idx]['slots'])) : 
+                        if len(predictions[model_idx][turn_idx][frame_idx]['slots'][slot_idx]) >= 2 : 
+                            slot_dict.append(domain+"-"+predictions[model_idx][turn_idx][frame_idx]['slots'][slot_idx][0] + " = " + predictions[model_idx][turn_idx][frame_idx]['slots'][slot_idx][1] )
+                            
+        d = Counter(slot_dict)
+        slot = ""
+        i = 0
+        if len(slot_dict) > 0 : 
+            for s in d.most_common(voted_slot_size) : 
+                if i == 0 :
+                    slot = slot + " " + s[0] 
+                else : 
+                    slot = slot + " , " + s[0]  
+                i+=1 
+        else :
+            slot = ""
         prompt+=(act + " " + " [ " + slot + " ] ")
     output.write(prompt + " <EOB> \n")
 
-def ensemble_frame(domain,frame_list):    # compare frames generated from different models
+        
+def ensemble_frame(domain,frame_list,previousAct):    # compare frames generated from different models
     act_dict = [] 
     slot_dict = [] 
     longest_slot_size = 0
@@ -56,7 +89,6 @@ def ensemble_frame(domain,frame_list):    # compare frames generated from differ
     slot_index.append(0)
     for frame in frame_list : 
         slot_index[len(frame['slots'])] += 1 
-
     voted_slot_size = slot_index.index(max(slot_index)) 
 
     for frame in frame_list : 
@@ -67,6 +99,10 @@ def ensemble_frame(domain,frame_list):    # compare frames generated from differ
                 if len(frame['slots'][slot_index]) >= 2 :  
                     slot = domain+"-" + frame['slots'][slot_index][0] + " = "+frame['slots'][slot_index][1]
             slot_dict.append(slot)
+    import ipdb; ipdb.set_trace()
+    act_dict = [ act for act in act_dict if act not in previousAct]
+    c.most_common(1)[0][0]
+    
     d = Counter(slot_dict)     
     c = Counter(act_dict)
     i = 0 
