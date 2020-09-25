@@ -24,6 +24,7 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
     --model_type=gpt2 \
     --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fine_tune \
+    --model_name_or_path=gpt2 \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/special_tokens.json \
     --do_train \
