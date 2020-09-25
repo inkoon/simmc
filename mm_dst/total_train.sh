@@ -15,25 +15,25 @@ then
 	VERSION=$3
 fi
 
-GPU_ID=0
+GPU_ID=1
 
 PATH_DIR=$(realpath .)
 
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}""${VERSION}" \
-    --model_type=gpt2-medium \
-    --model_name_or_path=gpt2-medium \
+    --model_type=gpt2 \
+    --model_name_or_path=gpt2 \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/special_tokens.json \
     --do_train \
     --train_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/"${DOMAIN}"_total_dials_target.txt \
-    --num_train_epochs=5 \
+    --num_train_epochs=10 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=8 \
-    --warmup_steps=8000 \
+    --per_gpu_train_batch_size=8 \
+    --per_gpu_eval_batch_size=32 \
+    --warmup_steps=4000 \
     --logging_steps=0 \
     --save_steps=0 \
     --fp16 
