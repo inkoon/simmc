@@ -36,8 +36,9 @@ if __name__ == '__main__':
     parser.add_argument('--attribute', action='store_true')
     parser.add_argument('--slot', action='store_true')
     parser.add_argument('--task1', action='store_true')
-    parser.add_argument('--attribute_path_json', default='')
+    parser.add_argument('--api_path_json', default='')
     parser.add_argument('--attribute_vocab_json', default='')
+    parser.add_argument('--domain', default='')
 
     args = parser.parse_args()
     input_path_json = args.input_path_json
@@ -47,8 +48,9 @@ if __name__ == '__main__':
     output_path_special_tokens = args.output_path_special_tokens
     len_context = args.len_context
     use_multimodal_contexts = bool(args.use_multimodal_contexts)
-    attribute_path_json = args.attribute_path_json
+    api_path_json = args.api_path_json
     attribute_vocab_json = args.attribute_vocab_json
+    domain = args.domain
 
     # Convert the data into GPT-2 friendly format
     convert_json_to_flattened(
@@ -62,7 +64,8 @@ if __name__ == '__main__':
         attribute=args.attribute,
         slot=args.slot,
         task1=args.task1,
-        attribute_path_json=attribute_path_json,
+        domain=domain,
+        api_path_json=api_path_json,
         attribute_vocab_json=attribute_vocab_json,
         use_multimodal_contexts=use_multimodal_contexts)
 
