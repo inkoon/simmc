@@ -196,6 +196,14 @@ if __name__ == "__main__":
         default="none",
         help="use MAG or MMI",
     )
+    parser.add_argument(
+        "--embedding_type",
+        dest="embedding_type",
+        choices=["random", "glove", "word2vec", "fasttext"],
+        type=str,
+        default="random",
+        help="choose embedding"
+    )
     try:
         args = vars(parser.parse_args())
     except (IOError) as msg:

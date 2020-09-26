@@ -108,10 +108,6 @@ def evaluate_agent(wizard, val_loader, args):
     if args["retrieval_evaluation"]:
         candidate_scores = [jj for ii in matches for jj in ii["candidate_scores"]]
         retrieval_metrics = val_loader.evaluate_response_retrieval(candidate_scores)
-        for batch_cs in candidate_scores:
-            for turn in batch_cs['candidate_scores']:
-                for i in range(len(turn)):
-                    turn[i] = float(turn[i])
         print(retrieval_metrics)
     else:
         retrieval_metrics = {}
@@ -196,6 +192,14 @@ if __name__ == "__main__":
         type=str,
         default="none",
         help="use MAG or MMI",
+    )
+    parser.add_argument(
+        "--embedding_type",
+        dest="embedding_type",
+        choices=["random", "glove", "word2vec", "fasttext"],
+        type=str,
+        default="random",
+        help="choose embedding"
     )
     parser.add_argument(
         "--pred_save_path", default=None, help="Paht to save predicted result"

@@ -52,6 +52,21 @@ class ActionExecutor(nn.Module):
             )
         self.classifiers = nn.ModuleDict(self.classifiers)
 
+        # All attributes list
+        if params["domain"] == "furniture":
+            self.all_classifier_list = [
+                'furnitureType',
+                'color',
+                'matches',
+                'navigate_direction',
+                'position',
+                'direction'
+            ]
+        elif params["domain"] == "fashion":
+            self.all_classifier_list = [
+                'attributes'
+            ]
+
         # Model multimodal state.
         if params["use_multimodal_state"]:
             if params["domain"] == "furniture":
@@ -169,6 +184,19 @@ class ActionExecutor(nn.Module):
                 cur_action = self.action_map.word(cur_action_ind)
                 cur_state = encoder_state_unflat[inst_id, round_id]
                 supervision = batch["action_super"][inst_id][round_id]
+
+                # Predict attributes on all actions for ensemble.
+                action_pred_datum = action_preds_dict[inst_id]["predictions"][round_id]
+                if not self.training:
+                    action_pred_datum["attributes_prob"] = {}
+                    for key in self.all_classifier_list:
+                        classifier = self.classifiers[key]
+                        attr_dict = {}
+                        model_preds = classifier(cur_state)
+                        for pred_i, pred in enumerate(model_preds):
+                            attr_dict[self.attribute_vocab[key][pred_i]] = float(pred)
+                        action_pred_datum["attributes_prob"][key] = attr_dict
+
                 # If there is no supervision, ignore and move on to next round.
                 if supervision is None:
                     continue
@@ -199,7 +227,6 @@ class ActionExecutor(nn.Module):
                         raise ValueError("Domain neither of furniture/fashion!")
                 else:
                     classifier_list = self.action_metainfo[cur_action]["attributes"]
-                    action_pred_datum = action_preds_dict[inst_id]["predictions"][round_id]
                     if self.params["domain"] == "furniture":
                         # Predict attributes based on the predicted action.
                         for key in classifier_list:
