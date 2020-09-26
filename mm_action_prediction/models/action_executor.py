@@ -198,9 +198,7 @@ class ActionExecutor(nn.Module):
                         raise ValueError("Domain neither of furniture/fashion!")
                 else:
                     classifier_list = self.action_metainfo[cur_action]["attributes"]
-                    action_pred_datum = action_preds_dict[
-                        inst_id
-                    ]["predictions"][round_id]
+                    action_pred_datum = action_preds_dict[inst_id]["predictions"][round_id]
                     if self.params["domain"] == "furniture":
                         # Predict attributes based on the predicted action.
                         for key in classifier_list:

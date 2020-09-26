@@ -157,8 +157,6 @@ def evaluate_agent(wizard, val_loader, args):
         "model_responses": model_responses,
         "cadidate_scores": candidate_scores
     }
-    with open('inference.json', 'w') as f:
-        json.dump(eval_outputs, f)
     return eval_dict, eval_outputs
 
 
