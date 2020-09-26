@@ -89,11 +89,6 @@ def evaluate_agent(wizard, val_loader, args):
                 del batch_outputs["beam_output"]
             matches.append(batch_outputs)
 
-
-            # Toy
-            # print("###############TOY TESTING!!###############")
-            # break
-
     wizard.train()
 
     # Compute perplexity.

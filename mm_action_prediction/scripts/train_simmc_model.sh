@@ -36,7 +36,8 @@ MODEL_METAINFO="models/${DOMAIN}_model_metainfo.json"
 
 # Train all models on a domain Save checkpoints and logs with unique label.
 CUR_TIME=$(date +"_%m%d_%H:%M")
-UNIQ_LABEL="${DETAILS}${CUR_TIME}"
+# UNIQ_LABEL="${DETAILS}${CUR_TIME}"
+UNIQ_LABEL="${DETAILS}"
 CHECKPOINT_PATH="outputs/${UNIQ_LABEL}/checkpoints"
 LOG_PATH="outputs/${UNIQ_LABEL}/logs"
 TENSORBOARD_PATH="outputs/${UNIQ_LABEL}/runs"
@@ -63,18 +64,18 @@ COMMON_FLAGS="
 
 # History-agnostic model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
-#      --encoder="history_agnostic" --text_encoder="lstm" --embedding_type="glove" --gate_type="MAG"\
+#      --encoder="history_agnostic" --text_encoder="lstm" --embedding_type="glove" --gate_type="MMI"\
 #      --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
 
 # Hierarchical recurrent encoder model.
-python -u train_simmc_agent.py $COMMON_FLAGS \
-    --encoder="hierarchical_recurrent" --text_encoder="lstm" --embedding_type="glove" --gate_type="MAG" \
-    --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="hierarchical_recurrent" --text_encoder="lstm" --embedding_type="glove" --gate_type="MMI" \
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
 
 # Memory encoder model.
-# python -u train_simmc_agent.py $COMMON_FLAGS \
-#     --encoder="memory_network" --text_encoder="lstm" --embedding_type="glove" --gate_type="MAG" \
-#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
+python -u train_simmc_agent.py $COMMON_FLAGS \
+    --encoder="memory_network" --text_encoder="lstm" --embedding_type="glove" --gate_type="MMI" \
+    --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
 
 # # TF-IDF model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \

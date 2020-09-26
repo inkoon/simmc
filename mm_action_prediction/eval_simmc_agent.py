@@ -70,7 +70,6 @@ def evaluate_agent(wizard, val_loader, args):
                 mode = None
             batch_outputs = wizard(batch, mode)
             # Stringify model responses.
-
             # batch_outputs["beam_output"] = idx of str
 
             if args["bleu_evaluation"]:
@@ -89,8 +88,6 @@ def evaluate_agent(wizard, val_loader, args):
                 # Remove beam output to avoid memory issues.
                 del batch_outputs["beam_output"]
             matches.append(batch_outputs)
-
-
             # Toy
             # print("###############TOY TESTING!!###############")
             # break
@@ -116,10 +113,6 @@ def evaluate_agent(wizard, val_loader, args):
     if args["retrieval_evaluation"]:
         candidate_scores = [jj for ii in matches for jj in ii["candidate_scores"]]
         retrieval_metrics = val_loader.evaluate_response_retrieval(candidate_scores)
-        for batch_cs in candidate_scores:
-            for turn in batch_cs['candidate_scores']:
-                for i in range(len(turn)):
-                    turn[i] = float(turn[i])
         print(retrieval_metrics)
     else:
         retrieval_metrics = {}
@@ -160,8 +153,6 @@ def evaluate_agent(wizard, val_loader, args):
         "model_responses": model_responses,
         "candidate_scores": candidate_scores
     }
-    # with open('inference.json', 'w') as f:
-    #     json.dump(eval_outputs, f)
     return eval_dict, eval_outputs
 
 

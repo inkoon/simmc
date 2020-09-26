@@ -39,9 +39,9 @@ COMMON_FLAGS="
     --asset_embed_path=${METADATA_EMBEDS} \
     --metainfo_path=${MODEL_METAINFO} \
     --attr_vocab_path=${ATTR_VOCAB_FILE} \
-    --learning_rate=0.0001 --gpu_id=$GPU_ID --use_action_attention \
+    --learning_rate=0.0002 --gpu_id=$GPU_ID --use_action_attention \
     --num_epochs=100 --eval_every_epoch=1 --batch_size=1 \
-    --save_every_epoch=5 --word_embed_size=256 --num_layers=2 \
+    --save_every_epoch=5 --word_embed_size=300 --num_layers=2 \
     --hidden_size=512 \
     --use_multimodal_state --use_action_output --use_bahdanau_attention \
     --domain=${DOMAIN}"
@@ -49,9 +49,9 @@ COMMON_FLAGS="
 
 # Train history-agnostic model.
 # For other models, please look at scripts/train_all_simmc_models.sh
-python -u train_simmc_agent.py $COMMON_FLAGS --embedding_type="random" \
-    --encoder="history_agnostic" \
-    --text_encoder="lstm" \
+python -u train_simmc_agent.py $COMMON_FLAGS \
+    --embedding_type="glove" --gate_type="MMI" \
+    --encoder="history_agnostic" --text_encoder="lstm" \
 
 # Transformer model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
