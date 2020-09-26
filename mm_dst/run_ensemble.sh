@@ -1,6 +1,6 @@
 PATH_DIR=$(realpath .)
 DOMAIN="furniture"
-python -m gpt2_dst.scripts.ensemble2 \
+python -m gpt2_dst.scripts.ensemble \
     --input_path_predicted_list  ~/predictions/large.txt ~/predictions/td_large.txt ~/predictions/td_small.txt --output_path_ensembled="${PATH_DIR}"/gpt2_dst/results/ensembled.txt \
     --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/"${DOMAIN}"_devtest_dials_predict.txt \
     --domain=furniture
