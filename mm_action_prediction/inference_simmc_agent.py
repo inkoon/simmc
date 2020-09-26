@@ -15,40 +15,45 @@ import loaders
 import models
 from tools import support
 
+TASKS = ['task1', 'task2_g', 'task2_r']
 
 def main(args):
     """Evaluate model and save the results.
     """
-    # Read the checkpoint and train args.
-    print("Loading checkpoint: {}".format(args["checkpoint"]))
-    checkpoint = torch.load(args["checkpoint"], map_location=torch.device("cpu"))
-    saved_args = checkpoint["args"]
-    saved_args.update(args)
-    support.pretty_print_dict(saved_args)
 
-    # Dataloader for evaluation.
-    dataloader_args = {
-        "single_pass": True,
-        "shuffle": False,
-        "data_read_path": args["eval_data_path"],
-        "get_retrieval_candidates": True
-    }
-    dataloader_args.update(saved_args)
-    val_loader = loaders.DataloaderSIMMC(dataloader_args)
-    saved_args.update(val_loader.get_data_related_arguments())
+    for task in TASKS:
+        # Read the checkpoint and train args.
+        print("Loading checkpoint: {}".format(args[f"{task}_checkpoint"]))
+        checkpoint = torch.load(args[f"{task}_checkpoint"], map_location=torch.device("cpu"))
+        saved_args = checkpoint["args"]
+        saved_args.update(args)
+        support.pretty_print_dict(saved_args)
 
-    # Models.
-    task1_wizard = models.Assistant(saved_args)
-    task2_wizard = models.Assistant(saved_args)
-    # Load the checkpoint.
-    wizard.load_state_dict(checkpoint["model_state"])
+        # Dataloader for evaluation.
+        dataloader_args = {
+            "single_pass": True,
+            "shuffle": False,
+            "data_read_path": args["eval_data_path"],
+            "get_retrieval_candidates": True
+        }
+        dataloader_args.update(saved_args)
+        val_loader = loaders.DataloaderSIMMC(dataloader_args)
+        saved_args.update(val_loader.get_data_related_arguments())
 
-    # Evaluate the SIMMC model.
-    eval_dict, eval_outputs = evaluate_agent(wizard, val_loader, saved_args)
-    save_path = saved_args["checkpoint"].replace(".tar", "_eval.json")
-    print("Saving results: {}".format(save_path))
-    with open(save_path, "w") as file_id:
-        json.dump(eval_dict, file_id)
+        # Model.
+        wizard = models.Assistant(saved_args)
+
+        # Load the checkpoint.
+        wizard.load_state_dict(checkpoint["model_state"])
+
+        # Evaluate the SIMMC model.
+        eval_dict, eval_outputs = evaluate_agent(wizard, val_loader, saved_args)
+
+        # Save the results.
+        save_path = saved_args[f"{task}_checkpoint"].replace("epoch_best_", "").replace(".tar", "_predict.json")
+        print("Saving results: {}".format(save_path))
+        with open(save_path, "w") as file_id:
+            json.dump(eval_outputs, file_id)
 
 
 def evaluate_agent(wizard, val_loader, args):
@@ -161,7 +166,8 @@ if __name__ == "__main__":
     # Read command line options.
     parser = argparse.ArgumentParser()
     parser.add_argument("--task1_checkpoint", required=True, help="Task1 checkpoint to load")
-    parser.add_argument("--task2_checkpoint", required=True, help="Task2 checkpoint to load")
+    parser.add_argument("--task2_g_checkpoint", required=True, help="Task2 generation checkpoint to load")
+    parser.add_argument("--task2_r_checkpoint", required=True, help="Task2 retrieval checkpoint to load")
     parser.add_argument("--batch_size", default=10, type=int, help="Batch size")
     parser.add_argument(
         "--eval_data_path", required=True, help="Evaluation data split"
@@ -186,6 +192,17 @@ if __name__ == "__main__":
         default=None,
         choices=["furniture", "fashion"],
         help="Domain to train the model on",
+    )
+    parser.add_argument(
+        "--gpt2", action="store_true", default=False, help="GPT2"
+    )
+    parser.add_argument(
+        "--gate_type",
+        dest="gate_type",
+        choices=["none", "MAG", "MMI"],
+        type=str,
+        default="none",
+        help="use MAG or MMI",
     )
     parser.add_argument(
         "--pred_save_path", default=None, help="Paht to save predicted result"

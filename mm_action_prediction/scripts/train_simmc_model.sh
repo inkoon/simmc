@@ -67,14 +67,14 @@ COMMON_FLAGS="
 #      --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
 
 # Hierarchical recurrent encoder model.
-# python -u train_simmc_agent.py $COMMON_FLAGS \
-#     --encoder="hierarchical_recurrent" --text_encoder="lstm" --embedding_type="random" --gate_type="MAG" \
-#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
+python -u train_simmc_agent.py $COMMON_FLAGS \
+    --encoder="hierarchical_recurrent" --text_encoder="lstm" --embedding_type="glove" --gate_type="MAG" \
+    --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
 
 # Memory encoder model.
-python -u train_simmc_agent.py $COMMON_FLAGS \
-    --encoder="memory_network" --text_encoder="lstm" --embedding_type="random" --gate_type="MAG" \
-    --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="memory_network" --text_encoder="lstm" --embedding_type="glove" --gate_type="MAG" \
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
 
 # # TF-IDF model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
