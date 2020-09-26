@@ -499,7 +499,7 @@ class DataloaderSIMMC(loaders.LoaderParent):
             {
                 "dialog_id": batch["dialog_id"][ii].item(),
                 "predictions": [
-                    {"response": self.tokenizer.decode(beam_outputs[ii][jj])}
+                    {"response": self.tokenizer.decode(beam_outputs[ii][jj], skip_special_tokens=True)}
                     for jj in range(batch["dialog_len"][ii])
                 ]
             }

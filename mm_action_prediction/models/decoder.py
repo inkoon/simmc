@@ -164,18 +164,7 @@ class GenerativeDecoder(nn.Module):
             enc_pad_mask = support.flatten(enc_pad_mask, batch_size, num_rounds)
             dec_pad_mask = batch["assist_in"] == batch["pad_token"]
             dec_pad_mask = support.flatten(dec_pad_mask, batch_size, num_rounds)
-            if self.params["gpt2"]:
-                # decoder_steps_in = [200, 26, h_d]
-                # decoder_in = [200, 26]
-                # decoder_out = [200, 26]
-                outputs = self.decoder_unit(
-                    inputs_embeds=decoder_steps_in,
-                    labels=decoder_out,
-                    # encoder_hidden_states=hidden_state,
-                    # encoder_attention_mask=~enc_pad_mask,
-                )
-                outputs = outputs[1]
-            elif self.params["encoder"] != "pretrained_transformer":
+            if self.params["encoder"] != "pretrained_transformer":
                 dec_embeds = self.pos_encoder(decoder_steps_in).transpose(0, 1)
                 outputs = self.decoder_unit(
                     dec_embeds,
@@ -221,6 +210,7 @@ class GenerativeDecoder(nn.Module):
                     context = (encoder_states * att_wts).sum(1, keepdim=True)
                     # Run through LSTM.
                     concat_in = [context, decoder_steps_in[:, step : step + 1, :]]
+                    import ipdb; ipdb.set_trace(context=10)
                     step_in = torch.cat(concat_in, dim=-1)
                     decoder_output, hidden_state = self.decoder_unit(
                         step_in, hidden_state

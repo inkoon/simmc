@@ -108,6 +108,10 @@ def evaluate_agent(wizard, val_loader, args):
     if args["retrieval_evaluation"]:
         candidate_scores = [jj for ii in matches for jj in ii["candidate_scores"]]
         retrieval_metrics = val_loader.evaluate_response_retrieval(candidate_scores)
+        for batch_cs in candidate_scores:
+            for turn in batch_cs['candidate_scores']:
+                for i in range(len(turn)):
+                    turn[i] = float(turn[i])
         print(retrieval_metrics)
     else:
         retrieval_metrics = {}
@@ -148,6 +152,8 @@ def evaluate_agent(wizard, val_loader, args):
         "model_responses": model_responses,
         "cadidate_scores": candidate_scores
     }
+    with open('inference.json', 'w') as f:
+        json.dump(eval_outputs, f)
     return eval_dict, eval_outputs
 
 

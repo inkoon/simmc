@@ -8,6 +8,7 @@ ROOT="../data/simmc_${DOMAIN}/"
 
 # Input files.
 TRAIN_JSON_FILE="${ROOT}${DOMAIN}_train_dials.json"
+TRAINDEV_JSON_FILE="${ROOT}${DOMAIN}_traindev_dials.json"
 DEV_JSON_FILE="${ROOT}${DOMAIN}_dev_dials.json"
 DEVTEST_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials.json"
 
@@ -29,7 +30,7 @@ ATTR_VOCAB_FILE="${ROOT}${DOMAIN}_attribute_vocabulary.json"
 
 
 # Step 1: Extract assistant API.
-INPUT_FILES="${TRAIN_JSON_FILE} ${DEV_JSON_FILE} ${DEVTEST_JSON_FILE}"
+INPUT_FILES="${TRAIN_JSON_FILE} ${TRAINDEV_JSON_FILE} ${DEV_JSON_FILE} ${DEVTEST_JSON_FILE}"
 # If statement.
 if [ "$DOMAIN" == "furniture" ]; then
     python tools/extract_actions.py \
@@ -70,7 +71,7 @@ fi
 
 
 # Step 4: Convert all the splits into npy files for dataloader.
-SPLIT_JSON_FILES=("${TRAIN_JSON_FILE}" "${DEV_JSON_FILE}" "${DEVTEST_JSON_FILE}")
+SPLIT_JSON_FILES=("${TRAIN_JSON_FILE}" "${TRAINDEV_JSON_FILE}" "${DEV_JSON_FILE}" "${DEVTEST_JSON_FILE}")
 for SPLIT_JSON_FILE in "${SPLIT_JSON_FILES[@]}" ; do
     python tools/build_multimodal_inputs.py \
         --json_path="${SPLIT_JSON_FILE}" \

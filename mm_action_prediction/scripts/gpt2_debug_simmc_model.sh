@@ -52,6 +52,8 @@ COMMON_FLAGS="
 python -u train_simmc_agent.py $COMMON_FLAGS \
     --encoder="history_agnostic" \
     --text_encoder="lstm" \
+    --embedding_type="random" \
+    --gate_type="MAG" \
 
 # Transformer model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
