@@ -15,7 +15,7 @@ then
 	VERSION=$3
 fi
 
-GPU_ID=1
+GPU_ID=0
 
 PATH_DIR=$(realpath .)
 
