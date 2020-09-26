@@ -24,10 +24,13 @@ END_OF_MULTIMODAL_CONTEXTS = '<EOM>'
 START_BELIEF_STATE = '=> Belief State :'
 END_OF_BELIEF = '<EOB>'
 END_OF_SENTENCE = '<EOS>'
+END_OF_RESPONSE = '<EOR>'
 
 TEMPLATE_PREDICT = '{context} {START_BELIEF_STATE} '
 TEMPLATE_TARGET = '{context} {START_BELIEF_STATE} {belief_state} ' \
     '{END_OF_BELIEF} {response} {END_OF_SENTENCE}'
+TEMPLATE_TARGET_TASK1 = '{context} {START_BELIEF_STATE} {belief_state} ' \
+    '{END_OF_BELIEF} {response} {END_OF_RESPONSE} {api} {END_OF_SENTENCE}'
 TEMPLATE_TARGET_NORESP = '{context} {START_BELIEF_STATE} {belief_state} {END_OF_SENTENCE}'
 
 
@@ -39,17 +42,26 @@ def convert_json_to_flattened(
         noresp=False,
         attribute=False,
         slot=False,
-        total=False,
-        api=False,
+        task1=False,
         use_multimodal_contexts=True,
+        attribute_path_json=None,
+        attribute_vocab_json=None,
+        api_path_json=None,
         input_path_special_tokens='',
         output_path_special_tokens=''):
     """
         Input: JSON representation of the dialogs
         Output: line-by-line stringified representation of each turn
     """
-    with open(input_path_json, 'r') as f_in:
-        raw_data = json.load(f_in)
+    if task1:
+        with open(api_path_json, 'r') as f_in:
+            apis = json.load(f_in)
+
+        with open(attribute_path_json, 'r') as f_in:
+            attributes = json.load(f_in)
+
+        with open(attribute_vocab_json, 'r') as f_in:
+            attribute_vocab = json.load(f_in)
 
     with open(input_path_json, 'r') as f_in:
         data = json.load(f_in)['dialogue_data']
@@ -81,12 +93,23 @@ def convert_json_to_flattened(
         # we track new OOVs
         oov = set()
 
-    for _, dialog in enumerate(data):
+    # B : track api, attribute oov
+    if task1:
+        # add attr oov
+        for key in attribute_vocab.keys():
+            oov.add(key)
+            for val in attribute_vocab[key]:
+                sp = val.split(' ')
+                for v in sp:
+                    oov.add(v)
+        # TODO add api oov
+
+    for dialog, api, attr in zip(data, apis, attributes):
 
         prev_asst_uttr = None
         lst_context = []
 
-        for turn in dialog[FIELDNAME_DIALOG]:
+        for i, turn in enumerate(dialog[FIELDNAME_DIALOG]):
             user_uttr = turn[FIELDNAME_USER_UTTR].replace('\n', ' ').strip()
             user_belief = turn[FIELDNAME_BELIEF_STATE]
             asst_uttr = turn[FIELDNAME_ASST_UTTR].replace('\n', ' ').strip()
@@ -191,6 +214,28 @@ def convert_json_to_flattened(
                     context=context,
                     START_BELIEF_STATE=START_BELIEF_STATE,
                     belief_state=str_belief_state,
+                    END_OF_SENTENCE=END_OF_SENTENCE
+                )
+            elif task1 :
+                # B : preprocess for task1 
+                # if api[i] != None:
+                str_api_per_frame = "{action} [ {attr} ]".format(
+                    action = api[i].strip(),
+                    attr = ', '.join(
+                        [f'{key.strip()} = {attribute_vocab[key][attribute[i][key]].strip()}'
+                            for key in attribute[i].keys()])
+                )
+                # else:
+                    # pass
+
+                target = TEMPLATE_TARGET_TASK1.format(
+                    context=context,
+                    START_BELIEF_STATE=START_BELIEF_STATE,
+                    belief_state=str_belief_state,
+                    END_OF_BELIEF=END_OF_BELIEF,
+                    response=asst_uttr,
+                    END_OF_RESPONSE=END_OF_RESPONSE,
+                    api=str_api_per_frame, 
                     END_OF_SENTENCE=END_OF_SENTENCE
                 )
             else:
