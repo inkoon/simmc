@@ -26,7 +26,6 @@ num_train_epochs : $EPOCH
 per_gpu_train_batch_size : $BATCH
 warmup_steps : $WARMUP"
 
-
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"/"${KEYWORD}" \

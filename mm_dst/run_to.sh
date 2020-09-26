@@ -14,10 +14,10 @@ PATH_DIR=$(realpath .)
 # PARAMTERS
 TRAIN_DATA=train
 MODEL_TYPE=gpt2
-EPOCH=10
+EPOCH=15
 BATCH=16
 VAL_BATCH=64
-WARMUP=2000
+WARMUP=4000
 
 
 PARAMS="train_data : $TRAIN_DATA
@@ -30,7 +30,7 @@ warmup_steps : $WARMUP"
 python -m gpt2_dst.scripts.run_language_modeling \
     --output_dir="${PATH_DIR}"/gpt2_dst/save/"${DOMAIN}"_to/"${KEYWORD}" \
     --model_type="${MODEL_TYPE}" \
-    --model_name_or_path="${MODEL_TYPE}" \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fine_tune \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"_to/special_tokens.json \
     --do_train \
