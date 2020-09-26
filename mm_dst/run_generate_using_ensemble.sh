@@ -115,8 +115,7 @@ GPU_ID='1'
 # Generate sentences (Fashion, multi-modal)
 python -m gpt2_dst.scripts.run_generation_en \
     --model_type=gpt2 \
-    --model_name_or_path_list "${PATH_DIR}"/gpt2_dst/save/fashion_to/td_large "${PATH_DIR}"/gpt2_dst/save/fashion_to/medium 
-    --num_return_sequences=1 \
+    --model_name_or_path_list "${PATH_DIR}"/gpt2_dst/save/fashion_to/td_large "${PATH_DIR}"/gpt2_dst/save/fashion_to/medium --num_return_sequences=1 \
     --length=100 \
     --stop_token='<EOS>' \
     --num_beams=$NUM_BEAMS \
