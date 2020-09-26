@@ -28,7 +28,7 @@ python -m gpt2_dst.scripts.run_language_modeling \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/special_tokens.json \
     --do_train \
-    --train_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/"${DOMAIN}"_total_dials_target.txt \
+    --train_data_file="${PATH_DIR}"/gpt2_dst/data/"${DOMAIN}"/"${DOMAIN}"_train_dials_target.txt \
     --num_train_epochs=15 \
     --overwrite_output_dir \
     --gpu_id=$GPU_ID \
