@@ -38,26 +38,36 @@ def ensemble_turn(domain,prompt,predictions,turn_idx) :
 
     c = Counter(act_dict) 
     j = 0
+    result = [None] * 10 
     for ac in c.most_common(voted_frame_index) : 
         act = ac[0]
         slot_index = []
         j+=1
+        slotSize = 0 
+        act_idx = [] 
+        for i in range(10000) : 
+            act_idx.append(0) 
         for model_idx in range(total_model) : 
+                
             for frame_idx in range(len(predictions[model_idx][turn_idx])) : 
                 for i in range(1000) : 
                     slot_index.append(0)
+                
                 if predictions[model_idx][turn_idx][frame_idx]['act'] == act : 
                     slot_index[len(predictions[model_idx][turn_idx][frame_idx]['slots'])] += 1 
+                    act_idx[frame_idx] += 1 
         
+        if turn_idx == 25 : 
+            import ipdb; ipdb.set_trace()
         voted_slot_size = slot_index.index(max(slot_index)) 
-
+        voted_frame_idx = act_idx.index(max(act_idx)) 
         for model_idx in range(total_model) : 
             for frame_idx in range(len(predictions[model_idx][turn_idx])) : 
                 if predictions[model_idx][turn_idx][frame_idx]['act'] == act : 
                     for slot_idx in range(len(predictions[model_idx][turn_idx][frame_idx]['slots'])) : 
                         if len(predictions[model_idx][turn_idx][frame_idx]['slots'][slot_idx]) >= 2 : 
                             slot_dict.append(domain+"-"+predictions[model_idx][turn_idx][frame_idx]['slots'][slot_idx][0] + " = " + predictions[model_idx][turn_idx][frame_idx]['slots'][slot_idx][1] )
-                            
+                
         d = Counter(slot_dict)
         slot = ""
         i = 0
@@ -70,7 +80,11 @@ def ensemble_turn(domain,prompt,predictions,turn_idx) :
                 i+=1 
         else :
             slot = ""
-        prompt+=(act + " " + " [ " + slot + " ] ")
+        result[voted_frame_idx] = (act + " " + " [ " + slot + " ] ") 
+    
+    for i in range(0,voted_frame_index) :
+        if result[i] != None :  
+            prompt += result[i]
     output.write(prompt + " <EOB> \n")
 
         
