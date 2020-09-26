@@ -6,8 +6,8 @@ if [ $# -lt 2 ];then
     exit 1
 fi
 
-# DOMAIN="furniture"
-DOMAIN="fashion"
+DOMAIN="furniture"
+# DOMAIN="fashion"
 ROOT="../data/simmc_${DOMAIN}/"
 DETAILS=$1
 GPU_ID=$2
@@ -15,6 +15,7 @@ GPU_ID=$2
 
 # Input files.
 TRAIN_JSON_FILE="${ROOT}${DOMAIN}_train_dials.json"
+TRAINDEV_JSON_FILE="${ROOT}${DOMAIN}_traindev_dials.json"
 DEV_JSON_FILE="${ROOT}${DOMAIN}_dev_dials.json"
 DEVTEST_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials.json"
 
@@ -47,33 +48,33 @@ mkdir -p ${LOG_PATH}
 
 
 COMMON_FLAGS="
-    --train_data_path=${TRAIN_JSON_FILE/.json/_mm_inputs.npy} \
-    --eval_data_path=${DEV_JSON_FILE/.json/_mm_inputs.npy} \
+    --train_data_path=${TRAINDEV_JSON_FILE/.json/_mm_inputs.npy} \
+    --eval_data_path=${DEVTEST_JSON_FILE/.json/_mm_inputs.npy} \
     --asset_embed_path=${METADATA_EMBEDS} \
     --metainfo_path=${MODEL_METAINFO} \
     --attr_vocab_path=${ATTR_VOCAB_FILE} \
-    --learning_rate=0.0001 --gpu_id=$GPU_ID --use_action_attention \
-    --num_epochs=60 --eval_every_epoch=3 --batch_size=20 \
-    --save_every_epoch=3 --word_embed_size=300 --num_layers=2 \
+    --learning_rate=0.0002 --gpu_id=$GPU_ID --use_action_attention \
+    --num_epochs=60 --eval_every_epoch=4 --batch_size=32 \
+    --save_every_epoch=4 --word_embed_size=300 --num_layers=2 \
     --hidden_size=512 \
     --use_multimodal_state --use_action_output --use_bahdanau_attention \
     --domain=${DOMAIN} --save_prudently --tensorboard_path=${TENSORBOARD_PATH}"
 
 
 # History-agnostic model.
-python -u train_simmc_agent.py $COMMON_FLAGS \
-     --encoder="history_agnostic" --text_encoder="lstm" --embedding_type="glove" --gate_type="MAG"\
-     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#      --encoder="history_agnostic" --text_encoder="lstm" --embedding_type="glove" --gate_type="MAG"\
+#      --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
 
 # Hierarchical recurrent encoder model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
-#     --encoder="hierarchical_recurrent" --text_encoder="lstm" --embedding_type="glove" --gate_type="MAG" \
+#     --encoder="hierarchical_recurrent" --text_encoder="lstm" --embedding_type="random" --gate_type="MAG" \
 #     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
 
 # Memory encoder model.
-# python -u train_simmc_agent.py $COMMON_FLAGS \
-#     --encoder="memory_network" --text_encoder="lstm" --embedding_type="glove" --gate_type="MAG" \
-#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
+python -u train_simmc_agent.py $COMMON_FLAGS \
+    --encoder="memory_network" --text_encoder="lstm" --embedding_type="random" --gate_type="MAG" \
+    --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
 
 # # TF-IDF model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \

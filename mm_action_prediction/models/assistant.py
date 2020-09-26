@@ -77,7 +77,6 @@ class Assistant(nn.Module):
             option_scores = []
             batch_size, num_rounds, num_candidates, _ = batch["candidate_in"].shape
             replace_keys = ("assist_in", "assist_out", "assist_in_len", "assist_mask")
-            import ipdb; ipdb.set_trace(context=10)
             for ii in range(num_candidates):
                 for key in replace_keys:
                     new_key = key.replace("assist", "candidate")

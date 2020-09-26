@@ -210,7 +210,6 @@ class GenerativeDecoder(nn.Module):
                     context = (encoder_states * att_wts).sum(1, keepdim=True)
                     # Run through LSTM.
                     concat_in = [context, decoder_steps_in[:, step : step + 1, :]]
-                    import ipdb; ipdb.set_trace(context=10)
                     step_in = torch.cat(concat_in, dim=-1)
                     decoder_output, hidden_state = self.decoder_unit(
                         step_in, hidden_state
