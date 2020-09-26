@@ -13,11 +13,11 @@ PATH_DIR=$(realpath .)
 
 # PARAMTERS
 TRAIN_DATA=total
-MODEL_TYPE=gpt2
-EPOCH=10
-BATCH=8
-VAL_BATCH=32
-WARMUP=4000
+MODEL_TYPE=gpt2-large
+EPOCH=5
+BATCH=2
+VAL_BATCH=8
+WARMUP=16000
 
 
 PARAMS="train_data : $TRAIN_DATA
@@ -26,7 +26,6 @@ num_train_epochs : $EPOCH
 per_gpu_train_batch_size : $BATCH
 warmup_steps : $WARMUP"
 
-VAL_BATCH=$BATCH*4
 
 # Train ("${DOMAIN}", multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
