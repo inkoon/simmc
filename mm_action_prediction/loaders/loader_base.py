@@ -192,6 +192,9 @@ class LoaderParent:
             related_args["vocab_size"] += len(self.words.added_tokens_encoder)
         if hasattr(self, "asset_feature_size"):
             related_args["asset_feature_size"] = self.asset_feature_size
+        # For glove embedding
+        if self.params["embedding_type"] == "glove":
+            related_args["words"] = self.words.get_vocabulary_state()
         return related_args
 
     @staticmethod

@@ -22,18 +22,24 @@ class MemoryNetworkEncoder(nn.Module):
         super(MemoryNetworkEncoder, self).__init__()
         self.params = params
 
-
+        if self.params["embedding_type"] == "random":
+            self.word_embed_net = nn.Embedding(
+                params["vocab_size"], params["word_embed_size"]
+            )
+        elif self.params["embedding_type"] == "glove":
+            self.nlp = spacy.load("en_vectors_web_lg")
+            glove_weight = []
+            for word in self.params["words"]:
+                glove_weight.append(list(self.nlp(word).vector))
+            glove_weight = torch.FloatTensor(glove_weight)
+            self.word_embed_net = nn.Embedding.from_pretrained(glove_weight)
         encoder_input_size = params["word_embed_size"]
         self.encoder_input_size = encoder_input_size
-        if self.params["embedding_type"]=="random":
-            self.word_embed_net = nn.Embedding(
-                params["vocab_size"], params["word_embed_size"])
-        elif self.params["embedding_type"]=="glove":
-            self.nlp = spacy.load("en_vectors_web_lg")
         # elif self.params["embedding_type"]=="word2vec":
         #     self.w2v_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/GoogleNews-vectors-negative300.bin', binary=True)
         # elif self.params["embedding_type"]=="fasttext":
         #     self.fasttext_model = torchtext.vocab.FastText('en')
+
         self.encoder_unit = nn.LSTM(
             encoder_input_size,
             params["hidden_size"],
