@@ -205,6 +205,7 @@ if __name__ == "__main__":
         "--root_path",
         default="../data/gpt2_simmc_furniture/",
         help="Path to ROOT (only for gpt2)",
+    )
     # B : for belief state embedding
     parser.add_argument(
         "--action_num",

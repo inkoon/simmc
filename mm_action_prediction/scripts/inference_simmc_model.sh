@@ -18,9 +18,9 @@ DEVTEST_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials.json"
 
 MODEL_LIST="
 HRE_G300_MAG
-MN_G300_MAG
 "
 
+# MN_G300_MAG
 # HAE_R300
 # HRE_R300
 # HRE_R300_MMI
@@ -30,7 +30,8 @@ MN_G300_MAG
 
 for MODEL in $MODEL_LIST
 do
-    CHECKPOINT_PATH="outputs/${DOMAIN}/${MODEL}/checkpoints/"
+    # CHECKPOINT_PATH="outputs/${DOMAIN}/${MODEL}/checkpoints/"
+    CHECKPOINT_PATH="outputs/tmp/HAE_R300_lr3_b32_la3_0924_11:50/"
 
     # Evaluate a trained model checkpoint.
     python -u inference_simmc_agent.py \
