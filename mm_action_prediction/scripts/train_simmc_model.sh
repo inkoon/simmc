@@ -6,8 +6,8 @@ if [ $# -lt 2 ];then
     exit 1
 fi
 
-DOMAIN="furniture"
-# DOMAIN="fashion"
+# DOMAIN="furniture"
+DOMAIN="fashion"
 ROOT="../data/simmc_${DOMAIN}/"
 DETAILS=$1
 GPU_ID=$2
@@ -49,8 +49,8 @@ mkdir -p ${LOG_PATH}
 
 
 COMMON_FLAGS="
-    --train_data_path=${TRAIN_JSON_FILE/.json/_mm_inputs.npy} \
-    --eval_data_path=${DEV_JSON_FILE/.json/_mm_inputs.npy} \
+    --train_data_path=${TRAINDEV_JSON_FILE/.json/_mm_inputs.npy} \
+    --eval_data_path=${DEVTEST_JSON_FILE/.json/_mm_inputs.npy} \
     --asset_embed_path=${METADATA_EMBEDS} \
     --metainfo_path=${MODEL_METAINFO} \
     --attr_vocab_path=${ATTR_VOCAB_FILE} \
@@ -64,22 +64,26 @@ COMMON_FLAGS="
 
 # History-agnostic model.
 python -u train_simmc_agent.py $COMMON_FLAGS \
-     --encoder="history_agnostic" --text_encoder="lstm" --embedding_type="glove" --gate_type="none"\
+     --encoder="history_agnostic" --text_encoder="lstm" \
+     --embedding_type="glove" --gate_type="none"\
      --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
 
 # Hierarchical recurrent encoder model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
-#     --encoder="hierarchical_recurrent" --text_encoder="lstm" --embedding_type="glove" --gate_type="none" \
+#     --encoder="hierarchical_recurrent" --text_encoder="lstm" \
+#     --embedding_type="glove" --gate_type="MAG"\
 #     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
 
 # Memory encoder model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
-#     --encoder="memory_network" --text_encoder="lstm" --embedding_type="glove" --gate_type="none" \
+#     --encoder="memory_network" --text_encoder="lstm" \
+#     --embedding_type="glove" --gate_type="MMI"\
 #     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
 
 # # TF-IDF model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
 #     --encoder="tf_idf" --text_encoder="lstm" \
+#     --embedding_type="glove" --gate_type="none"\
 #     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/tf_idf.log" &
 #
 # Transformer model.

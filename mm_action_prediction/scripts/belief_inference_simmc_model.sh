@@ -9,7 +9,7 @@ fi
 GPU_ID=$1
 DOMAIN="furniture"
 # DOMAIN="fashion"
-ROOT="../data/simmc_${DOMAIN}/"
+ROOT="../data/belief_simmc_${DOMAIN}/"
 
 
 # Input files.
@@ -42,6 +42,8 @@ do
         --gpu_id=$GPU_ID \
         --gate_type="MAG" \
         --embedding_type="glove"\
+        --use_belief_state \
+        --use_task3_belief_state \
         --batch_size=50 \
         --domain="$DOMAIN" \
         --pred_save_path="$CHECKPOINT_PATH"

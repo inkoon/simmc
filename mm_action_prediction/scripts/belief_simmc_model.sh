@@ -1,13 +1,21 @@
 #!/bin/bash
 
-GPU_ID=1
+# Check the parameters
+if [ $# -lt 2 ];then
+    echo "There's no parameters -> ./run.sh [model descriptions] [gpu no]"
+    exit 1
+fi
+
 #DOMAIN="furniture"
 DOMAIN="fashion"
 ROOT="../data/belief_simmc_${DOMAIN}/"
+DETAILS=$1
+GPU_ID=$2
 
 
 # Input files.
 TRAIN_JSON_FILE="${ROOT}${DOMAIN}_train_dials.json"
+TRAINDEV_JSON_FILE="${ROOT}${DOMAIN}_traindev_dials.json"
 DEV_JSON_FILE="${ROOT}${DOMAIN}_dev_dials.json"
 DEVTEST_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials.json"
 
@@ -27,6 +35,19 @@ ATTR_VOCAB_FILE="${ROOT}${DOMAIN}_attribute_vocabulary.json"
 MODEL_METAINFO="models/${DOMAIN}_model_metainfo.json"
 
 
+# Train all models on a domain Save checkpoints and logs with unique label.
+CUR_TIME=$(date +"_%m%d_%H:%M")
+# UNIQ_LABEL="${DETAILS}${CUR_TIME}"
+UNIQ_LABEL="${DETAILS}"
+CHECKPOINT_PATH="outputs/${UNIQ_LABEL}/checkpoints"
+LOG_PATH="outputs/${UNIQ_LABEL}/logs"
+TENSORBOARD_PATH="outputs/${UNIQ_LABEL}/runs"
+
+mkdir -p outputs
+mkdir -p outputs/${UNIQ_LABEL}
+mkdir -p ${CHECKPOINT_PATH}
+mkdir -p ${LOG_PATH}
+
 COMMON_FLAGS="
     --train_data_path=${TRAIN_JSON_FILE/.json/_mm_inputs.npy} \
     --eval_data_path=${DEV_JSON_FILE/.json/_mm_inputs.npy} \
@@ -36,24 +57,51 @@ COMMON_FLAGS="
     --learning_rate=0.0002 --gpu_id=$GPU_ID --use_action_attention \
     --num_epochs=60 --eval_every_epoch=3 --batch_size=20 \
     --save_every_epoch=3 --word_embed_size=300 --num_layers=2 \
-    --hidden_size=512 \
+    --hidden_size=768 \
     --use_multimodal_state --use_action_output --use_bahdanau_attention \
     --skip_bleu_evaluation --domain=${DOMAIN}"
 
 
-# Train history-agnostic model.
-# For other models, please look at scripts/train_all_simmc_models.sh
+# History-agnostic model.
 python -u train_simmc_agent.py $COMMON_FLAGS \
-    --encoder="history_agnostic" \
-    --text_encoder="lstm" \
-    --use_belief_state --use_task3_belief_state \
+     --encoder="history_agnostic" --text_encoder="lstm" \
+     --embedding_type="glove" --gate_type="none"\
+     --use_belief_state --use_task3_belief_state \
+     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
 
+# Hierarchical recurrent encoder model.
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="hierarchical_recurrent" --text_encoder="lstm" \
+#     --embedding_type="glove" --gate_type="MAG"\
+#     --use_belief_state --use_task3_belief_state \
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
 
+# Memory encoder model.
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="memory_network" --text_encoder="lstm" \
+#     --embedding_type="glove" --gate_type="MMI"\
+#     --use_belief_state --use_task3_belief_state \
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
 
+# # TF-IDF model.
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="tf_idf" --text_encoder="lstm" \
+#     --embedding_type="glove" --gate_type="none"\
+#     --use_belief_state --use_task3_belief_state \
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/tf_idf.log" &
+#
+# Transformer model.
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="history_agnostic" \
+#     --text_encoder="transformer" \
+#     --num_heads_transformer=4 --num_layers_transformer=4 \
+#     --embedding_type="glove" \
+#     --hidden_size_transformer=2048 --hidden_size=300\
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/transf.log" &
 
 # Evaluate a trained model checkpoint.
 # CHECKPOINT_PATH="checkpoints/hae/epoch_20.tar"
-# python -u eval_simmc_cd.py \
+# python -u eval_simmc_agent.py \
 #     --eval_data_path=${DEV_JSON_FILE/.json/_mm_inputs.npy} \
 #     --checkpoint="$CHECKPOINT_PATH" --gpu_id=0 --batch_size=50 \
 #     --domain="$DOMAIN"

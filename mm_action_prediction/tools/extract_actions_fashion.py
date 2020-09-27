@@ -90,7 +90,7 @@ def extract_actions(input_json_file):
                     }
                 else:
                     # AddToCart action.
-                    for intent_info in eval(round_datum["transcript_annotated"]):
+                    for intent_info in ast.literal_eval(round_datum["transcript_annotated"]):
                         if "DA:REQUEST:ADD_TO_CART" in intent_info["intent"]:
                             insert_item["action"] = "AddToCart"
                             insert_item["action_supervision"] = None
@@ -121,10 +121,7 @@ def extract_info_attributes(round_datum):
     Returns:
         get_attribute_matches: Information attributes
     """
-    user_annotation = eval(round_datum["transcript_annotated"])
-    assistant_annotation = eval(round_datum["transcript_annotated"])
-    annotation = user_annotation + assistant_annotation
-    # annotation = user_annotation
+    user_annotation = ast.literal_eval(round_datum["transcript_annotated"])
     annotation = user_annotation
     all_intents = [ii["intent"] for ii in annotation]
     get_attribute_matches = []
