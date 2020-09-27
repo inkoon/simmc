@@ -22,7 +22,8 @@ class ActionExecutor(nn.Module):
         """
         super(ActionExecutor, self).__init__()
         self.params = params
-
+        self.belief_state_size = int(self.params["hidden_size"]/32)
+        self.slot_size = 2
         input_size = self.params["hidden_size"]
         if self.params["text_encoder"] == "transformer":
             input_size = self.params["word_embed_size"]
@@ -32,6 +33,19 @@ class ActionExecutor(nn.Module):
         # If multimodal input state is to be used.
         if self.params["use_multimodal_state"]:
             input_size += self.params["hidden_size"]
+        self.action_net = self._get_classify_network(input_size, params["num_actions"])
+        self.params["use_belief_state"]=False
+        # B : If belief state is to be used.
+        if self.params["use_belief_state"]:
+            # one belief state
+            input_size += self.belief_state_size
+            # two belief states
+            input_size += self.belief_state_size
+            # slot
+            input_size += 6*self.slot_size
+            #import ipdb;ipdb.set_trace(context=10)
+            if self.params["text_encoder"] == "transformer" and self.belief_state_size%2==1:
+                input_size -= 2
         self.action_net = self._get_classify_network(input_size, params["num_actions"])
         # Read action metadata.
         with open(params["metainfo_path"], "r") as file_id:
@@ -88,6 +102,14 @@ class ActionExecutor(nn.Module):
         self.criterion = nn.CrossEntropyLoss(reduction="none")
         self.criterion_multi = torch.nn.MultiLabelSoftMarginLoss()
 
+
+        # B : belief state embedding
+        self.action_embedding = nn.Embedding(params["action_num"], int(self.belief_state_size/2), padding_idx=0)
+        self.attribute_embedding = nn.Embedding(params["attribute_num"], int(self.belief_state_size/2), padding_idx=0)
+        self.slot_embedding = nn.Embedding(params["slot_num"], int(self.slot_size), padding_idx=0)
+
+
+
     def forward(self, batch, prev_outputs):
         """Forward pass a given batch.
 
@@ -98,6 +120,7 @@ class ActionExecutor(nn.Module):
         Returns:
             outputs: Dict of expected outputs
         """
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         outputs = {}
         if self.params["use_action_attention"] and self.params["encoder"] != "tf_idf":
             encoder_state = prev_outputs["hidden_states_all"]
@@ -125,11 +148,59 @@ class ActionExecutor(nn.Module):
                     multimodal_state, encoder_state, batch["dialog_mask"].shape[:2]
                 )
 
+        # B : belief state.
+        if self.params["use_belief_state"]:
+            #import ipdb;ipdb.set_trace(context=10)
+            batch_act_0 = batch["belief_state_act"][:,:num_rounds,0].to(device)
+            batch_attr_0 = batch["belief_state_attr"][:,:num_rounds,0].to(device)
+            batch_act_1 = batch["belief_state_act"][:,:num_rounds,1].to(device)
+            batch_attr_1 = batch["belief_state_attr"][:,:num_rounds,1].to(device)
+            slot_0_0 = batch["belief_state_slot"][:,:num_rounds,0,0].to(device)
+            slot_0_1 = batch["belief_state_slot"][:,:num_rounds,0,1].to(device)
+            slot_0_2 = batch["belief_state_slot"][:,:num_rounds,0,2].to(device)
+            slot_1_0 = batch["belief_state_slot"][:,:num_rounds,1,0].to(device)
+            slot_1_1 = batch["belief_state_slot"][:,:num_rounds,1,1].to(device)
+            slot_1_2 = batch["belief_state_slot"][:,:num_rounds,1,2].to(device)
+
+            #import ipdb;ipdb.set_trace(context=7)
+            batch_act_0 = support.flatten(batch_act_0, batch_size, num_rounds)
+            batch_attr_0 = support.flatten(batch_attr_0, batch_size, num_rounds)
+            batch_act_1 = support.flatten(batch_act_1, batch_size, num_rounds)
+            batch_attr_1 = support.flatten(batch_attr_1, batch_size, num_rounds)
+            batch_slot_0_0 = support.flatten(slot_0_0, batch_size, num_rounds)
+            batch_slot_0_1 = support.flatten(slot_0_1, batch_size, num_rounds)
+            batch_slot_0_2 = support.flatten(slot_0_2, batch_size, num_rounds)
+            batch_slot_1_0 = support.flatten(slot_1_0, batch_size, num_rounds)
+            batch_slot_1_1 = support.flatten(slot_1_1, batch_size, num_rounds)
+            batch_slot_1_2 = support.flatten(slot_1_2, batch_size, num_rounds)
+
+            act_0_embedd = self.action_embedding(batch_act_0).to(device)
+            attr_0_embedd = self.attribute_embedding(batch_attr_0).to(device)
+            act_1_embedd = self.action_embedding(batch_act_1).to(device)
+            attr_1_embedd = self.attribute_embedding(batch_attr_1).to(device)
+            slot_0_0_embedd = self.slot_embedding(batch_slot_0_0).to(device)
+            slot_0_1_embedd = self.slot_embedding(batch_slot_0_1).to(device)
+            slot_0_2_embedd = self.slot_embedding(batch_slot_0_2).to(device)
+            slot_1_0_embedd = self.slot_embedding(batch_slot_1_0).to(device)
+            slot_1_1_embedd = self.slot_embedding(batch_slot_1_1).to(device)
+            slot_1_2_embedd = self.slot_embedding(batch_slot_1_2).to(device)
+
+
+            belief_state_0 = torch.cat((act_0_embedd, attr_0_embedd, slot_0_0_embedd, slot_0_1_embedd, slot_0_2_embedd), dim=1)
+            belief_state_1 = torch.cat((act_1_embedd, attr_1_embedd, slot_1_0_embedd, slot_1_1_embedd, slot_1_2_embedd), dim=1)
+            #import ipdb;ipdb.set_trace(context=10)
+            encoder_state = torch.cat((encoder_state, belief_state_0, belief_state_1), dim=1)
+
         # Predict and execute actions.
-        action_logits = self.action_net(encoder_state)
-        dialog_mask = batch["dialog_mask"]
+        #if self.params["use_belief_state"]:
+            #action_net_1 = self._get_classify_network(2*self.params["hidden_size"]+2*belief_state_0.shape[1], self.params["num_actions"]).to(device)
+            #action_logits = action_net_1(encoder_state.to(device)).to(device)
+        #else:
+        #import ipdb;ipdb.set_trace(context=10)
+        action_logits = self.action_net(encoder_state);#print("encoder_state+_shape: " +str(encoder_state.shape))
+        dialog_mask = batch["dialog_mask"];#print("action_logits__shape: " +str(action_logits.shape))
         batch_size, num_rounds = dialog_mask.shape
-        loss_action = self.criterion(action_logits, batch["action"].view(-1))
+        loss_action = self.criterion(action_logits, batch["action"].view(-1)); #print("action"+str(batch["action"].shape))
         loss_action.masked_fill_((~dialog_mask).view(-1), 0.0)
         loss_action_sum = loss_action.sum() / dialog_mask.sum().item()
         outputs["action_loss"] = loss_action_sum
@@ -251,6 +322,7 @@ class ActionExecutor(nn.Module):
         # Compute losses if training, else predict.
         if self.training:
             for key, values in attr_logits.items():
+                #import ipdb;ipdb.set_trace(context=10)
                 classifier = self.classifiers[key]
                 prelogits = [ii[0] for ii in values if ii[1] is not None]
                 if not prelogits:

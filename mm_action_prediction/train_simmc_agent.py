@@ -55,7 +55,6 @@ if args["eval_data_path"]:
     val_loader = loaders.DataloaderSIMMC(dataloader_args)
 else:
     val_loader = None
-
 # Model.
 wizard = models.Assistant(args)
 wizard.train()
@@ -78,10 +77,7 @@ best_epoch = -1
 task1_best_epoch = -1
 task2_g_best_epoch = -1
 task2_r_best_epoch = -1
-
-# first_batch = None
 for iter_ind, batch in enumerate(train_loader.get_batch()):
-    #import pdb;pdb.set_trace()
     epoch = iter_ind / num_iters_per_epoch
     batch_loss = wizard(batch)
     batch_loss_items = {key: val.item() for key, val in batch_loss.items()}
@@ -92,7 +88,6 @@ for iter_ind, batch in enumerate(train_loader.get_batch()):
     batch_loss["total"].backward()
     torch.nn.utils.clip_grad_value_(wizard.parameters(), 1.0)
     optimizer.step()
-    #import pdb;pdb.set_trace()
 
     if iter_ind % 50 == 0:
         cur_time = time.strftime("%a %d%b%y %X", time.gmtime())
