@@ -31,7 +31,7 @@ class DataloaderSIMMC(loaders.LoaderParent):
         self.raw_data = raw_data[()]
 
         # Belief state
-        if self.params["use_task3_belief_state"]:
+        if self.params["use_belief_state"]:
             self.belief_state_act = self.raw_data["belief_state_act"]
             self.belief_state_attr = self.raw_data["belief_state_attr"]
             self.belief_state_slot = self.raw_data["belief_state_slot"]

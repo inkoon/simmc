@@ -226,11 +226,11 @@ def build_multimodal_inputs(input_json_file):
             def slot_append(slots):
                 mini_slot_list=[]
                 if len(slots)>=3:
-                    mini_slot_list = [slots[-1]split('_')[0],slots[-2]split('_')[0],slots[-3].split('_')[0]]
+                    mini_slot_list = [slots[-1].split('_')[0],slots[-2].split('_')[0],slots[-3].split('_')[0]]
                 elif len(slots)==2:
-                    mini_slot_list = [slots[-1]split('_')[0],slots[-2]split('_')[0],'none']
+                    mini_slot_list = [slots[-1].split('_')[0],slots[-2].split('_')[0],'none']
                 elif len(slots)==1:
-                    mini_slot_list = [slots[-1]split('_')[0],'none','none']
+                    mini_slot_list = [slots[-1].split('_')[0],'none','none']
                 else:
                     mini_slot_list = ['none','none','none']
                 for i, slot in enumerate(mini_slot_list):

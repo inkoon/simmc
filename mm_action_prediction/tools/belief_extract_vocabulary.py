@@ -142,7 +142,7 @@ def main(args):
         with open(f'{args["vocab_save_path"]}gpt2_vocab.json', "w") as file_id:
             json.dump(vocabulary, file_id)
     else:
-        with open(f'{args["vocab_save_path"]}_vocabulary.json', "w") as file_id:
+        with open(f'{args["vocab_save_path"]}', "w") as file_id:
             json.dump(vocabulary, file_id)
 
 
@@ -170,10 +170,10 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Use gpt2 tokenizer"
-    }
+    )
     parser.add_argument(
         "--task3_fusion_path",
-        deault=None
+        default=None
     )
     try:
         parsed_args = vars(parser.parse_args())

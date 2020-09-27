@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#DOMAIN="furniture"
-DOMAIN="fashion"
+DOMAIN="furniture"
+#DOMAIN="fashion"
 ROOT="../data/belief_simmc_${DOMAIN}/"
 
 # Input files.
@@ -50,7 +50,7 @@ fi
 
 
 # Step 2: Extract vocabulary from train.
-python tools/extract_vocabulary.py \
+python tools/belief_extract_vocabulary.py \
     --train_json_path="${TRAIN_JSON_FILE}" \
     --vocab_save_path="${VOCAB_FILE}" \
     --threshold_count=5 \
