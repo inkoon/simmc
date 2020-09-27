@@ -75,7 +75,7 @@ fi
 # Step 4: Convert all the splits into npy files for dataloader.
 SPLIT_JSON_FILES=("${TRAIN_JSON_FILE}" "${TRAINDEV_JSON_FILE}" "${DEV_JSON_FILE}" "${DEVTEST_JSON_FILE}")
 for SPLIT_JSON_FILE in "${SPLIT_JSON_FILES[@]}" ; do
-    python tools/build_multimodal_inputs.py \
+    python tools/belief_build_multimodal_inputs.py \
         --json_path="${SPLIT_JSON_FILE}" \
         --vocab_file="${VOCAB_FILE}" \
         --save_path="$ROOT" \

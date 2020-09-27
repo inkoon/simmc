@@ -71,7 +71,7 @@ class DataloaderSIMMC(loaders.LoaderParent):
             self.unk_token = self.words.unk_token_id
             self.words.word = self.words.convert_ids_to_tokens
             self.words.index = self.words.convert_tokens_to_ids
-        
+
         # Read the metainfo for the dataset.
         with open(params["metainfo_path"], "r") as file_id:
             self.metainfo = json.load(file_id)
@@ -81,7 +81,7 @@ class DataloaderSIMMC(loaders.LoaderParent):
         with open(params["attr_vocab_path"], "r") as file_id:
             attribute_map = json.load(file_id)
         print("Loading attribute vocabularies..")
-        
+
         self.attribute_map = {}
         for attr, attr_vocab in attribute_map.items():
             self.attribute_map[attr] = loaders.Vocabulary(
@@ -133,6 +133,7 @@ class DataloaderSIMMC(loaders.LoaderParent):
             self._prepare_asset_embeddings()
         else:
             raise ValueError("Domain must be either furniture/fashion!")
+
         # Additional data constructs (post-processing).
         if params["encoder"] == "memory_network":
             self._construct_fact()
@@ -159,74 +160,65 @@ class DataloaderSIMMC(loaders.LoaderParent):
         batch["dialog_len"] = self.raw_data["dialog_len"][sample_ids]
         batch["dialog_id"] = self.raw_data["dialog_id"][sample_ids]
         max_dialog_len = max(batch["dialog_len"])
-        #my_arr=[]
-        batch["belief_state_act"] = []
-        for i in sample_ids: # 1개 dialog
-            utter_list=[]
-            for turn_id, turn in enumerate(self.belief_state_act[i]): # 1개 turn
-                if self.belief_state_act[i][turn_id]=='None'or self.belief_state_act[i][turn_id]=='none' or self.belief_state_act[i][turn_id]==None :
-                    utter_list.append([0,0])
-                else:
-                    utter_list.append(self.belief_state_act[i][turn_id])
 
-            while len(utter_list)!=14:
-                utter_list.append([0,0])
-            batch["belief_state_act"].append(utter_list)
-        act_array=np.array(batch["belief_state_act"])
-        batch["belief_state_act"]=torch.from_numpy(act_array) 
-        batch["belief_state_attr"] = []#np.zeros(len(sample_ids), max_dialog_len)
-        for i in sample_ids: # 1개 dialog
-            utter_list=[]
-            for turn_id, turn in enumerate(self.belief_state_attr[i]):
-                if self.belief_state_attr[i][turn_id]=='None'or self.belief_state_attr[i][turn_id]=='none' or self.belief_state_attr[i][turn_id]==None:
-                    utter_list.append([0,0])
-                else:
-                    utter_list.append(self.belief_state_attr[i][turn_id])
-            '''
-            for index in self.belief_state_attr[i]:
-                utter_list.append(index)
-            '''
-            while len(utter_list)!=14:
-                utter_list.append([0,0])
-            batch["belief_state_attr"].append(utter_list)
+        if self.params["use_belief_state"]:
+            batch["belief_state_act"] = []
+            for i in sample_ids: # 1개 dialog
+                utter_list=[]
+                for turn_id, turn in enumerate(self.belief_state_act[i]): # 1개 turn
+                    if self.belief_state_act[i][turn_id]=='None'or \
+                        self.belief_state_act[i][turn_id]=='none' or \
+                        self.belief_state_act[i][turn_id]==None :
+                        utter_list.append([0,0])
+                    else:
+                        utter_list.append(self.belief_state_act[i][turn_id])
 
-            '''
-            for index in range(len(self.belief_state_attr[i])): # 1개 turn
-                if self.belief_state_attr[i][index]=='None':
+                while len(utter_list)!=14:
                     utter_list.append([0,0])
-                else:
-                    utter_list.append(self.belief_state_attr[i][index])
-            batch["belief_state_attr"].append(utter_list)
-            while len(batch["belief_state_attr"])!=14:
-                batch["belief_state_attr"].append([[0,0,0],[0,0,0]])
-            '''
-        attr_array = np.array(batch["belief_state_attr"])
-        batch["belief_state_attr"]=torch.from_numpy(attr_array)
-        batch["belief_state_slot"] = []
-        for i in sample_ids: # dialog 1개
-            utter_list=[]
-            for index, turn_slot in enumerate(self.belief_state_slot[i]):# turn 1개
-                mini_list = []
-                if turn_slot=='None' or turn_slot=='none' or turn_slot==None:
-                    mini_list=[[0,0,0],[0,0,0]]
-                    utter_list.append(mini_list)
-                    continue
-                for mini, one_slot in enumerate(turn_slot):
-                    mmm=[]
-                    if one_slot=='none' or one_slot==None or one_slot=='None':
-                        one_slot=[0,0,0]
-                        mmm.append(one_slot)
+                batch["belief_state_act"].append(utter_list)
+            act_array=np.array(batch["belief_state_act"])
+            batch["belief_state_act"]=torch.from_numpy(act_array)
+            batch["belief_state_attr"] = [] #np.zeros(len(sample_ids), max_dialog_len)
+            for i in sample_ids: # 1개 dialog
+                utter_list=[]
+                for turn_id, turn in enumerate(self.belief_state_attr[i]):
+                    if self.belief_state_attr[i][turn_id]=='None'or \
+                        self.belief_state_attr[i][turn_id]=='none' or \
+                        self.belief_state_attr[i][turn_id]==None:
+                        utter_list.append([0,0])
+                    else:
+                        utter_list.append(self.belief_state_attr[i][turn_id])
+                while len(utter_list)!=14:
+                    utter_list.append([0,0])
+                batch["belief_state_attr"].append(utter_list)
+            attr_array = np.array(batch["belief_state_attr"])
+            batch["belief_state_attr"]=torch.from_numpy(attr_array)
+            batch["belief_state_slot"] = []
+            for i in sample_ids: # dialog 1개
+                utter_list=[]
+                for index, turn_slot in enumerate(self.belief_state_slot[i]):# turn 1개
+                    mini_list = []
+                    if turn_slot=='None' or turn_slot=='none' or turn_slot==None:
+                        mini_list=[[0,0,0],[0,0,0]]
+                        utter_list.append(mini_list)
                         continue
-                    for ii, minim in enumerate(one_slot):
-                        mmm.append(minim)
-                    mini_list.append(mmm)
-                utter_list.append(mini_list)
-                while len(utter_list)>14:
-                    utter_list.append([[0,0,0],[0,0,0]])
-            batch["belief_state_slot"].append(utter_list)
+                    for mini, one_slot in enumerate(turn_slot):
+                        mmm=[]
+                        if one_slot=='none' or one_slot==None or one_slot=='None':
+                            one_slot=[0,0,0]
+                            mmm.append(one_slot)
+                            continue
+                        for ii, minim in enumerate(one_slot):
+                            mmm.append(minim)
+                        mini_list.append(mmm)
+                    utter_list.append(mini_list)
+                    while len(utter_list)>14:
+                        utter_list.append([[0,0,0],[0,0,0]])
+                batch["belief_state_slot"].append(utter_list)
 
-        slot_array = np.array(batch["belief_state_slot"])
-        batch["belief_state_slot"] = torch.from_numpy(slot_array)
+            slot_array = np.array(batch["belief_state_slot"])
+            batch["belief_state_slot"] = torch.from_numpy(slot_array)
+
         user_utt_id = self.raw_data["user_utt_id"][sample_ids]
         batch["user_utt"], batch["user_utt_len"] = self._sample_utterance_pool(
             user_utt_id,
@@ -283,7 +275,6 @@ class DataloaderSIMMC(loaders.LoaderParent):
         batch["action_super"] = [
             self.raw_data["action_supervision"][ii] for ii in sample_ids
         ]
-        #self.attribute_data.extend(batch["action_super"])
 
         # Fetch facts if required.
         if self.params["encoder"] == "memory_network":

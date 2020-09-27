@@ -8,7 +8,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import torch
 import torch.nn as nn
 
-# import models.encoders as encoders
 from models import encoders
 
 

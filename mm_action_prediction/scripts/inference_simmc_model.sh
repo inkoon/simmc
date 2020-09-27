@@ -31,7 +31,7 @@ HRE_G300_MAG
 for MODEL in $MODEL_LIST
 do
     # CHECKPOINT_PATH="outputs/${DOMAIN}/${MODEL}/checkpoints/"
-    CHECKPOINT_PATH="outputs/tmp/HAE_R300_lr3_b32_la3_0924_11:50/"
+    CHECKPOINT_PATH="outputs/tmp/HAE_R300_lr3_b32_la3_0924_11:50/checkpoints/"
 
     # Evaluate a trained model checkpoint.
     python -u inference_simmc_agent.py \

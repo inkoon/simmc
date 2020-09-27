@@ -49,8 +49,8 @@ mkdir -p ${LOG_PATH}
 
 
 COMMON_FLAGS="
-    --train_data_path=${TRAINDEV_JSON_FILE/.json/_mm_inputs.npy} \
-    --eval_data_path=${DEVTEST_JSON_FILE/.json/_mm_inputs.npy} \
+    --train_data_path=${TRAIN_JSON_FILE/.json/_mm_inputs.npy} \
+    --eval_data_path=${DEV_JSON_FILE/.json/_mm_inputs.npy} \
     --asset_embed_path=${METADATA_EMBEDS} \
     --metainfo_path=${MODEL_METAINFO} \
     --attr_vocab_path=${ATTR_VOCAB_FILE} \
@@ -63,9 +63,9 @@ COMMON_FLAGS="
 
 
 # History-agnostic model.
-# python -u train_simmc_agent.py $COMMON_FLAGS \
-#      --encoder="history_agnostic" --text_encoder="lstm" --embedding_type="glove" --gate_type="none"\
-#      --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
+python -u train_simmc_agent.py $COMMON_FLAGS \
+     --encoder="history_agnostic" --text_encoder="lstm" --embedding_type="glove" --gate_type="none"\
+     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
 
 # Hierarchical recurrent encoder model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
@@ -83,13 +83,13 @@ COMMON_FLAGS="
 #     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/tf_idf.log" &
 #
 # Transformer model.
-python -u train_simmc_agent.py $COMMON_FLAGS \
-    --encoder="history_agnostic" \
-    --text_encoder="transformer" \
-    --num_heads_transformer=4 --num_layers_transformer=4 \
-    --embedding_type="glove" \
-    --hidden_size_transformer=2048 --hidden_size=300\
-    --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/transf.log" &
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="history_agnostic" \
+#     --text_encoder="transformer" \
+#     --num_heads_transformer=4 --num_layers_transformer=4 \
+#     --embedding_type="glove" \
+#     --hidden_size_transformer=2048 --hidden_size=300\
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/transf.log" &
 
 # Evaluate a trained model checkpoint.
 # CHECKPOINT_PATH="checkpoints/hae/epoch_20.tar"

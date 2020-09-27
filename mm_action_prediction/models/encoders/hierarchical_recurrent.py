@@ -7,10 +7,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import torch
 import torch.nn as nn
-# import torchtext
 from tools import rnn_support as rnn
 from tools import torch_support as support
-# import models.encoders as encoders
 from models import encoders
 import spacy
 import gensim
@@ -35,10 +33,6 @@ class HierarchicalRecurrentEncoder(nn.Module):
             self.word_embed_net = nn.Embedding.from_pretrained(glove_weight)
         encoder_input_size = params["word_embed_size"]
         self.encoder_input_size = encoder_input_size
-        # elif self.params["embedding_type"]=="word2vec":
-        #     self.w2v_model = gensim.models.KeyedVectors.load_word2vec_format('/home/yeonseok/GoogleNews-vectors-negative300.bin', binary=True)
-        # elif self.params["embedding_type"]=="fasttext":
-        #     self.fasttext_model = torchtext.vocab.FastText('en')
 
         self.encoder_unit = nn.LSTM(
             encoder_input_size,
@@ -70,18 +64,6 @@ class HierarchicalRecurrentEncoder(nn.Module):
         encoder_len = batch["user_utt_len"].reshape(-1)
         word_embeds_enc = self.word_embed_net(encoder_in)
 
-        # if self.params["embedding_type"]=="random":
-        #     word_embeds_enc = self.word_embed_net(encoder_in)
-        # elif self.params["embedding_type"]=="glove":
-        #     word_embeds_enc = torch.tensor([[self.nlp(batch["ind2word"][int(encoder_in[row][col])]).vector for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])], requires_grad=True).to(torch.device("cuda:0"))
-        # elif self.params["embedding_type"]=="word2vec":
-        #     word_embeds_enc = torch.stack([torch.stack([self.word_to_vec(encoder_in, row, col, batch["ind2word"]) for col in range(encoder_in.shape[1])]) for row in range(encoder_in.shape[0])])
-        #     word_embeds_enc.requires_grad_(requires_grad=True).to(device)
-        # elif self.params["embedding_type"]=="fasttext":
-        #     word_list = [[batch["ind2word"][int(encoder_in[row][col])] for col in range(encoder_in.shape[1])] for row in range(encoder_in.shape[0])]
-        #     word_embeds_enc = torch.stack([self.fasttext_model.get_vecs_by_tokens(row) for row in word_list]).to(device)
-        #     word_embeds_enc.requires_grad=True
-
         # Fake encoder_len to be non-zero even for utterances out of dialog.
         fake_encoder_len = encoder_len.eq(0).long() + encoder_len
         all_enc_states, enc_states = rnn.dynamic_rnn(
@@ -97,10 +79,3 @@ class HierarchicalRecurrentEncoder(nn.Module):
             self.dialog_unit, utterance_enc, batch["dialog_len"], return_states=True
         )
         return encoder_out
-
-    def word_to_vec(self, encoder_in, row, col, ind2word):
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        try:
-            return torch.from_numpy(self.w2v_model[ind2word[int(encoder_in[row][col])]]).requires_grad_(requires_grad=True).to(device)
-        except KeyError as k:
-            return torch.zeros(300, requires_grad=True).to(device)
