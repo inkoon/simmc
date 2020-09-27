@@ -299,7 +299,7 @@ class GenerativeDecoder(nn.Module):
                             ii[:, index, :].unsqueeze(1).contiguous()
                             for ii in encoder_output["hidden_state"]
                         )
-                new_batch["ind2word"]=batch["ind2word"]
+                #new_batch["ind2word"]=batch["ind2word"]
                 beamsearch_outputs = self.forward_beamsearch_single(
                     new_batch, new_output, mode_params
                 )

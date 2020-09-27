@@ -249,6 +249,36 @@ def read_command_line():
         "--root_path",
         default="../data/gpt2_simmc_furniture/",
         help="Path to ROOT (only for gpt2)",
+    # B : for belief state embedding
+    parser.add_argument(
+        "--action_num",
+        type=int,
+        default=44,
+        help="number of dialog actions"
+    )
+    parser.add_argument(
+        "--attribute_num",
+        type=int,
+        default=50,
+        help="number of dialog attributes"
+    )
+    parser.add_argument(
+        "--slot_num",
+        type=int,
+        default=100,
+        help="number of dialog attributes"
+    )
+
+    parser.add_argument(
+        "--use_belief_state",
+        action='store_true',
+        help="set to True to use belief state"
+    )
+    parser.add_argument(
+        "--use_task3_belief_state",
+        type=bool,
+        default=True,
+        help="use to inference"
     )
     try:
         parsed_args = vars(parser.parse_args())

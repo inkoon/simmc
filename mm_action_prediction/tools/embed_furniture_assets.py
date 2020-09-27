@@ -8,12 +8,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import argparse
 import ast
 
-import sys
-sys.path.append('/home/kwon/simmc/mm_action_prediction')
-
 import numpy as np
-import sys
-sys.path.append('/home/yeonseok/simmc/mm_action_prediction') 
 import data_support
 import spacy
 
@@ -40,8 +35,6 @@ def main(args):
             clean_asset[key] = val if isinstance(val, list) else [val]
         clean_asset["id"] = int(asset["obj"].split("/")[-1].strip(".zip"))
         cleaned_assets.append(clean_asset)
-    #import pdb;pdb.set_trace()
-    
     # Vocabulary for each field.
     vocabulary = {key: {} for key in EMBED_ATTRIBUTES}
     for asset in cleaned_assets:

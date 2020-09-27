@@ -202,6 +202,41 @@ if __name__ == "__main__":
         help="choose embedding"
     )
     parser.add_argument(
+        "--root_path",
+        default="../data/gpt2_simmc_furniture/",
+        help="Path to ROOT (only for gpt2)",
+    # B : for belief state embedding
+    parser.add_argument(
+        "--action_num",
+        type=int,
+        default=44,
+        help="number of dialog actions"
+    )
+    parser.add_argument(
+        "--attribute_num",
+        type=int,
+        default=50,
+        help="number of dialog attributes"
+    )
+    parser.add_argument(
+        "--slot_num",
+        type=int,
+        default=100,
+        help="number of dialog attributes"
+    )
+
+    parser.add_argument(
+        "--use_belief_state",
+        action='store_true',
+        help="set to True to use belief state"
+    )
+    parser.add_argument(
+        "--use_task3_belief_state",
+        type=bool,
+        default=True,
+        help="use to inference"
+    )
+    parser.add_argument(
         "--pred_save_path", default=None, help="Paht to save predicted result"
     )
     try:
