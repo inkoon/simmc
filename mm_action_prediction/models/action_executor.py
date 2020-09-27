@@ -186,8 +186,8 @@ class ActionExecutor(nn.Module):
                 supervision = batch["action_super"][inst_id][round_id]
 
                 # Predict attributes on all actions for ensemble.
-                action_pred_datum = action_preds_dict[inst_id]["predictions"][round_id]
                 if not self.training:
+                    action_pred_datum = action_preds_dict[inst_id]["predictions"][round_id]
                     action_pred_datum["attributes_prob"] = {}
                     for key in self.all_classifier_list:
                         classifier = self.classifiers[key]

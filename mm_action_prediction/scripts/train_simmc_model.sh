@@ -6,8 +6,8 @@ if [ $# -lt 2 ];then
     exit 1
 fi
 
-# DOMAIN="furniture"
-DOMAIN="fashion"
+DOMAIN="furniture"
+# DOMAIN="fashion"
 ROOT="../data/simmc_${DOMAIN}/"
 DETAILS=$1
 GPU_ID=$2
@@ -64,17 +64,17 @@ COMMON_FLAGS="
 
 # History-agnostic model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
-#      --encoder="history_agnostic" --text_encoder="lstm" --embedding_type="glove" --gate_type="MMI"\
+#      --encoder="history_agnostic" --text_encoder="lstm" --embedding_type="glove" --gate_type="none"\
 #      --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hae.log" &
 
 # Hierarchical recurrent encoder model.
-python -u train_simmc_agent.py $COMMON_FLAGS \
-    --encoder="hierarchical_recurrent" --text_encoder="lstm" --embedding_type="random" --gate_type="MAG" \
-    --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
+# python -u train_simmc_agent.py $COMMON_FLAGS \
+#     --encoder="hierarchical_recurrent" --text_encoder="lstm" --embedding_type="glove" --gate_type="none" \
+#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/hre.log" &
 
 # Memory encoder model.
 # python -u train_simmc_agent.py $COMMON_FLAGS \
-#     --encoder="memory_network" --text_encoder="lstm" --embedding_type="random" --gate_type="MAG" \
+#     --encoder="memory_network" --text_encoder="lstm" --embedding_type="glove" --gate_type="none" \
 #     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/mn.log" &
 
 # # TF-IDF model.
@@ -82,13 +82,14 @@ python -u train_simmc_agent.py $COMMON_FLAGS \
 #     --encoder="tf_idf" --text_encoder="lstm" \
 #     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/tf_idf.log" &
 #
-# # Transformer model.
-# python -u train_simmc_agent.py $COMMON_FLAGS \
-#     --encoder="history_agnostic" \
-#     --text_encoder="transformer" \
-#     --num_heads_transformer=4 --num_layers_transformer=4 \
-#     --hidden_size_transformer=2048 --hidden_size=256\
-#     --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/transf.log" &
+# Transformer model.
+python -u train_simmc_agent.py $COMMON_FLAGS \
+    --encoder="history_agnostic" \
+    --text_encoder="transformer" \
+    --num_heads_transformer=4 --num_layers_transformer=4 \
+    --embedding_type="glove" \
+    --hidden_size_transformer=2048 --hidden_size=300\
+    --snapshot_path="${CHECKPOINT_PATH}/" &> "${LOG_PATH}/transf.log" &
 
 # Evaluate a trained model checkpoint.
 # CHECKPOINT_PATH="checkpoints/hae/epoch_20.tar"
