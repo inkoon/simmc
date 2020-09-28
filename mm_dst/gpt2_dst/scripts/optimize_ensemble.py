@@ -14,9 +14,12 @@ from utils.evaluate_dst import evaluate_from_flat_list
 
 START_BELIEF_STATE = '=> Belief State :'
 
+check = 0
 def ensemble_turn(domain,prompt,predictions,turn_idx) :
     global output 
+    global check 
     prompt = prompt.rstrip() 
+    originalPrompt = prompt
     total_model = len(predictions)
     longest_frame_len = 0
     for model_idx in range(total_model) :  # for the current turn_idx, find the longest frame length
@@ -40,7 +43,8 @@ def ensemble_turn(domain,prompt,predictions,turn_idx) :
         act = ensembled[0]
         slot = ensembled[1] 
         prompt+=(act + " " + "[ " + slot + "] ")
-
+    #if len(prompt) > 10 :
+        #prompt = originalPrompt + "DA:NONE:NONE:NONE" + " [ ] "
     output.write(prompt + "<EOB>\n")
 
 def ensemble_frame(domain,frame_list):    # compare frames generated from different models
@@ -79,7 +83,6 @@ def ensemble_frame(domain,frame_list):    # compare frames generated from differ
             slots = slots + " , " + slot[0] 
         i+=1
     return c.most_common(1)[0][0], slots
-
 
 if __name__ == '__main__':
     # Parse input args
