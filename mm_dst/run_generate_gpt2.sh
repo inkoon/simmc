@@ -1,47 +1,41 @@
 #!/bin/bash
-if [[ $# -lt 1 ]]
+
+TEST_DATA=devtest		# {devtest|test}
+PATH_DIR=$(realpath .)
+
+if [[ $# -eq 2 ]]
 then
-    PATH_DIR=$(realpath .)
+	KEYWORD=$1
+	GPU_ID=$2
 else
-    PATH_DIR=$(realpath "$1")
+	echo "error : run format > ./run_generate_gpt2.sh [KEYWORD] [GPU_ID]"
+	exit 1
 fi
 
-# Generate sentences (Furniture, text-only)
-python -m gpt2_dst.scripts.run_generation \
-    --model_type=gpt2 \
-    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/furniture_to/ \
-    --num_return_sequences=1 \
-    --length=100 \
-    --stop_token='<EOS>' \
-    --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/furniture_to/furniture_devtest_dials_predict.txt \
-    --path_output="${PATH_DIR}"/gpt2_dst/results/furniture_to/furniture_devtest_dials_predicted.txt
+# IMPORTANT : install normal transformers version 2.8.0
 
-# Generate sentences (Furniture, multi-modal)
-python -m gpt2_dst.scripts.run_generation \
+# Furniture
+# Multimodal Data
+CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
-    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/furniture/ \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/furniture/"${KEYWORD}" \
     --num_return_sequences=1 \
     --length=100 \
-    --stop_token='<EOS>' \
-    --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_devtest_dials_predict.txt \
-    --path_output="${PATH_DIR}"/gpt2_dst/results/furniture/furniture_devtest_dials_predicted.txt
+    --stop_token="<EOS>" \
+    --num_beams=2 \
+    --num_gen=10 \
+    --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_"${TEST_DATA}"_dials_predict.txt \
+    --path_output="${PATH_DIR}"/gpt2_dst/results/furniture/"${KEYWORD}"/furniture_"${TEST_DATA}"_dials_predicted.txt
 
-# Generate sentences (Fashion, text-only)
-python -m gpt2_dst.scripts.run_generation \
+# Fashion
+# Multimodal Data
+CUDA_VISIBLE_DEVICES=$GPU_ID python -m gpt2_dst.scripts.run_generation \
     --model_type=gpt2 \
-    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fashion_to/ \
+    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fashion/"${KEYWORD}" \
     --num_return_sequences=1 \
     --length=100 \
-    --stop_token='<EOS>' \
-    --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/fashion_to/fashion_devtest_dials_predict.txt \
-    --path_output="${PATH_DIR}"/gpt2_dst/results/fashion_to/fashion_devtest_dials_predicted.txt
-
-# Generate sentences (Fashion, multi-modal)
-python -m gpt2_dst.scripts.run_generation \
-    --model_type=gpt2 \
-    --model_name_or_path="${PATH_DIR}"/gpt2_dst/save/fashion/ \
-    --num_return_sequences=1 \
-    --length=100 \
-    --stop_token='<EOS>' \
-    --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_devtest_dials_predict.txt \
-    --path_output="${PATH_DIR}"/gpt2_dst/results/fashion/fashion_devtest_dials_predicted.txt
+    --stop_token="<EOS>" \
+    --num_beams=2 \
+    --num_gen=10 \
+    --prompts_from_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_"${TEST_DATA}"_dials_predict.txt \
+    --path_output="${PATH_DIR}"/gpt2_dst/results/fashion/"${KEYWORD}"/fashion_"${TEST_DATA}"_dials_predicted.txt

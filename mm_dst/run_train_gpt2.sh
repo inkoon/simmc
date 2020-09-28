@@ -1,81 +1,64 @@
 #!/bin/bash
-if [[ $# -lt 1 ]]
+
+# HYPER-PARAMETERS 	# OPTIONS
+
+TRAIN_DATA=total	# { total | train }
+MODEL_TYPE=gpt2		# { gpt2 | gpt2-medium | gpt2-large }
+EPOCH=10
+TRAIN_BATCH=8
+VAL_BATCH=32
+WARMUP=4000
+LR=5e-5
+
+if [[ $# -eq 2 ]]
 then
-    PATH_DIR=$(realpath .)
+	KEYWORD=$1
+	GPU_ID=$2
 else
-    PATH_DIR=$(realpath "$1")
+	echo "ERROR : run format > ./run_train_gpt2.sh [KEYWORD] [GPU_ID]"
+	exit 1
 fi
 
-GPU_ID=1
-
-# Train (furniture, text-only)
-python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/furniture_to \
-    --model_type=gpt2 \
-    --model_name_or_path=gpt2 \
-    --line_by_line \
-    --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/furniture_to/special_tokens.json \
-    --do_train \
-    --train_data_file="${PATH_DIR}"/gpt2_dst/data/furniture_to/furniture_train_dials_target.txt \
-    --do_eval \
-    --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture_to/furniture_dev_dials_target.txt \
-    --num_train_epochs=1 \
-    --save_steps=7303 \
-    --overwrite_output_dir \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4 \
-    --gpu_id=$GPU_ID
+PATH_DIR=$(realpath .)
 
 # Train (furniture, multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/furniture \
-    --model_type=gpt2 \
-    --model_name_or_path=gpt2 \
+    --output_dir="${PATH_DIR}"/gpt2_dst/save/furniture/"${KEYWORD}" \
+    --model_type="${MODEL_TYPE}" \
+    --model_name_or_path="${MODEL_TYPE}" \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/furniture/special_tokens.json \
     --do_train \
-    --train_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_train_dials_target.txt \
-    --do_eval \
-    --eval_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_dev_dials_target.txt \
-    --num_train_epochs=1 \
-    --save_steps=7303 \
+    --train_data_file="${PATH_DIR}"/gpt2_dst/data/furniture/furniture_"${TRAIN_DATA}"_dials_target.txt \
+    --logging_steps=0 \
+    --save_steps=0 \
+    --num_train_epochs=$EPOCH \
     --overwrite_output_dir \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4 \
-    --gpu_id=$GPU_ID
+    --learning_rate=$LR \
+    --warmup_steps=$WARMUP \
+    --gpu_id=$GPU_ID \
+    --per_gpu_train_batch_size=$TRAIN_BATCH \
+    --per_gpu_eval_batch_size=$VAL_BATCH
 
-# Train (Fashion, text-only)
-python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/fashion_to \
-    --model_type=gpt2 \
-    --model_name_or_path=gpt2 \
-    --line_by_line \
-    --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/fashion_to/special_tokens.json \
-    --do_train \
-    --train_data_file="${PATH_DIR}"/gpt2_dst/data/fashion_to/fashion_train_dials_target.txt \
-    --do_eval \
-    --eval_data_file="${PATH_DIR}"/gpt2_dst/data/fashion_to/fashion_dev_dials_target.txt \
-    --num_train_epochs=1 \
-    --save_steps=7303 \
-    --overwrite_output_dir \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4 \
-    --gpu_id=$GPU_ID
+echo "Train Complete! Model saved in gpt2_dst/save/furniture/$KEYWORD"
 
 # Train (Fashion, multi-modal)
 python -m gpt2_dst.scripts.run_language_modeling \
-    --output_dir="${PATH_DIR}"/gpt2_dst/save/fashion \
-    --model_type=gpt2 \
-    --model_name_or_path=gpt2 \
+    --output_dir="${PATH_DIR}"/gpt2_dst/save/fashion/"${KEYWORD}" \
+    --model_type="${MODEL_TYPE}" \
+    --model_name_or_path="${MODEL_TYPE}" \
     --line_by_line \
     --add_special_tokens="${PATH_DIR}"/gpt2_dst/data/fashion/special_tokens.json \
     --do_train \
-    --train_data_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_train_dials_target.txt \
-    --do_eval \
-    --eval_data_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_dev_dials_target.txt \
-    --num_train_epochs=1 \
-    --save_steps=7303 \
+    --train_data_file="${PATH_DIR}"/gpt2_dst/data/fashion/fashion_"${TRAIN_DATA}"_dials_target.txt \
+    --logging_steps=0 \
+    --save_steps=0 \
+    --num_train_epochs=$EPOCH \
     --overwrite_output_dir \
-    --per_gpu_train_batch_size=4 \
-    --per_gpu_eval_batch_size=4 \
-    --gpu_id=$GPU_ID
+    --learning_rate=$LR \
+    --warmup_steps=$WARMUP \
+    --gpu_id=$GPU_ID \
+    --per_gpu_train_batch_size=$TRAIN_BATCH \
+    --per_gpu_eval_batch_size=$VAL_BATCH
+
+echo "Train Complete! Model saved in gpt2_dst/save/fashion/$KEYWORD"

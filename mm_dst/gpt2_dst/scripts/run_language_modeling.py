@@ -24,7 +24,7 @@ Adapted from:
 https://github.com/huggingface/transformers/blob/master/examples/language-modeling/run_language_modeling.py
 """
 
-
+import ipdb
 import argparse
 import glob
 import json
@@ -285,7 +285,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
         model, optimizer = amp.initialize(model, optimizer, opt_level=args.fp16_opt_level)
 
     # multi-gpu training (should be after apex fp16 initialization)
-    if args.n_gpu > 1:
+    if args.n_gpu > 1 and args.mul_gpu == 1:
         model = torch.nn.DataParallel(model)
 
     # Distributed training (should be after apex fp16 initialization)
@@ -362,6 +362,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
                 loss.backward()
 
             tr_loss += loss.item()
+            #import ipdb; ipdb.set_trace()
             if (step + 1) % args.gradient_accumulation_steps == 0:
                 if args.fp16:
                     torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), args.max_grad_norm)
@@ -377,7 +378,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
                     if (
                         args.local_rank == -1 and args.evaluate_during_training
                     ):  # Only evaluate when single GPU otherwise metrics may not average well
-                        results = evaluate(args, model, tokenizer)
+                        results = evaluate(args, model, tokenizer, global_step)
                         for key, value in results.items():
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
@@ -417,7 +418,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
     return global_step, tr_loss / global_step
 
 
-def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefix="") -> Dict:
+def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, global_step, prefix="") -> Dict:
     # Loop to handle MNLI double evaluation (matched, mis-matched)
     eval_output_dir = args.output_dir
 
@@ -468,11 +469,22 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefi
     result = {"perplexity": perplexity}
 
     output_eval_file = os.path.join(eval_output_dir, prefix, "eval_results.txt")
+    prev_results = []
+    if os.path.isfile(output_eval_file):
+        with open(output_eval_file, 'r') as reader:
+            for line in reader.readlines():
+                prev_results.append(line)
+
     with open(output_eval_file, "w") as writer:
         logger.info("***** Eval results {} *****".format(prefix))
-        for key in sorted(result.keys()):
-            logger.info("  %s = %s", key, str(result[key]))
-            writer.write("%s = %s\n" % (key, str(result[key])))
+        for prev_r in prev_results:
+            line = prev_r.split('\t')
+            writer.write(line[0]+'\t'+line[1])
+        # for key in sorted(result.keys()):
+            # logger.info("  %s = %s", key, str(result[key]))
+            # writer.write("%s = %s\n" % (key, str(result[key])))
+
+        writer.write(str(global_step)+'\t'+str(result['perplexity'])+'\n')
 
     return result
 
@@ -623,11 +635,13 @@ def main():
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
+    # B: user added args
     parser.add_argument(
-        "--gpu_id", type=int, default=-1, help="GPU id to use, -1 for CPU"
+        "--gpu_id", type=str, default='-1', help="GPU id to use, -1 for CPU"
     )
+    parser.add_argument("--mul_gpu", type=int, default=0)
     args = parser.parse_args()
-
+    
     if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
         raise ValueError(
             "BERT and RoBERTa-like models do not have LM heads but masked LM heads. They must be run using the --mlm "
@@ -668,14 +682,15 @@ def main():
         ptvsd.wait_for_attach()
 
     # Setup GPU
+
     gpu_id = args.gpu_id
-    if gpu_id < 0:
+    if gpu_id == '-1':
         print("Running on CPU...")
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
     else:
         print("Running on GPU {0}...".format(gpu_id))
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+        os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
 
     # Setup CUDA, GPU & distributed training
     if args.local_rank == -1 or args.no_cuda:
@@ -824,7 +839,7 @@ def main():
 
             model = AutoModelWithLMHead.from_pretrained(checkpoint)
             model.to(args.device)
-            result = evaluate(args, model, tokenizer, prefix=prefix)
+            result = evaluate(args, model, tokenizer, global_step, prefix=prefix)
             result = dict((k + "_{}".format(global_step), v) for k, v in result.items())
             results.update(result)
 

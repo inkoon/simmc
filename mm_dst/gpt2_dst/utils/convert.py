@@ -24,27 +24,46 @@ END_OF_MULTIMODAL_CONTEXTS = '<EOM>'
 START_BELIEF_STATE = '=> Belief State :'
 END_OF_BELIEF = '<EOB>'
 END_OF_SENTENCE = '<EOS>'
+END_OF_RESPONSE = '<EOR>'
 
 TEMPLATE_PREDICT = '{context} {START_BELIEF_STATE} '
 TEMPLATE_TARGET = '{context} {START_BELIEF_STATE} {belief_state} ' \
     '{END_OF_BELIEF} {response} {END_OF_SENTENCE}'
-
+TEMPLATE_TARGET_TASK1 = '{context} {START_BELIEF_STATE} {belief_state} ' \
+    '{END_OF_BELIEF} {response} {END_OF_RESPONSE} {api} {END_OF_SENTENCE}'
 
 def convert_json_to_flattened(
         input_path_json,
         output_path_predict,
         output_path_target,
         len_context=2,
+        task1=False,
+        domain=None,
         use_multimodal_contexts=True,
+        api_path_json=None,
+        attribute_vocab_json=None,
         input_path_special_tokens='',
         output_path_special_tokens=''):
     """
         Input: JSON representation of the dialogs
         Output: line-by-line stringified representation of each turn
     """
-
     with open(input_path_json, 'r') as f_in:
         data = json.load(f_in)['dialogue_data']
+    
+    if task1:
+        with open(api_path_json, 'r') as f_in:
+            api_calls = json.load(f_in)
+
+        with open(attribute_vocab_json, 'r') as f_in:
+            attribute_vocab = json.load(f_in)
+
+        attr_list = []
+        for key in attribute_vocab.keys():
+            attr_list.append(key)
+    else:
+        # B: make a dummy data
+        api_calls = data
 
     predicts = []
     targets = []
@@ -59,26 +78,45 @@ def convert_json_to_flattened(
             ]
         }
         if use_multimodal_contexts:
-            special_tokens = {
-                "eos_token": END_OF_SENTENCE,
-                "additional_special_tokens": [
-                    END_OF_BELIEF,
-                    START_OF_MULTIMODAL_CONTEXTS,
-                    END_OF_MULTIMODAL_CONTEXTS
-                ]
-            }
-
+            if task1:
+                special_tokens = {
+                    "eos_token": END_OF_SENTENCE,
+                    "additional_special_tokens": [
+                        END_OF_BELIEF,
+                        START_OF_MULTIMODAL_CONTEXTS,
+                        END_OF_MULTIMODAL_CONTEXTS,
+                        END_OF_RESPONSE
+                    ]
+                }
+            else:
+                special_tokens = {
+                    "eos_token": END_OF_SENTENCE,
+                    "additional_special_tokens": [
+                        END_OF_BELIEF,
+                        START_OF_MULTIMODAL_CONTEXTS,
+                        END_OF_MULTIMODAL_CONTEXTS
+                    ]
+                }
+            
     if output_path_special_tokens != '':
         # If a new output path for special tokens is given,
         # we track new OOVs
         oov = set()
 
-    for _, dialog in enumerate(data):
+        # B : track api, attribute oov
+        if task1:
+            for key in attribute_vocab.keys():
+                oov.add(key)
+                for val in attribute_vocab[key]:
+                    sp = val.split(' ')
+                    for v in sp:
+                        oov.add(v)
+    
+    for dialog, api_call in zip(data, api_calls):
 
         prev_asst_uttr = None
         lst_context = []
-
-        for turn in dialog[FIELDNAME_DIALOG]:
+        for i, turn in enumerate(dialog[FIELDNAME_DIALOG]):
             user_uttr = turn[FIELDNAME_USER_UTTR].replace('\n', ' ').strip()
             user_belief = turn[FIELDNAME_BELIEF_STATE]
             asst_uttr = turn[FIELDNAME_ASST_UTTR].replace('\n', ' ').strip()
@@ -130,14 +168,71 @@ def convert_json_to_flattened(
             predicts.append(predict)
 
             # Format the main output
-            target = TEMPLATE_TARGET.format(
-                context=context,
-                START_BELIEF_STATE=START_BELIEF_STATE,
-                belief_state=str_belief_state,
-                END_OF_BELIEF=END_OF_BELIEF,
-                response=asst_uttr,
-                END_OF_SENTENCE=END_OF_SENTENCE
-            )
+            if task1 :
+                # B : preprocess for task1 
+                # if api[i] != None:
+                if domain == 'furniture':
+                    action_supervision = api_call['actions'][i]['action_supervision']
+                    action_args = []
+                    if action_supervision['api'] == None:
+                         str_api_per_frame = "{action} [ {attr} ]".format(
+                            action = 'None',
+                            attr = ""
+                        )
+
+                    elif action_supervision['args'] == None:
+                        str_api_per_frame = "{action} [ {attr} ]".format(
+                            action = action_supervision['api'],
+                            attr = ""
+                        )
+                         
+                    else:
+                        for key in action_supervision['args'].keys():
+                            if key in attr_list:
+                                action_args.append([key, action_supervision['args'][key]])
+
+                        str_api_per_frame = "{action} [ {attr} ]".format(
+                            action = action_supervision['api'],
+                            attr = ', '.join(
+                                [f'{attr[0]} = {attr[1]}'
+                                    for attr in action_args])
+                        )
+                else:
+                    action_supervision = api_call['actions'][i]
+                    action_args = []
+                    if action_supervision['action'] == 'None' or action_supervision['action'] == 'AddToCart':
+                         str_api_per_frame = "{action} [ {attr} ]".format(
+                            action = 'None',
+                            attr = ""
+                        )
+                         
+                    else:
+                         str_api_per_frame = "{action} [ {attr} ]".format(
+                            action = action_supervision['action'],
+                            attr = ', '.join(
+                                [f'{attr}'
+                                    for attr in action_supervision['action_supervision']['attributes']])
+                        )
+
+                target = TEMPLATE_TARGET_TASK1.format(
+                    context=context,
+                    START_BELIEF_STATE=START_BELIEF_STATE,
+                    belief_state=str_belief_state,
+                    END_OF_BELIEF=END_OF_BELIEF,
+                    response=asst_uttr,
+                    END_OF_RESPONSE=END_OF_RESPONSE,
+                    api=str_api_per_frame, 
+                    END_OF_SENTENCE=END_OF_SENTENCE
+                )
+            else:
+                target = TEMPLATE_TARGET.format(
+                    context=context,
+                    START_BELIEF_STATE=START_BELIEF_STATE,
+                    belief_state=str_belief_state,
+                    END_OF_BELIEF=END_OF_BELIEF,
+                    response=asst_uttr,
+                    END_OF_SENTENCE=END_OF_SENTENCE
+                )
             targets.append(target)
 
     # Create a directory if it does not exist
@@ -221,8 +316,8 @@ def parse_flattened_result(to_parse):
                 }, ...  # End of a frame
             ]  # End of a dialog
     """
-    dialog_act_regex = re.compile('([\w:?.?]*)  *\[([^\]]*)\]')
-    slot_regex = re.compile('([A-Za-z0-9_.-:]*)  *= ([^,]*)')
+    dialog_act_regex = re.compile(r'([\w:?.?]*)  *\[([^\]]*)\]')
+    slot_regex = re.compile(r'([A-Za-z0-9_.-:]*)  *= ([^,]*)')
 
     belief = []
 
