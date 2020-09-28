@@ -29,9 +29,13 @@ $ scripts/belief_inference_simmc_model.sh
 
 ### (5) Ensemble models and Generate submission files
 ex) --model_types model1 model2 model3 ...
+
     --best_gen model1
+    
 --model_type inputs are models that used for action prediction and retrieval prediction.
+
 --best_gen inputs is a model that used for response generation
+
 
 ```
 $ python ensemble_code/furniture_ensemble.py --model_types HAE_R300 HRE_R300_MAG --best_gen HAE_R300
