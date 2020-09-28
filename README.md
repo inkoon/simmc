@@ -4,7 +4,7 @@
 task1, task2 base directory: simmc/mm_action_prediction/
 
 ### (1) Generate predicted belief state
-# Running model for Task3 and Task2
+#### Running model for Task3 and Task2
 
 1. **Preprocess** the datasets to reformat the data for GPT-2 input.
 
