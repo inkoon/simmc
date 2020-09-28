@@ -30,7 +30,7 @@ $ scripts/belief_inference_simmc_model.sh
 ### (5) Ensemble models and Generate submission files
 ex) --model_types model1 model2 model3 ...
 
-    --best_gen model1
+--best_gen model1
     
 --model_type inputs are models that used for action prediction and retrieval prediction.
 
