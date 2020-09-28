@@ -6,8 +6,8 @@ if [ $# -lt 2 ];then
     exit 1
 fi
 
-#DOMAIN="furniture"
-DOMAIN="fashion"
+DOMAIN="furniture"
+# DOMAIN="fashion"
 ROOT="../data/belief_simmc_${DOMAIN}/"
 DETAILS=$1
 GPU_ID=$2
@@ -59,7 +59,7 @@ COMMON_FLAGS="
     --save_every_epoch=3 --word_embed_size=300 --num_layers=2 \
     --hidden_size=768 \
     --use_multimodal_state --use_action_output --use_bahdanau_attention \
-    --skip_bleu_evaluation --domain=${DOMAIN}"
+    --skip_bleu_evaluation --save_prudently --domain=${DOMAIN}"
 
 
 # History-agnostic model.

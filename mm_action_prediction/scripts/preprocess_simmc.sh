@@ -1,8 +1,8 @@
 #!/bin/bash
 
 
-# DOMAIN="furniture"
-DOMAIN="fashion"
+DOMAIN="furniture"
+# DOMAIN="fashion"
 
 ROOT="../data/simmc_${DOMAIN}/"
 
@@ -11,6 +11,7 @@ TRAIN_JSON_FILE="${ROOT}${DOMAIN}_train_dials.json"
 TRAINDEV_JSON_FILE="${ROOT}${DOMAIN}_traindev_dials.json"
 DEV_JSON_FILE="${ROOT}${DOMAIN}_dev_dials.json"
 DEVTEST_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials.json"
+TESTSTD_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials_teststd_format_public.json"
 
 
 if [ "$DOMAIN" == "furniture" ]; then
@@ -31,6 +32,7 @@ ATTR_VOCAB_FILE="${ROOT}${DOMAIN}_attribute_vocabulary.json"
 
 # Step 1: Extract assistant API.
 INPUT_FILES="${TRAIN_JSON_FILE} ${TRAINDEV_JSON_FILE} ${DEV_JSON_FILE} ${DEVTEST_JSON_FILE}"
+# INPUT_FILES="${TESTSTD_JSON_FILE}"
 # If statement.
 if [ "$DOMAIN" == "furniture" ]; then
     python tools/extract_actions.py \

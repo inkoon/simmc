@@ -15,6 +15,7 @@ ROOT="../data/simmc_${DOMAIN}/"
 # Input files.
 DEV_JSON_FILE="${ROOT}${DOMAIN}_dev_dials.json"
 DEVTEST_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials.json"
+TESTSTD_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials_teststd_format_public.json"
 
 MODEL_LIST="
 HRE_G300_MAG
@@ -34,6 +35,7 @@ do
     # CHECKPOINT_PATH="outputs/tmp/HAE_R300_lr3_b32_la3_0924_11:50/checkpoints/"
 
     # Evaluate a trained model checkpoint.
+        # --eval_data_path=${TESTSTD_JSON_FILE/.json/_mm_inputs.npy} \
     python -u inference_simmc_agent.py \
         --eval_data_path=${DEVTEST_JSON_FILE/.json/_mm_inputs.npy} \
         --task1_checkpoint="${CHECKPOINT_PATH}epoch_best_task1.tar" \

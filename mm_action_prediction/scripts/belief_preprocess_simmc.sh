@@ -9,10 +9,12 @@ TRAIN_JSON_FILE="${ROOT}${DOMAIN}_train_dials.json"
 TRAINDEV_JSON_FILE="${ROOT}${DOMAIN}_traindev_dials.json"
 DEV_JSON_FILE="${ROOT}${DOMAIN}_dev_dials.json"
 DEVTEST_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials.json"
+TESTSTD_JSON_FILE="${ROOT}${DOMAIN}_teststd_dials.json"
 # Task 3 fusion
 TRAIN_BELIEF_FILE="${ROOT}${DOMAIN}_train_belief_state.json"
 DEV_BELIEF_FILE="${ROOT}${DOMAIN}_dev_belief_state.json"
 DEVTEST_BELIEF_FILE="${ROOT}${DOMAIN}_devtest_belief_state.json"
+TESTSTD_BELIEF_FILE="${ROOT}${DOMAIN}_teststd_belief_state.json"
 
 if [ "$DOMAIN" == "furniture" ]; then
     METADATA_FILE="${ROOT}furniture_metadata.csv"
@@ -32,6 +34,7 @@ ATTR_VOCAB_FILE="${ROOT}${DOMAIN}_attribute_vocabulary.json"
 
 # Step 1: Extract assistant API.
 INPUT_FILES="${TRAIN_JSON_FILE} ${TRAINDEV_JSON_FILE} ${DEV_JSON_FILE} ${DEVTEST_JSON_FILE}"
+# INPUT_FILES="${TESTSTD_JSON_FILE}"
 # If statement.
 if [ "$DOMAIN" == "furniture" ]; then
     python tools/extract_actions.py \
