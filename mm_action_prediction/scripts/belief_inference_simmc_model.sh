@@ -7,8 +7,8 @@ if [ $# -lt 1 ];then
 fi
 
 GPU_ID=$1
-# DOMAIN="furniture"
-DOMAIN="fashion"
+DOMAIN="furniture"
+# DOMAIN="fashion"
 ROOT="../data/belief_simmc_${DOMAIN}/"
 
 
