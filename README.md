@@ -13,18 +13,18 @@ $ scripts/
 
 preprocess dataset with predicted belief state
 ```
-$ scripts/belief_preprocess_simmc.sh
+$ scripts/test_belief_preprocess_simmc.sh
 ```
 
 ### (3) Train the model
 ```
-$ scripts/belief_simmc_model.sh
-$ scripts/belief_simmc_all_model.sh
+$ scripts/test_belief_simmc_model.sh
+$ scripts/test_belief_simmc_all_model.sh
 ```
 
 ### (4) Inference the model
 ```
-$ scripts/belief_inference_simmc_model.sh
+$ scripts/test_belief_inference_simmc_model.sh
 ```
 
 ### (5) Ensemble models and Generate submission files
