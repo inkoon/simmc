@@ -141,10 +141,10 @@ def main(Model_types, best_gen_model_type):
         return base_model
 
     def sum_cand_scores(base_model, add_model):
-        for cs_i, cand_score in enumerate(add_model["cadidate_scores"]):
+        for cs_i, cand_score in enumerate(add_model["candidate_scores"]):
             for c_i, cand in enumerate(cand_score["candidate_scores"]):
                 for i, c in enumerate(cand["scores"]):
-                    base_model["cadidate_scores"][cs_i]["candidate_scores"][c_i]["scores"][i] += c
+                    base_model["candidate_scores"][cs_i]["candidate_scores"][c_i]["scores"][i] += c
         return base_model            
 
     def mean_action_logits(base_model, total_num):
@@ -181,7 +181,7 @@ def main(Model_types, best_gen_model_type):
     #generation은 bleu제일 높은 모델로, voting방법 생각 좀 해봐야함
     matches["model_response"] = best_gen_model["model_responses"]
     #ret
-    matches["candidate_scores"] = ret_model[0]["cadidate_scores"]
+    matches["candidate_scores"] = ret_model[0]["candidate_scores"]
 
     
     # Compute BLEU score.

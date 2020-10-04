@@ -51,9 +51,10 @@ def main(args):
 
         # Save the results.
         save_path = saved_args[f"{task}_checkpoint"].replace("epoch_best_", "").replace(".tar", "_predict.json")
-        print("Saving results: {}".format(save_path))
-        with open(save_path, "w") as file_id:
-            json.dump(eval_outputs, file_id)
+        if args["inference"]:
+            print("Saving results: {}".format(save_path))
+            with open(save_path, "w") as file_id:
+                json.dump(eval_outputs, file_id)
 
 
 def evaluate_agent(wizard, val_loader, args):
@@ -239,6 +240,9 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--pred_save_path", default=None, help="Paht to save predicted result"
+    )
+    parser.add_argument(
+        "--inference", default=None, help="Do infernece"
     )
     try:
         args = vars(parser.parse_args())
