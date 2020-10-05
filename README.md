@@ -87,8 +87,10 @@ $ ./scripts/inference_simmc_model.sh
 ex) --model_types model1 model2 model3 ...
 
 --best_gen model1
+
+--ret_model_types model1 model2 model3 ...
     
---model_type inputs are models that used for action prediction and retrieval prediction.
+--model_types and --ret_model_types inputs are models that used for action prediction and retrieval prediction.
 
 --best_gen inputs is a model that used for response generation
 
