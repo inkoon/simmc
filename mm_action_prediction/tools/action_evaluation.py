@@ -5,12 +5,12 @@ Author(s): Satwik Kottur
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from absl import app, flags
 import argparse
 import collections
 import json
 
 import numpy as np
+
 
 
 IGNORE_ATTRIBUTES = [
@@ -113,7 +113,7 @@ def evaluate_action_prediction(gt_actions, model_actions, single_round_eval=Fals
         "action_accuracy": np.mean(matches["action"]),
         "action_perplexity": np.exp(-1 * np.mean(matches["perplexity"])),
         "attribute_accuracy": np.mean(matches["attributes"]),
-        "confusion_matrix": matrix.astype(int)
+        "confusion_matrix": matrix
     }
 
 
