@@ -141,6 +141,10 @@ def main(Model_types, best_gen_model_type, ret_model_types):
         return base_model
 
     def sum_cand_scores(base_model, add_model):
+        if "cadidate_scores" in add_model.keys():
+            add_model["candidate_scores"] = add_model["cadidate_scores"]
+        if "cadidate_scores" in base_model.keys():
+            base_model["candidate_scores"] = base_model["cadidate_scores"]
         for cs_i, cand_score in enumerate(add_model["candidate_scores"]):
             for c_i, cand in enumerate(cand_score["candidate_scores"]):
                 for i, c in enumerate(cand["scores"]):
@@ -169,7 +173,7 @@ def main(Model_types, best_gen_model_type, ret_model_types):
     mean_action_logits(action_model[0], len(Model_types))
 
     #retrieval
-    for j in range(1, len(Model_types)):
+    for i in range(1, len(ret_model_types)):
         ret_model[0] = sum_cand_scores(ret_model[0], ret_model[i])
 
 
