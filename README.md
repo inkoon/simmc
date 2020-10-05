@@ -96,8 +96,8 @@ ex) --model_types model1 model2 model3 ...
 
 
 ```
-$ python ensemble_code/furniture_ensemble.py --model_types HAE_R300 HRE_R300_MAG --best_gen HAE_R300 --ret_model_types MN_R300 MN_R300_MAG
-$ python ensemble_code/fashion_ensemble.py --model_types T_HAE_G300_TD MN_R300_MAG_TD --best_gen MN_G300_TD --ret_model_types MN_G300_TD HAE_R300_MAG_TD
+$ python ensemble_code/furniture_ensemble.py --model_types HRE_R300_S HRE_R300_MAG_S_TD MN_G300_MAG_S HAE_G300_MAG_H768_S HAE_G300_MMI_H768_S --best_gen HRE_R300_S --ret_model_types MN_R300_gpt2S_TD HAE_R300_MAG_gpt2S HRE_R300_MAG_S_TD MN_G300_MAG_H768_S HAE_G300_MMI_H768_S
+$ python ensemble_code/fashion_ensemble.py --model_types HRE_R300_S_TD HAE_R300_MAG_gpt2S_TD MN_G300_MAG_S HAE_G300_MAG_H768_S HAE_G300_MMI_H768_S --best_gen MN_R300_S_TD --ret_model_types HAE_R300_MAG_gpt2S HAE_R300_MAG_S_TD HAE_R300_MAG_H768_S HRE_G300_MAG_H768_S MN_G300_MAG_H768_S
 ```
 
 
