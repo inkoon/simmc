@@ -100,3 +100,13 @@ $ python ensemble_code/furniture_ensemble.py --model_types HAE_R300 HRE_R300_MAG
 $ python ensemble_code/fashion_ensemble.py --model_types T_HAE_G300_TD MN_R300_MAG_TD --best_gen MN_G300_TD --ret_model_types MN_G300_TD HAE_R300_MAG_TD
 ```
 
+
+## Notes
+#### Devtest Results
+Devtest results for task1 & task2 will be generated in "simmc/mm_action_prediction/" .
+
+You can evaluate with provided codes.
+#### Model parameters
+We have all model parameters for generating devtest and teststd result. (trained with our entry code before Sep 28th)
+
+If you need them, please contact us via email (md98765@naver.com)
