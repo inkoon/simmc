@@ -12,19 +12,18 @@ import tools.retrieval_evaluation as rre
 ###fashion ensemble
 
 #model predictions file
-def main(Model_types, best_gen_model_type):
-    Tasks = ['task1', 'task2_g', 'task2_r']
+def main(Model_types, best_gen_model_type, ret_model_types):
+    #Tasks = ['task1', 'task2_g', 'task2_r']
     #Model_types = ['T_HAE_G300_TD', 'MN_R300_MAG_TD', 'MN_G300_TD'] 
 
     action_model = []
     ret_model = []
 
-    for task in Tasks:
-        for model in Model_types:
-            if task == "task1":
-                action_model.append(json.load(open(f"./outputs/fashion/{model}/checkpoints/{task}_predict.json", "r")))
-            elif task == "task2_r":
-                ret_model.append(json.load(open(f"./outputs/fashion/{model}/checkpoints/{task}_predict.json", "r")))
+
+    for model in Model_types:
+        action_model.append(json.load(open(f"./outputs/fashion/{model}/checkpoints/task1_predict.json", "r")))
+    for r_model in ret_model_types:
+        ret_model.append(json.load(open(f"./outputs/fashion/{model}/checkpoints/task2_r_predict.json", "r")))
     
     best_gen_model = json.load(open(f"./outputs/fashion/{best_gen_model_type}/checkpoints/task2_g_predict.json", "r"))        
     """
@@ -171,13 +170,15 @@ def get_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_types', '-m', nargs='+' ,help='Example) HAE_R300', dest='modelname')
     parser.add_argument('--best_gen', '-b', help='Example) HAE_R300', dest='bestgen')
+    parser.add_argument('--ret_model_types', '-r', nargs='+', help='Example) HAE_R300_MAG', dest='ret_model')
 
     Model_types = parser.parse_args().modelname
     best_gen_model_type = parser.parse_args().bestgen
+    ret_model_types = parser.parse_args().ret_model
 
-    return Model_types, best_gen_model_type
+    return Model_types, best_gen_model_type, ret_model_types
 
 if __name__ == '__main__':
-    Model_types, best_gen_model_type = get_arguments()
-    main(Model_types, best_gen_model_type)
+    Model_types, best_gen_model_type, ret_model_types = get_arguments()
+    main(Model_types, best_gen_model_type, ret_model_types)
 
