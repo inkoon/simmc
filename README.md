@@ -3,6 +3,9 @@
 ## Model Instructions
 task1, task2 base directory: simmc/mm_action_prediction/
 
+#### Brief Summary
+will be added
+
 ## (1) Generate predicted belief state
 ### Installation
 Install the required Python packages:
