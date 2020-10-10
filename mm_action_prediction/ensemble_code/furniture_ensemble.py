@@ -15,18 +15,17 @@ import tools.retrieval_evaluation as rre
 #model predictions file
 def main(Model_types, best_gen_model_type, ret_model_types):
     #Tasks = ['task1', 'task2_r']
-    #Model_types = ['HAE_R300', 'HRE_R300_MAG', 'HRE_R300_MMI', 'MN_R300_MAG', 'MN_R300_MMI'] 
+    #Model_types = ['HAE_R300', 'HRE_R300_MAG', 'HRE_R300_MMI', 'MN_R300_MAG', 'MN_R300_MMI']
     #best_gen_model_type = 'HRE_R300'
 
     action_model = []
     ret_model = []
 
-
     for model in Model_types:
         action_model.append(json.load(open(f"./outputs/furniture/{model}/checkpoints/task1_predict.json", "r")))
 
     for r_model in ret_model_types:
-        ret_model.append(json.load(open(f"./outputs/furniture/{model}/checkpoints/task2_r_predict.json", "r")))
+        ret_model.append(json.load(open(f"./outputs/furniture/{r_model}/checkpoints/task2_r_predict.json", "r")))
 
     best_gen_model = json.load(open(f"./outputs/furniture/{best_gen_model_type}/checkpoints/task2_g_predict.json", "r"))
 
@@ -55,11 +54,11 @@ def main(Model_types, best_gen_model_type, ret_model_types):
                 base_model["model_actions"][a_i]["predictions"][p_i]["action_log_prob"]["NavigateCarousel"] += add_pre["NavigateCarousel"]
                 base_model["model_actions"][a_i]["predictions"][p_i]["action_log_prob"]["AddToCart"] += add_pre["AddToCart"]
                 base_model["model_actions"][a_i]["predictions"][p_i]["action_log_prob"]["None"] += add_pre["None"]
-                
+
                 if action_flag == True:
                     ac_dict = base_model["model_actions"][a_i]["predictions"][p_i]["action_log_prob"]
                     base_model["model_actions"][a_i]["predictions"][p_i]["action"]=str(max(ac_dict.keys(), key=(lambda k:ac_dict[k])))
-                
+
                 attribute_list = action_att_dict[base_model["model_actions"][a_i]["predictions"][p_i]["action"]]
                 new_att_dict = {}
                 for att in attribute_list:
@@ -136,7 +135,7 @@ def main(Model_types, best_gen_model_type, ret_model_types):
                             new_att_dict["navigate_direction"] = str(max(at_temp.keys(), key=(lambda k: at_temp[k])))
                 if action_flag == True:
                     base_model["model_actions"][a_i]["predictions"][p_i]["attributes"] = new_att_dict
-                
+
 
         return base_model
 
@@ -149,7 +148,7 @@ def main(Model_types, best_gen_model_type, ret_model_types):
             for c_i, cand in enumerate(cand_score["candidate_scores"]):
                 for i, c in enumerate(cand["scores"]):
                     base_model["candidate_scores"][cs_i]["candidate_scores"][c_i]["scores"][i] += c
-        return base_model            
+        return base_model
 
     def mean_action_logits(base_model, total_num):
         for a_i, action in enumerate(base_model["model_actions"]):
@@ -172,6 +171,8 @@ def main(Model_types, best_gen_model_type, ret_model_types):
 
     mean_action_logits(action_model[0], len(Model_types))
 
+    if "cadidate_scores" in ret_model[0].keys():
+        ret_model[0]["candidate_scores"] = ret_model[0]["cadidate_scores"]
     #retrieval
     for i in range(1, len(ret_model_types)):
         ret_model[0] = sum_cand_scores(ret_model[0], ret_model[i])
@@ -187,7 +188,7 @@ def main(Model_types, best_gen_model_type, ret_model_types):
     #ret
     matches["candidate_scores"] = ret_model[0]["candidate_scores"]
 
-    
+
     # Compute BLEU score.
     model_responses = [jj for jj in matches["model_response"]]
     #bleu_score = re.evaluate_response_generation(gt_responses_file, model_responses)
