@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DOMAIN="furniture"
-#DOMAIN="fashion"
+# DOMAIN="fashion"
 ROOT="../data/belief_simmc_${DOMAIN}/"
 
 # Input files.
@@ -33,8 +33,7 @@ ATTR_VOCAB_FILE="${ROOT}${DOMAIN}_attribute_vocabulary.json"
 
 
 # Step 1: Extract assistant API.
-INPUT_FILES="${TRAIN_JSON_FILE} ${TRAINDEV_JSON_FILE} ${DEV_JSON_FILE} ${DEVTEST_JSON_FILE}"
-# INPUT_FILES="${TESTSTD_JSON_FILE}"
+INPUT_FILES="${TRAIN_JSON_FILE} ${TRAINDEV_JSON_FILE} ${DEV_JSON_FILE} ${DEVTEST_JSON_FILE} ${TESTSTD_JSON_FILE}"
 # If statement.
 if [ "$DOMAIN" == "furniture" ]; then
     python tools/extract_actions.py \
@@ -57,7 +56,7 @@ python tools/belief_extract_vocabulary.py \
     --train_json_path="${TRAIN_JSON_FILE}" \
     --vocab_save_path="${VOCAB_FILE}" \
     --threshold_count=5 \
-    --task3_fusion_path="${TRAIN_BELIEF_FILE}" 
+    --task3_fusion_path="${TRAIN_BELIEF_FILE}"
 
 
 # Step 3: Read and embed shopping assets.
@@ -76,7 +75,7 @@ fi
 
 
 # Step 4: Convert all the splits into npy files for dataloader.
-SPLIT_JSON_FILES=("${TRAIN_JSON_FILE}" "${TRAINDEV_JSON_FILE}" "${DEV_JSON_FILE}" "${DEVTEST_JSON_FILE}")
+SPLIT_JSON_FILES=("${TRAIN_JSON_FILE}" "${DEV_JSON_FILE}" "${TRAINDEV_JSON_FILE}" "${DEVTEST_JSON_FILE}" "${TESTSTD_JSON_FILE}")
 for SPLIT_JSON_FILE in "${SPLIT_JSON_FILES[@]}" ; do
     python tools/belief_build_multimodal_inputs.py \
         --json_path="${SPLIT_JSON_FILE}" \

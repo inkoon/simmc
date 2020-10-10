@@ -15,36 +15,24 @@ ROOT="../data/belief_simmc_${DOMAIN}/"
 # Input files.
 DEV_JSON_FILE="${ROOT}${DOMAIN}_dev_dials.json"
 DEVTEST_JSON_FILE="${ROOT}${DOMAIN}_devtest_dials.json"
+TESTSTD_JSON_FILE="${ROOT}${DOMAIN}_teststd_dials.json"
 
-MODEL_LIST="
-HAE_R300_H768_S
-"
+MODEL="HRE_R300_S_TD"
 
-# MN_G300_MAG
-# HAE_R300
-# HRE_R300
-# HRE_R300_MMI
-# MN_R300_MMI
-# HRE_R300_MAG
-# MN_R300_MAG
+CHECKPOINT_PATH="outputs/${DOMAIN}/${MODEL}/checkpoints/"
 
-for MODEL in $MODEL_LIST
-do
-    CHECKPOINT_PATH="outputs/${DOMAIN}/${MODEL}/checkpoints/"
-    # CHECKPOINT_PATH="outputs/tmp/HAE_R300_lr3_b32_la3_0924_11:50/checkpoints/"
-
-    # Evaluate a trained model checkpoint.
-    python -u inference_simmc_agent.py \
-        --eval_data_path=${DEVTEST_JSON_FILE/.json/_mm_inputs.npy} \
-        --task1_checkpoint="${CHECKPOINT_PATH}epoch_best_task1.tar" \
-        --task2_g_checkpoint="${CHECKPOINT_PATH}epoch_best_task2_g.tar" \
-        --task2_r_checkpoint="${CHECKPOINT_PATH}epoch_best_task2_r.tar" \
-        --gpu_id=$GPU_ID \
-        --gate_type="none" \
-        --embedding_type="random"\
-        --use_belief_state \
-        --use_task3_belief_state \
-        --batch_size=50 \
-        --domain="$DOMAIN" \
-        --pred_save_path="$CHECKPOINT_PATH"
-done
+# Evaluate a trained model checkpoint.
+python -u inference_simmc_agent.py \
+    --eval_data_path=${TESTSTD_JSON_FILE/.json/_mm_inputs.npy} \
+    --task1_checkpoint="${CHECKPOINT_PATH}epoch_best_task1.tar" \
+    --task2_g_checkpoint="${CHECKPOINT_PATH}epoch_best_task2_g.tar" \
+    --task2_r_checkpoint="${CHECKPOINT_PATH}epoch_best_task2_r.tar" \
+    --gpu_id=$GPU_ID \
+    --embedding_type="random"\
+    --gate_type="none" \
+    --use_belief_state \
+    --use_task3_belief_state \
+    --batch_size=50 \
+    --domain="$DOMAIN" \
+    --pred_save_path="$CHECKPOINT_PATH" \
+    --inference
