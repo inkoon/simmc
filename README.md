@@ -110,10 +110,14 @@ $ python ensemble_code/fashion_ensemble.py --model_types HRE_R300_S_TD HAE_R300_
 
 ## Notes
 #### Teststd Results
-Teststd results for task1 & task2 were in "simmc/mm_action_prediction/".
+Teststd results for task1 & task2 were in "simmc/mm_action_prediction/teststd".
+
+#### Devtest Results
+Devtest results for task1 & task2 were in "simmc/mm_action_prediction/devtest".
 
 You can evaluate with provided codes.
+
 #### Model parameters
 We have all model parameters for generating devtest and teststd result. (trained with our entry code before Sep 28th)
 
-If you need them, please contact us via email (md98765@naver.com)
+If you need the model parameters or have any other issues, please contact us via email. (md98765@naver.com)
