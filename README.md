@@ -4,7 +4,11 @@
 task1, task2 base directory: simmc/mm_action_prediction/
 
 #### Brief Summary
-will be added
+We have built an end-to-end encoder-decoder model for sub-task1 & sub-task2.
+
+Encoder is composed of three components: Utterance & History Encoder, Multi-Modal Fusion Gate, Belief State Embedder. Using HAE, HRE, MN Encoder from baseline, and two different types of embeddings (random, glove). Adding two more multi-modal fusion gate MAG (Wasifur Rahman et al., 2019) and MMI-module (Jianfei Yu et al., 2020). Further, our model use predicted belief-state from sub-task3.
+
+We trained various types of models and generated final results by ensemble.
 
 ## (1) Generate predicted belief state
 ### Installation
@@ -105,8 +109,8 @@ $ python ensemble_code/fashion_ensemble.py --model_types HRE_R300_S_TD HAE_R300_
 
 
 ## Notes
-#### Devtest Results
-Devtest results for task1 & task2 will be generated in "simmc/mm_action_prediction/" .
+#### Teststd Results
+Teststd results for task1 & task2 were in "simmc/mm_action_prediction/".
 
 You can evaluate with provided codes.
 #### Model parameters
