@@ -21,11 +21,11 @@ def main(Model_types, best_gen_model_type, ret_model_types):
 
 
     for model in Model_types:
-        action_model.append(json.load(open(f"./outputs/fashion/{model}/checkpoints/task1_predict.json", "r")))
+        action_model.append(json.load(open(f"./outputs/fashion/{model}/checkpoints/devtest/task1_predict.json", "r")))
     for r_model in ret_model_types:
-        ret_model.append(json.load(open(f"./outputs/fashion/{r_model}/checkpoints/task2_r_predict.json", "r")))
+        ret_model.append(json.load(open(f"./outputs/fashion/{r_model}/checkpoints/devtest/task2_r_predict.json", "r")))
 
-    best_gen_model = json.load(open(f"./outputs/fashion/{best_gen_model_type}/checkpoints/task2_g_predict.json", "r"))
+    best_gen_model = json.load(open(f"./outputs/fashion/{best_gen_model_type}/checkpoints/devtest/task2_g_predict.json", "r"))
     """
     #action answer file
     gt_action = open("../data/simmc_fashion/fashion_devtest_dials_api_calls.json", "r")
