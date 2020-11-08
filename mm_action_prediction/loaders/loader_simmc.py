@@ -156,7 +156,6 @@ class DataloaderSIMMC(loaders.LoaderParent):
             "sample_ids": sample_ids,
         }
 
-        batch["ind2word"] = self.raw_data["ind2word"]
         batch["dialog_len"] = self.raw_data["dialog_len"][sample_ids]
         batch["dialog_id"] = self.raw_data["dialog_id"][sample_ids]
         max_dialog_len = max(batch["dialog_len"])
