@@ -124,18 +124,21 @@ def evaluate_agent(wizard, val_loader, args):
     print_str = (
         "\nEvaluation\n\tLoss: {:.2f}\n\t"
         "Perplexity: {:.2f}\n\tBLEU: {:.3f}\n\t"
-        "Action: {:.2f}\n\t"
-        "Action Perplexity: {:.2f}\n\t"
-        "Action Attribute Accuracy: {:.2f}"
+        "Action: {:.4f}\n\t"
+        # "Action Perplexity: {:.2f}\n\t"
+        "Action Perplexity: {:.4f}\n\t"
+        "Action Attribute Accuracy: {:.4f}"
     )
     print(
         print_str.format(
             avg_loss_eval,
             math.exp(avg_loss_eval),
             bleu_score,
-            100 * action_metrics["action_accuracy"],
+            # 100 * action_metrics["action_accuracy"],
+            action_metrics["action_accuracy"],
             action_metrics["action_perplexity"],
-            100 * action_metrics["attribute_accuracy"]
+            # 100 * action_metrics["attribute_accuracy"]
+            action_metrics["attribute_accuracy"]
         )
     )
     # Save the results to a file.
@@ -236,9 +239,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--use_task3_belief_state",
-        type=bool,
         action='store_true',
-        default=True,
+        default=False,
         help="use to inference"
     )
     try:
